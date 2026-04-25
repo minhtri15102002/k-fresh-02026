@@ -37,4 +37,9 @@ export class Constants {
   static readonly LOGIN_PASSWORD = process.env.LOGIN_PASSWORD || '';
   static readonly USERS_JSON_FILE = './data/users.json';
   static readonly PRODUCT_JSON_FILE = './data/product.json';
+  static readonly LOAD_STATE = {
+    NETWORK_IDLE: "networkidle",
+    DOM_CONTENT_LOADED: "domcontentloaded",
+    LOAD: "load",
+  } as const;
 }
