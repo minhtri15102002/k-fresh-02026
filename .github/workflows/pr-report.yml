@@ -3,7 +3,7 @@ name: Auto Generate PR Report
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-
+    branches: [main, master]
 jobs:
   generate-report:
     runs-on: ubuntu-latest

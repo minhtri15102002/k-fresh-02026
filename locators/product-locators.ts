@@ -8,7 +8,10 @@ export class ProductLocators extends CommonLocators {
   }
 
   // Product detail locators
-  lnkProduct!: Locator;
+  getProductLink(productName: string): Locator {
+    return this.page.locator(`a:has-text("${productName}")`);
+  }
+
   btnSearch!: Locator;
   lblProductTitle!: Locator;
   lblProductPrice!: Locator;
@@ -42,13 +45,11 @@ export class ProductLocators extends CommonLocators {
   btnCompareNotificationAction!: Locator;
 
   divSuccessAlert!: Locator;
-  searchInput!: Locator;
   firstProductImage!: Locator;
   btnBuyNow!: Locator;
   locatorInitialization(): void {
     super.locatorInitialization();
     this.divSuccessAlert = this.page.getByRole("alert");
-    this.searchInput = this.page.locator('//input[@name="search"]');
     this.firstProductImage = this.page
       .locator('//div[contains(@class, "product-layout")]//img')
       .first();
@@ -70,7 +71,9 @@ export class ProductLocators extends CommonLocators {
       )
       .first();
     this.divTabContent = this.page
-      .locator(`(//div[contains(@class, 'description') and contains(@class, 'text-collapsed')])[1]`)
+      .locator(
+        `(//div[contains(@class, 'description') and contains(@class, 'text-collapsed')])[1]`,
+      )
       .first();
     this.lnkBrand = this.page.locator('//li[.//span[text()="Brand:"]]//a');
     this.inputQuantity = this.page.locator('(//input[@name="quantity"])[2]');
@@ -112,10 +115,5 @@ export class ProductLocators extends CommonLocators {
     this.btnCompareNotificationAction = this.page.locator(
       "//div[@id='notification-box-top']//a[contains(.,'Product Compare')]",
     );
-  }
-
-  clickProductLink(productName: string) {
-    this.lnkProduct = this.page.locator(`a:has-text("${productName}")`).first();
-    return this.lnkProduct.click();
   }
 }

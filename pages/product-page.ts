@@ -4,8 +4,8 @@ import { CommonPage } from "./common-page";
 import { step } from "../utilities/logging";
 import { ProductLocators } from "../locators/product-locators";
 import { Product } from "../models/product";
-import { AssertHelper } from './assert-helper-page';
-
+import { AssertHelper } from "./assert-helper-page";
+import { Assertions } from "../utilities/assertions";
 
 export class ProductPage extends ProductLocators {
   commonPage: CommonPage;
@@ -17,19 +17,31 @@ export class ProductPage extends ProductLocators {
     this.assertHelper = new AssertHelper();
   }
 
+  /**
+   * Click Product Link
+   * @param productName The name of the product to click.
+   */
+  @step('Click product link')
+  async clickProductLink(productName: string): Promise<void> {
+    await this.commonPage.click(this.getProductLink(productName));
+  }
+
+  /**
+   * Click Add to Compare Button
+   * @param productName The name of the product to add to compare.
+   */
   @step("Click Add to Compare Button")
   async clickAddToCompareButton(productName: string): Promise<void> {
     await this.clickProductLink(productName);
     await this.commonPage.click(this.btnCompare);
   }
 
-
   @step("Verify compare notification box")
   async expectCompareNotificationBox(): Promise<void> {
     await test.step("Verify compare notification box", async () => {
       await this.assertHelper.assertElementVisible(this.boxCompareNotificationTop);
       await this.assertHelper.assertElementVisible(this.boxCompareNotificationContent);
-      await this.assertHelper.assertElementContainsText(this.boxCompareNotificationContent, /success|added to your product comparison/i);
+      await this.assertHelper.assertElementContainsText(this.boxCompareNotificationContent, Constants.REGEX.COMPARE_SUCCESS);
     });
   }
 
@@ -37,7 +49,6 @@ export class ProductPage extends ProductLocators {
    * Check product details on the product page and return a Product object with the details.
    * @returns A Product object containing the details of the product on the product page.
    */
-
   @step("Get Product Details")
   async openProductDetail(productName: string): Promise<void> {
     await test.step(`Open product detail: ${productName}`, async () => {
@@ -55,21 +66,19 @@ export class ProductPage extends ProductLocators {
       // Price should be visible and contain a currency symbol and a valid number format
       await this.assertHelper.assertElementVisible(this.lblProductPrice);
       await this.assertHelper.assertElementContainsText(this.lblProductPrice, "$");
-      await this.assertHelper.assertElementContainsText(this.lblProductPrice, /\d+\.\d{2}/i);
+      await this.assertHelper.assertElementContainsText(this.lblProductPrice, Constants.REGEX.PRICE_FORMAT);
     });
 
     await test.step("Verify stock status", async () => {
       // Stock status should be visible
       await this.assertHelper.assertElementVisible(this.lblStockStatus);
-      await this.assertHelper.assertElementContainsText(this.lblStockStatus, /in stock|out of stock|availability|available|unavailable/i);
-
-
+      await this.assertHelper.assertElementContainsText(this.lblStockStatus, Constants.REGEX.STOCK_STATUS);
     });
 
     await test.step("Verify main product image and description", async () => {
       // Main product image should be visible and have a valid src attribute
       await this.assertHelper.assertElementVisible(this.imgMainProduct);
-      await this.assertHelper.assertElementHasAttribute(this.imgMainProduct, "src", /.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i);
+      await this.assertHelper.assertElementHasAttribute(this.imgMainProduct, "src", Constants.REGEX.IMAGE_URL);
       const imageSrc = await this.imgMainProduct.getAttribute("src");
       expect(imageSrc).toBeTruthy();
     });
@@ -81,7 +90,7 @@ export class ProductPage extends ProductLocators {
     });
     await test.step("Verify description content", async () => {
       await this.assertHelper.assertElementVisible(this.divTabContent);
-      await this.assertHelper.assertElementContainsText(this.divTabContent, /\w+/);
+      await this.assertHelper.assertElementContainsText(this.divTabContent, Constants.REGEX.NON_EMPTY_TEXT);
     });
 
     await test.step("Verify Brand", async () => {
@@ -94,7 +103,6 @@ export class ProductPage extends ProductLocators {
    * Check Quantity counter functionality by incrementing and decrementing the quantity and verifying the value changes accordingly.
    * @param initialQuantity The initial quantity value before incrementing or decrementing.
    */
-
   @step("Check Quantity Counter Functionality")
   async checkQuantityCounterFunctionality(productName: string): Promise<void> {
     await this.clickProductLink(productName);
@@ -102,31 +110,25 @@ export class ProductPage extends ProductLocators {
       await this.assertHelper.assertElementVisible(this.inputQuantity);
       //check initial quantity is a valid number and greater than 0
       const quantity = await this.commonPage.getAttribute(this.inputQuantity, "value");
-      await this.assertHelper.assertNumberGreaterThanOrEqual(parseInt(quantity), 0);
+      await expect.soft(parseInt(quantity)).toBeGreaterThanOrEqual(1);
     });
   }
 
   @step("Increment and Decrement Quantity and Verify")
   async incrementDecrementQuantityAndVerify(productName: string): Promise<void> {
-    await test.step("Increment quantity and verify", async () => {
+    await test.step("Increment quantity", async () => {
       await this.assertHelper.assertElementVisible(this.btnIncreaseQuantity);
       const times = 3;
-      for (let i = 0; i < times; i++) {
-        await this.commonPage.click(this.btnIncreaseQuantity);
-        await this.page.waitForTimeout(500);
-      }
+      await this.commonPage.click(this.btnIncreaseQuantity, { clickCount: times });
     });
   }
 
   @step("Decrement Quantity and Verify")
   async decrementQuantityAndVerify(productName: string): Promise<void> {
-    await test.step("Decrement quantity and verify", async () => {
+    await test.step("Decrement quantity", async () => {
       await this.assertHelper.assertElementVisible(this.btnDecreaseQuantity);
       const times = 2;
-      for (let i = 0; i < times; i++) {
-        await this.commonPage.click(this.btnDecreaseQuantity);
-        await this.page.waitForTimeout(500);
-      }
+      await this.commonPage.click(this.btnDecreaseQuantity, { clickCount: times });
     });
   }
 
@@ -136,18 +138,17 @@ export class ProductPage extends ProductLocators {
       const finalValue = await this.inputQuantity.inputValue();
       // Final quantity should be initial value + 1 (3 increments - 2 decrements)
       const expectedValue = 1;
-      this.assertHelper.assertNumberGreaterThanOrEqual(parseInt(finalValue), expectedValue);
+      await expect.soft(parseInt(finalValue)).toBeGreaterThanOrEqual(expectedValue);
     });
   }
 
   @step("Fill Quantity Input Directly and Verify")
-  async fillQuantityInputDirectlyAndVerify(productName: string): Promise<void> {
+  async fillQuantityInputDirectlyAndVerify(quantity: string): Promise<void> {
     await test.step("Fill quantity input directly and verify", async () => {
-      const directValue = "5";
-      await this.commonPage.fill(this.inputQuantity, directValue);
+      await this.commonPage.fill(this.inputQuantity, quantity);
       await this.page.waitForTimeout(500);
       const finalValue = await this.inputQuantity.inputValue();
-      expect(finalValue).toBe(directValue);
+      expect(finalValue).toBe(quantity);
     });
   }
 
@@ -203,12 +204,6 @@ export class ProductPage extends ProductLocators {
   }
 
   /**
-   * Clicks the add to cart button to add the product to the cart
-   */
-  @step("Click Quick View Button")
-  async clickQuickViewButton(productName: string): Promise<void> { }
-
-  /**
    *  Clicks the "Inquiry" button for the specified product.
    * @param productName
    */
@@ -244,8 +239,8 @@ export class ProductPage extends ProductLocators {
 
   @step('Search and Navigate to Product Page via UI Navigation')
   async searchAndSelectProduct(product: Product): Promise<void> {
-    await this.commonPage.fill(this.searchInput.first(), product.name);
-    await this.commonPage.press(this.searchInput.first(), 'Enter');
+    await this.commonPage.fill(this.inputSearch.first(), product.name);
+    await this.commonPage.press(this.inputSearch.first(), 'Enter');
     await this.page.waitForLoadState('domcontentloaded');
     await this.commonPage.waitForVisible(this.firstProductImage);
     await this.commonPage.click(this.firstProductImage);
