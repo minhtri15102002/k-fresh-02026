@@ -1,5 +1,5 @@
-import { Locator, Page } from "@playwright/test";
-import { CommonLocators } from "./common-locators";
+import { Locator, Page } from '@playwright/test';
+import { CommonLocators } from './common-locators';
 
 export class ProductLocators extends CommonLocators {
   constructor(page: Page) {
@@ -49,7 +49,7 @@ export class ProductLocators extends CommonLocators {
   btnBuyNow!: Locator;
   locatorInitialization(): void {
     super.locatorInitialization();
-    this.divSuccessAlert = this.page.getByRole("alert");
+    this.divSuccessAlert = this.page.getByRole('alert');
     this.firstProductImage = this.page
       .locator('//div[contains(@class, "product-layout")]//img')
       .first();
@@ -57,10 +57,10 @@ export class ProductLocators extends CommonLocators {
     this.btnSearch = this.page
       .locator('(//input[@placeholder="Search For Products"])')
       .first();
-    this.lblProductTitle = this.page.locator("h1").first();
+    this.lblProductTitle = this.page.locator('h1').first();
     this.lblProductPrice = this.page.locator('//h3[@data-update="price"]');
     this.lblStockStatus = this.page.locator(
-      `//li[span='Availability:']/span[2]`,
+      '//li[span=\'Availability:\']/span[2]',
     );
     this.imgMainProduct = this.page
       .locator('//div[@class="image-thumb d-flex"]//a//img')
@@ -72,7 +72,7 @@ export class ProductLocators extends CommonLocators {
       .first();
     this.divTabContent = this.page
       .locator(
-        `(//div[contains(@class, 'description') and contains(@class, 'text-collapsed')])[1]`,
+        '(//div[contains(@class, \'description\') and contains(@class, \'text-collapsed\')])[1]',
       )
       .first();
     this.lnkBrand = this.page.locator('//li[.//span[text()="Brand:"]]//a');

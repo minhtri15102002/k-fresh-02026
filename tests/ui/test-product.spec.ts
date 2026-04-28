@@ -1,8 +1,8 @@
-import { test } from "../../pages/base-page";
-import { Constants } from "../../utilities/constants";
-import { productData } from "../../data/product-data";
+import { test } from '@pages/base-page';
+import { Constants } from '@utilities/constants';
+import { productData } from '@data/product-data';
 
-test.describe("Product Tests", () => {
+test.describe('Product Tests', () => {
   test.beforeEach(async ({ commonPage }) => {
     await commonPage.goto(Constants.BASE_URL);
   });
@@ -41,9 +41,10 @@ test.describe("Product Tests", () => {
     productPage,
   }) => {
     await productPage.checkQuantityCounterFunctionality(productData.productName);
-    await productPage.incrementDecrementQuantityAndVerify(productData.productName);
-    await productPage.decrementQuantityAndVerify(productData.productName);
+    await productPage.incrementQuantity(productData.productName);
+    await productPage.decrementQuantity(productData.productName);
     await productPage.verifyFinalQuantityValue(productData.productName);
-    await productPage.fillQuantityInputDirectlyAndVerify("10");
+    await productPage.fillQuantityInputDirectly('10');
+    await productPage.verifyFinalQuantityValueAfterFill('10');
   });
 });
