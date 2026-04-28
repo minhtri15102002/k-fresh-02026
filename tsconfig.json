@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@utilities/*": [
+        "utilities/*"
+      ],
+      "@pages/*": [
+        "pages/*"
+      ],
+      "@locators/*": [
+        "locators/* "
+      ],
+      "@data/*": [
+        "data/*"
+      ],
+      "@models/*": [
+        "/models/*"
+      ]
+    },
+    "module": "CommonJS",
+    "target": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "strict": true,
+    "ignoreDeprecations": "6.0"
+  },
+  "include": [
+    "tests/**/*",
+    "playwright.config.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

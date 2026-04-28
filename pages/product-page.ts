@@ -113,7 +113,6 @@ export class ProductPage extends ProductLocators {
       const times = 3;
       for (let i = 0; i < times; i++) {
         await this.commonPage.click(this.btnIncreaseQuantity);
-        await this.page.waitForTimeout(500);
       }
     });
   }
@@ -125,7 +124,6 @@ export class ProductPage extends ProductLocators {
       const times = 2;
       for (let i = 0; i < times; i++) {
         await this.commonPage.click(this.btnDecreaseQuantity);
-        await this.page.waitForTimeout(500);
       }
     });
   }
