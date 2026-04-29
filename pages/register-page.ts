@@ -1,8 +1,9 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { CommonPage } from './common-page';
 import { step } from '../utilities/logging';
 import { RegisterLocators } from '../locators/register-locators';
 import { UserProfile } from '../models/user';
+import { Constants } from '../utilities/constants';
 
 export class RegisterPage extends RegisterLocators {
 
@@ -32,7 +33,7 @@ export class RegisterPage extends RegisterLocators {
    */
   @step('Submit Registration Form')
   async submitRegistrationForm(): Promise<void> {
-    await this.btnContinue.click();
+    await this.commonPage.click(this.btnContinue);
   }
 
   /**
@@ -40,6 +41,24 @@ export class RegisterPage extends RegisterLocators {
    */
   @step('Click Agree to Terms Checkbox')
   async clickAgreeTermsCheckbox(): Promise<void> {
-    await this.chkPrivacyPolicy.check();
+    await this.commonPage.click(this.chkPrivacyPolicy);
+  }
+
+  /** 
+   * Verifies that the user has been successfully registered
+   * This method checks if the page URL contains the success message and clicks the continue link.
+  */
+  @step('Verify successful registration')
+  async expectSuccessfulRegistration(): Promise<void> {
+    await expect(this.page).toHaveURL(/.*account\/success/, { timeout: Constants.TIMEOUTS.PERFORM_LOADING * 1000 });
+  }
+
+  /** 
+   * Clicks the continue button after verifying a successful registration.
+   */
+  @step('Click Continue After Registration')
+  async clickContinueAfterRegistration(): Promise<void> {
+    await this.commonPage.click(this.btnSuccessContinue);
+    await this.page.waitForLoadState('domcontentloaded');
   }
 }
