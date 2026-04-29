@@ -21,7 +21,10 @@ export class HomeLocators extends CommonLocators {
     btnMyAccount!: Locator;
     lnkRegister!: Locator;
 
-    locatorsInitialization() {
+    ddlMyAccount!: Locator;
+    lnkMyAccountLogin!: Locator;
+
+    locatorInitialization() {
         super.locatorInitialization();
         this.shopByCategoryMenu = this.page.locator(
             '//a[text()=" Shop by Category"]',
@@ -51,6 +54,7 @@ export class HomeLocators extends CommonLocators {
 
         /** Add to Cart button from product detail page */
         this.btnAddToCart = this.page.locator('button[title="Add to Cart"]');
+
         this.menuLink = (menuName: string) =>
             this.page.locator('nav').locator(`a:has-text("${menuName}")`);
         this.btnMyAccount = this.page

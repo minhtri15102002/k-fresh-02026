@@ -3,7 +3,8 @@ import { CommonPage } from './common-page';
 import { step } from '../utilities/logging';
 import { HomeLocators } from '../locators/home-locators';
 import { AssertHelper } from './assert-helper-page';
-
+import { Constants } from '../utilities/constants';
+import { Assertions } from '../utilities/assertions';
 export class HomePage extends HomeLocators {
 
   commonPage: CommonPage;
@@ -13,13 +14,6 @@ export class HomePage extends HomeLocators {
     super(page);
     this.commonPage = new CommonPage(page);
     this.assertHelper = new AssertHelper();
-  }
-
-  /**
-   * Navigates to the homepage URL defined in Constants.
-   */
-  async goto(): Promise<void> {
-    await this.page.goto(Constants.BASE_URL);
   }
 
   /**
@@ -56,7 +50,7 @@ export class HomePage extends HomeLocators {
     await this.commonPage.hover(productCard);
     await this.commonPage.click(this.getAddToCartButton(productName));
   }
-
+  /**
    * Navigates directly to the Home Page (Base URL).
    * This is the ONLY place where page.goto() should be used.
    */
@@ -75,5 +69,28 @@ export class HomePage extends HomeLocators {
     await this.commonPage.click(this.btnMyAccount);
     await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
     await this.commonPage.click(this.lnkRegister);
+  }
+  @step('Open Home page')
+  async goto(): Promise<void> {
+    await this.commonPage.goto(Constants.BASE_URL);
+  }
+  /**
+   * Opens the My Account dropdown menu.
+   */
+  @step('Open My Account dropdown')
+  async openMyAccountDropdown(): Promise<void> {
+    await this.commonPage.click(this.ddlMyAccount);
+  }
+  /**
+   * Navigates to the Login page from the Home page.
+   */
+  @step('Navigate to Login page from Home page')
+  async goToLoginPage(): Promise<void> {
+    await this.openMyAccountDropdown();
+    await this.commonPage.click(this.lnkMyAccountLogin);
+    await this.page.waitForURL(/route=account\/login/);
+    Assertions.assertTextMatch(this.page.url(),
+      /route=account\/login/,
+      'Login page');
   }
 }
