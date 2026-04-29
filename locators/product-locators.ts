@@ -52,6 +52,25 @@ export class ProductLocators extends CommonLocators {
   inputProductSearch!: Locator;
   firstProductImage!: Locator;
   btnBuyNow!: Locator;
+  productThumbnail!: Locator;
+  productThumb!: Locator;
+  productThumbnaiByName!: (name: string) => Locator;
+  productThumbnailTop!: (name: string) => Locator;
+  imgProduct!: (productName: string) => Locator;
+  iconCompare!: (productName: string) => Locator;
+  lblProductName!: Locator;
+  lblProuctPrice!: Locator;
+  btnCompare!: (productName: string) => Locator;
+  btnCompareById!: (id: string) => Locator;
+  btnAddWishlist!: (productName: string) => Locator;
+  btnQuickView!: (productName: string) => Locator;
+  btnAddCart!: (productName: string) => Locator;
+  btnNavigateToComparePage!: (productName: string) => Locator;
+  //toast
+  toastMessage!: (productName: string) => Locator;
+  btnCloseToast!: (name: string) => Locator;
+  toastBody!: Locator;
+
   locatorInitialization(): void {
     super.locatorInitialization();
     this.divSuccessAlert = this.page.getByRole('alert');
@@ -85,48 +104,26 @@ export class ProductLocators extends CommonLocators {
     this.btnIncreaseQuantity = this.page.locator(
       '(//button[@aria-label="Increase quantity"])[2]',
     );
-    this.btnDecreaseQuantity = this.page.locator(
-      '(//button[@aria-label="Decrease quantity"])[2]',
-    );
-
-    // Size Chart locators with multiple strategies
-    this.lnkSizeChart = this.page.locator("//a[@aria-label='Size chart']");
-    this.tblSizeChart = this.page.locator(
-      '//div[@class="modal fade show"]//table',
-    );
-    this.btnSizeChartClose = this.page.locator(
-      '//div[@class="modal fade show"]//button[@aria-label="Close"]',
-    );
-
-    // Pop-up locators
-    this.lnkPopup = this.page.locator("//a[@aria-label='Popup']");
-    this.btnPopupClose = this.page.locator(
-      '//div[@class="modal fade show"]//button[@aria-label="Close"]',
-    );
-    this.divPopupContent = this.page.locator(
-      '//h4[contains(normalize-space(), "Popup content")]',
-    );
-
-    // Compare locators
-    this.btnCompare = this.page.locator(
-      '//button[contains(normalize-space(), "Compare this Product")]',
-    );
-    this.boxCompareNotificationTop = this.page.locator(
-      "//div[@id='notification-box-top']",
-    );
-    this.boxCompareNotificationContent = this.page.locator(
-      "//div[@id='notification-box-top']//div[contains(@class,'toast-body')]",
-    );
-    this.btnCompareNotificationAction = this.page.locator(
-      "//div[@id='notification-box-top']//a[contains(.,'Product Compare')]",
-    );
-    this.lnkViewCart = this.page
-      .getByRole('link', { name: 'View Cart' })
-      .first();
-    this.btnAddToCart = this.page.getByRole('button', { name: 'Add to Cart', exact: true }).first();
-    this.searchInput = this.page.locator('//input[@name="search"]');
-    this.btnSearch = this.page.locator('#search button').first();
-    this.inputProductSearch = this.page.getByPlaceholder(/Search/i).first();
-    this.btnBuyNow = this.page.getByRole('button', { name: /Buy Now/i });
+    this.inputQuantity = this.page.locator('(//input[@name="quantity"])[1]');
+    this.divSuccessAlert = this.page.getByRole('alert');
+    this.productThumbnail = this.page.locator('//div[@class="product-thumb"]');
+    this.productThumbnaiByName = (productName: string): Locator => this.page.locator(`//h4/a[contains(text(),"${productName}")]/ancestor::div[contains(@class, "product-thumb")]`);
+    this.lblProductName = this.page.locator('//h4[@class="title"]');
+    this.lblProuctPrice = this.page.locator('//div[@class="price"]');
+    this.iconCompare = (productName: string): Locator => this.productThumbnaiByName(productName).getByTitle('Compare this Product');
+    this.btnAddWishlist = (productName: string): Locator => this.productThumbnaiByName(productName).locator('//button[contains(@class,"btn-wishlist")]');
+    this.btnQuickView = (productName: string): Locator => this.productThumbnaiByName(productName).locator('//button[contains(@class,"btn-quickview")]');
+    this.btnAddCart = (productName: string): Locator => this.productThumbnaiByName(productName).locator('//button[contains(@class,"btn-cart")]');
+    this.btnCompare = (productName: string): Locator => this.productThumbnaiByName(productName).getByTitle('Compare this Product');
+    this.btnNavigateToComparePage = (productName: string): Locator => {
+      return this.page.locator(`//div[contains(@class,"toast")]//p//a[contains(text(),"${productName}")]/ancestor::div[3]//a[contains(text(),"Product Compare")]`);
+    }
+    this.toastMessage = (productName: string): Locator => {
+      return this.page.locator(`//div[contains(@class,"toast")]//p//a[contains(text(),"${productName}")]`);
+    }
+    this.btnCloseToast = (name: string): Locator => {
+      return this.page.locator(`//div[contains(@class,"toast")]//p//a[contains(text(),"${name}")]/ancestor::div//span[text()="×"]`);
+    }
+    this.toastBody = this.page.locator('//div[@class="toast-body"]');
   }
 }

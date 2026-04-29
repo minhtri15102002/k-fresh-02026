@@ -1,5 +1,4 @@
-import test, { expect, Page } from '@playwright/test';
-import { Constants } from '../utilities/constants';
+import { Page } from '@playwright/test';
 import { CommonPage } from './common-page';
 import { step } from '../utilities/logging';
 import { WishListLocators } from '../locators/wish-list-locators';

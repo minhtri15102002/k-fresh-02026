@@ -19,12 +19,14 @@ export class CommonLocators {
         return this.page;
     }
 
+    //buttons
     btnSave!: Locator;
     btnCancel!: Locator;
     btnEdit!: Locator;
     btnDelete!: Locator;
     btnAddNew!: Locator;
     btnSubmit!: Locator;
+    btnContinue!: Locator;
     btnConfirmDelete!: Locator;
     btnCancelDelete!: Locator;
     inputSearch!: Locator;
@@ -48,18 +50,18 @@ export class CommonLocators {
         this.Iframe2 = this.page.frameLocator(this.iframe2);
         this.Iframe3 = this.page.frameLocator(this.iframe3);
         this.Iframe4 = this.page.frameLocator(this.iframe4);
-
         this.btnSave = this.page.locator('button:has-text("Save")');
         this.btnCancel = this.page.locator('button:has-text("Cancel")');
-        this.btnEdit = this.page.locator('//a[text()="Edit"]');
-        this.btnDelete = this.page.locator('//a[text()="Delete"]');
-        this.btnAddNew = this.page.locator('//a[text()="New Address"]');
+        this.btnEdit = this.page.locator('button:has-text("Edit")');
+        this.btnDelete = this.page.locator('button:has-text("Delete")');
+        this.btnAddNew = this.page.locator('button:has-text("Add New")');
         this.btnSubmit = this.page.locator('//input[@type="submit"]');
+        this.btnContinue = this.page.locator('//a[contains(@class, "btn") and contains(., "Continue")] | //input[@value="Continue"]');
         this.btnConfirmDelete = this.page.locator('button:has-text("Confirm Delete")');
         this.btnCancelDelete = this.page.locator('button:has-text("Cancel Delete")');
         this.inputSearch = this.page.locator('input[placeholder="Search"]');
-
         this.ddlOption = this.page.locator('ul[role="listbox"]');
+        this.inputSearch = this.page.locator('//input[@placeholder="Search"]');
 
         this.linkText = (name: string): Locator => {
             return this.page.locator(`xpath=//a[@id and text()="${name}"]`);
@@ -291,5 +293,4 @@ export class CommonLocators {
     locatorIframeIframe(iframe1: string, iframe2: string, element: string): Locator {
         return this.page.frameLocator(iframe1).frameLocator(iframe2).locator(element);
     }
-
 }

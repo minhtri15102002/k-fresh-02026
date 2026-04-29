@@ -1,12 +1,11 @@
-
-import test, { expect, Page } from '@playwright/test';
-import { Constants } from '@utilities/constants';
+import { Page } from '@playwright/test';
 import { CommonPage } from './common-page';
 import { step } from '@utilities/logging';
 import { ProductLocators } from '@locators/product-locators';
 import { Product } from '@models/product';
 import { AssertHelper } from './assert-helper-page';
 import { Product } from '../models/product';
+import { ActionType } from '../models/action-type';
 
 export class ProductPage extends ProductLocators {
   commonPage: CommonPage;
@@ -231,6 +230,52 @@ export class ProductPage extends ProductLocators {
   }
 
   /**
+   * Main orchestrator to perform various actions on a product.
+   * Handles scrolling, ID extraction, hovering, and dynamic button selection.
+   * @param product - The product object.
+   * @param action - Action type to execute.
+   */
+  @step('Perform action on product')
+  async performActionOnProduct(product: Product, action: ActionType): Promise<void> {
+    const productName = product.name;
+    // Locate the product thumbnail and ensure it's in the viewport
+    const targetProduct = this.productThumbnaiByName(productName);
+
+    // Select the appropriate locator based on the requested action
+    let btnAction;
+    switch (action) {
+      case ActionType.ADD_TO_CART:
+        btnAction = this.btnAddCart(productName);
+        break;
+      case ActionType.WISHLIST:
+        btnAction = this.btnAddWishlist(productName);
+        break;
+      case ActionType.COMPARE:
+        btnAction = this.btnCompare(productName);
+        break;
+      case ActionType.QUICK_VIEW:
+        btnAction = this.btnQuickView(productName);
+        break;
+      default:
+        throw new Error(`Unsupported action: "${action}"`);
+    }
+    // Wait for the button to be interactable and click it
+    await this.commonPage.waitForVisible(btnAction);
+    await this.commonPage.hover(targetProduct);
+    await this.commonPage.click(btnAction, { force: true });
+    await this.commonPage.waitForPageLoad();
+  }
+
+  /**
+   * Add one or more products to Compare, verify them, and close the Toast message.
+   * @param products - List of Product objects that need to be added
+   */
+  @step('Add multiple products to compare and verify toast')
+  async addProductsToCompare(products: Product[]): Promise<void> {
+    for (const product of products) {
+      await this.performActionOnProduct(product, ActionType.COMPARE);
+      await this.commonPage.waitForVisible(this.toastMessage(product.name));
+    }
    *  Clicks the "Inquiry" button for the specified product.
    * @param productName
    */
@@ -242,8 +287,8 @@ export class ProductPage extends ProductLocators {
   }
 
   /**
-   * Verifies that the success alert displays the expected message after adding a product to the cart
-   * @param expectedMessage
+   * Scrapes all visible products on the page and converts them into Product objects.
+   * Useful for dynamic data-driven testing.
    */
   @step('Verifying that the success alert displays the expected message after adding a product to the cart')
   async verifyAddToCartSuccessMessage(expectedMessage: string): Promise<void> {
@@ -292,6 +337,24 @@ export class ProductPage extends ProductLocators {
   }
 
   /**
+   * Close toast message by name
+   * @param name - Name of the toast message
+   */
+  @step('Close toast message by name')
+  async closeToast(name: string): Promise<void> {
+    await this.commonPage.click(this.btnCloseToast(name));
+    await this.commonPage.waitForHidden(this.toastBody.first());
+  }
+
+  /**
+   * Navigate to compare page
+   * @param productName - Name of the product
+   */
+  @step('Navigate to compare page')
+  async clickNavigateToComparePage(productName: string): Promise<void> {
+    const btnNavigate = this.btnNavigateToComparePage(productName);
+    await this.commonPage.waitForVisible(btnNavigate);
+    await this.commonPage.click(btnNavigate);
    * Search and Navigate to Product Page via UI Navigation
    * @param product The name of the product to search for (e.g., 'HP LP3065').
    */

@@ -1,7 +1,5 @@
-import test, { expect, Page } from '@playwright/test';
-import { Constants } from '../utilities/constants';
+import { Page } from '@playwright/test';
 import { CommonPage } from './common-page';
-import { step } from '../utilities/logging';
 import { MyOrdersLocators } from '../locators/my-orders-locators';
 
 export class MyOrdersPage extends MyOrdersLocators {
@@ -12,5 +10,4 @@ export class MyOrdersPage extends MyOrdersLocators {
     super(page);
     this.commonPage = new CommonPage(page);
   }
-
 }

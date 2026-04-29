@@ -25,6 +25,15 @@ export class CommonPage extends CommonLocators {
     }
 
     /**
+     * Clicks the "Continue" button.
+     */
+    @step('Click on Continue button')
+    async clickContinue(): Promise<void> {
+        await this.click(this.btnContinue);
+        await this.waitForPageLoad();
+    }
+
+    /**
      * Click on Locator
      * @param locator
      */
@@ -775,6 +784,18 @@ export class CommonPage extends CommonLocators {
     }
 
     /**
+         * Verify page loaded by checking title or load state
+         * @param expectedTitle - Expected title of the page (can be string or regex)
+         */
+    @step('Verify page loaded')
+    async verifyPageLoaded(expectedTitle?: string | RegExp): Promise<void> {
+        if (expectedTitle) {
+            // Wait for title match
+            await expect(this.page).toHaveTitle(expectedTitle);
+        } else {
+            // Wait for DOM to load
+            await this.page.waitForLoadState('domcontentloaded');
+        }
      * Get Current URL
      * @returns
      */

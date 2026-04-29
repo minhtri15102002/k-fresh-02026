@@ -1,5 +1,4 @@
 import { Page } from '@playwright/test';
-import { Constants } from '../utilities/constants';
 import { CommonPage } from './common-page';
 import { step } from '../utilities/logging';
 import { HomeLocators } from '../locators/home-locators';
@@ -24,11 +23,15 @@ export class HomePage extends HomeLocators {
   }
 
   /**
-   * Selects a menu item from the main navigation.
-   * @param menuName The name of the menu item to select.
+   * Navigate to product category page
+   * @param menuName Category name
    */
   @step('Select Menu')
   async selectMenu(menuName: string): Promise<void> {
+    await this.commonPage.click(this.shopByCategoryMenu);
+    await this.commonPage.waitForVisible(this.itemTopCategory(menuName));
+    await this.commonPage.click(this.itemTopCategory(menuName));
+  }
     await this.commonPage.click(this.menuLink(menuName));
     await this.page.waitForLoadState('networkidle');
   }
