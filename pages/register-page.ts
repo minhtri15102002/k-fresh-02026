@@ -23,7 +23,7 @@ export class RegisterPage extends RegisterLocators {
     await this.inputFirstName.fill(userProfile.firstName);
     await this.inputLastName.fill(userProfile.lastName);
     await this.inputEmail.fill(userProfile.email);
-    await this.inputTelephone.fill(userProfile.phone);
+    await this.inputTelephone.fill(userProfile.telephone);
     await this.inputPassword.fill(userProfile.password);
     await this.inputPasswordConfirm.fill(userProfile.password);
   }

@@ -1,5 +1,6 @@
-export class Constants {
+import process from 'process';
 
+export class Constants {
   // Section timeouts
   static readonly TIMEOUTS = {
     DEFAULT: 60000,
@@ -19,8 +20,8 @@ export class Constants {
     PERFORM_LOADING: 2,
   };
 
-  static readonly WORKERS = Number(process.env.WORKERS ?? 2);
-  static readonly LOCAL_WORKERS = Number(process.env.LOCAL_WORKERS ?? 6);
+  static readonly WORKERS = Number(process.env.WORKERS ?? 4);
+  static readonly LOCAL_WORKERS = Number(process.env.LOCAL_WORKERS ?? 4);
 
   static readonly MAX_RETRY_ATTEMPTS = 2;
   static readonly DATA_FOLDER = '../data';
@@ -29,8 +30,8 @@ export class Constants {
   static readonly OUTPUT_FOLDER = '../output';
 
   static readonly ENV = process.env.ENV || 'qa';
-  static readonly BASE_URL = process.env.BASE_URL || 'https://ecommerce-playground.lambdatest.io/';
-  static readonly LOGIN_URL = `${Constants.BASE_URL}/login`;
+  static readonly BASE_URL = process.env.BASE_URL || 'https://ecommerce-playground.lambdatest.io';
+  static readonly LOGIN_URL = `${Constants.BASE_URL}/index.php?route=account/login`;
   static readonly REGISTER_URL = `${Constants.BASE_URL}/index.php?route=account/register`;
   static readonly SECURE_URL = `${Constants.BASE_URL}/secure`;
   static readonly LOGIN_USERNAME = process.env.LOGIN_USERNAME || 'tomsmith';
