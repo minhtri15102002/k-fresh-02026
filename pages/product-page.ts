@@ -262,6 +262,22 @@ export class ProductPage extends ProductLocators {
     await this.commonPage.roleLinkName('View Cart', false).click();
   }
 
+  /**
+  * Adds an item to the cart using standard UI navigation (Search -> Product Detail -> Add to Cart).
+  * @param searchTerm The name of the product to search for (e.g., 'HP LP3065').
+  */
+  @step('Buy Specific Item Now via UI Navigation')
+  async buySpecificItemNow(searchTerm: string): Promise<void> {
+    await this.commonPage.waitForVisible(this.inputProductSearch);
+    await this.commonPage.fill(this.inputProductSearch, searchTerm);
+    await this.commonPage.press(this.inputProductSearch, 'Enter');
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.commonPage.waitForVisible(this.firstProductImage);
+    await this.commonPage.click(this.firstProductImage);
+    await this.commonPage.waitForVisible(this.btnBuyNow);
+    await this.commonPage.click(this.btnBuyNow);
+    await expect(this.page).toHaveURL(/.*checkout\/checkout/, { timeout: Constants.TIMEOUTS.PAGE_EVENT_LOAD });
+  }
   @step('Search and Navigate to Product Page via UI Navigation')
   async searchAndSelectProduct(product: Product): Promise<void> {
     await this.commonPage.fill(this.inputSearch.first(), product.name);
