@@ -6,7 +6,6 @@ import { step } from '@utilities/logging';
 import { ProductLocators } from '@locators/product-locators';
 import { Product } from '@models/product';
 import { AssertHelper } from './assert-helper-page';
-import { Product } from '../models/product';
 
 export class ProductPage extends ProductLocators {
   commonPage: CommonPage;
@@ -264,7 +263,7 @@ export class ProductPage extends ProductLocators {
     await this.assertHelper.assertElementVisible(this.divSuccessAlert);
     await this.commonPage.click(this.roleLinkName('View Cart', false));
   }
-  
+
   /**
      * Sets the quantity of the product to be added to the cart.
      * @param qty 
@@ -273,7 +272,7 @@ export class ProductPage extends ProductLocators {
   async setQuantity(qty: number): Promise<void> {
     await this.commonPage.fill(this.inputQuantity, qty.toString());
   }
- 
+
   /**
   * Adds an item to the cart using standard UI navigation (Search -> Product Detail -> Add to Cart).
   * @param searchTerm The name of the product to search for (e.g., 'HP LP3065').
