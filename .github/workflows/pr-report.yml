@@ -31,12 +31,5 @@ jobs:
         with:
           name: pr-report
           path: PR_REPORT.md
-
-      - name: Comment PR
-        uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            ## 📄 PR Report Generated Successfully
-            Download file: **PR_REPORT.md** (Artifact)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
