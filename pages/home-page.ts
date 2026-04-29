@@ -32,9 +32,6 @@ export class HomePage extends HomeLocators {
     await this.commonPage.waitForVisible(this.itemTopCategory(menuName));
     await this.commonPage.click(this.itemTopCategory(menuName));
   }
-    await this.commonPage.click(this.menuLink(menuName));
-    await this.page.waitForLoadState('networkidle');
-  }
 
   /**
      * Selects a product by its name from the homepage and navigates to the product detail page.
