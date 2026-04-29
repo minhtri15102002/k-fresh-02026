@@ -9,6 +9,7 @@ import { getEnvProduct } from '../../data/product.helper';
 const product: Product = getEnvProduct();
 let userProfile: UserProfile;
 
+/** Test suite for cart-related tests */
 test.describe('Cart Tests', () => {
 
   test.beforeEach(async ({ commonPage, registerPage }) => {
@@ -43,7 +44,7 @@ test.describe('Cart Tests', () => {
     await productPage.clickAddToCart();
     await productPage.verifyAddToCartSuccessMessage(Messages.ADD_TO_CART_SUCCESS_MESSAGE);
     await productPage.clickViewCartLink();
-    await cartPage.clickRemoveProduct(product);
+    await cartPage.removeAllProducts();
     await cartPage.verifyProductRemovedFromCart(product);
   });
 
@@ -69,5 +70,48 @@ test.describe('Cart Tests', () => {
     const productWithZeroQty = { ...product, quantity: 0 };
     await cartPage.updateProductQuantity(productWithZeroQty);
     await cartPage.verifyProductRemovedFromCart(product);
+  });
+  
+  /** Test case Add-to-Cart of PThao */
+  test('TC_CART_01 - Add product to cart', async ({ homePage, productPage, cartPage }) => {
+      await homePage.commonPage.goto(Constants.BASE_URL);
+      await homePage.selectProduct(product.name);
+      await productPage.clickAddToCart();
+      await productPage.verifyAddToCartSuccessMessage(Messages.ADD_TO_CART_SUCCESS_MESSAGE);
+      await cartPage.clickViewCartLink();
+      await cartPage.verifyProductAddedToCart(product);
+  });
+
+  test('TC_CART_02 - Add product with multiple quantity successfully', async ({ homePage, productPage, cartPage }) => {
+      await homePage.commonPage.goto(Constants.BASE_URL);
+      await homePage.selectProduct(product.name);
+      await productPage.setQuantity(3);
+      await productPage.clickAddToCart();
+      await productPage.verifyAddToCartSuccessMessage(Messages.ADD_TO_CART_SUCCESS_MESSAGE);
+      await cartPage.clickViewCartLink();
+      await cartPage.verifyUpdatedProductQuantity({ ...product, quantity: 3 });
+  });
+
+  test('TC_CART_03 - Add product to cart from homepage', async ({ homePage, productPage, cartPage }) => {
+      await homePage.commonPage.goto(Constants.BASE_URL);
+      await homePage.hoverAndAddToCart(product.name);
+      await productPage.verifyAddToCartSuccessMessage(Messages.ADD_TO_CART_SUCCESS_MESSAGE);
+      await productPage.clickViewCartLink();
+      await cartPage.verifyProductAddedToCart(product);
+  });
+
+  test('TC_CART_04 - Update product quantity in cart successfully', async ({ homePage, productPage, cartPage }) => {
+      await homePage.commonPage.goto(Constants.BASE_URL);
+      await homePage.selectProduct(product.name);
+      await productPage.clickAddToCart();
+      await productPage.verifyAddToCartSuccessMessage(
+        Messages.ADD_TO_CART_SUCCESS_MESSAGE,
+      );
+      await productPage.clickViewCartLink();
+      await cartPage.verifyProductAddedToCart(product);
+      await cartPage.updateQuantity(2, product.name);
+      await cartPage.clickUpdateQuantity(product.name);
+      await cartPage.verifyCartModifiedSuccessMessage(Messages.UPDATE_CART_SUCCESS_MESSAGE);
+      await cartPage.verifyUpdatedProductQuantity({ ...product, quantity: 2 });
   });
 });
