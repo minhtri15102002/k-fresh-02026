@@ -25,8 +25,7 @@ export const test = baseTest.extend<{
     profilePage: ProfilePage;
     registerPage: RegisterPage;
     wishlistPage: WishListPage;
-
-    }>({
+}>({
     loginPage: async ({ page, context }, use) => {
         const instance = new LoginPage(page);
         context.on('page', (newPage: Page) => {
@@ -111,5 +110,4 @@ export const test = baseTest.extend<{
         });
         await use(instance);
     },
-
 });
