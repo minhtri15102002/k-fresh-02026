@@ -1,5 +1,5 @@
 import test, { expect, Page } from '@playwright/test';
-import { User } from '../models/user';
+import { User, UserProfile } from '../models/user';
 import { Constants } from '../utilities/constants';
 import { Messages } from '../data/messages.data';
 import { LoginLocators } from '../locators/login-locators';
@@ -20,11 +20,12 @@ export class LoginPage extends LoginLocators {
    * @param user An object containing the username and password for login.
    */
   @step('Log in with user credentials')
-  async login(user: User): Promise<void> {
-    await test.step(`Log in with username: ${user.username}`, async () => {
-      await this.inputUsername.fill(user.username);
-      await this.inputPassword.fill(user.password);
-      await this.btnSubmit.click();
+  async login(user: UserProfile): Promise<void> {
+    await test.step(`Log in with username: ${user.email}`, async () => {
+      await this.commonPage.goto(Constants.LOGIN_URL);
+      await this.commonPage.fill(this.inputEmail, user.email);
+      await this.commonPage.fill(this.inputPassword, user.password);
+      await this.commonPage.click(this.btnSubmit);
     });
   }
   

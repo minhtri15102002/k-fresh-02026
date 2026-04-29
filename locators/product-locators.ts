@@ -4,7 +4,7 @@ import { CommonLocators } from './common-locators';
 export class ProductLocators extends CommonLocators {
   constructor(page: Page) {
     super(page);
-    this.locatorInitialization();
+    this.locatorsInitialization();
   }
 
   // Product detail locators
@@ -45,6 +45,11 @@ export class ProductLocators extends CommonLocators {
   btnCompareNotificationAction!: Locator;
 
   divSuccessAlert!: Locator;
+  btnAddToCart!: Locator;
+  lnkViewCart!: Locator;
+  searchInput!: Locator;
+  btnSearch!: Locator;
+  inputProductSearch!: Locator;
   firstProductImage!: Locator;
   btnBuyNow!: Locator;
   locatorInitialization(): void {
@@ -115,5 +120,13 @@ export class ProductLocators extends CommonLocators {
     this.btnCompareNotificationAction = this.page.locator(
       "//div[@id='notification-box-top']//a[contains(.,'Product Compare')]",
     );
+    this.lnkViewCart = this.page
+      .getByRole('link', { name: 'View Cart' })
+      .first();
+    this.btnAddToCart = this.page.getByRole('button', { name: 'Add to Cart', exact: true }).first();
+    this.searchInput = this.page.locator('//input[@name="search"]');
+    this.btnSearch = this.page.locator('#search button').first();
+    this.inputProductSearch = this.page.getByPlaceholder(/Search/i).first();
+    this.btnBuyNow = this.page.getByRole('button', { name: /Buy Now/i });
   }
 }

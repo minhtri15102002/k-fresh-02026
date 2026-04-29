@@ -10,3 +10,4 @@ node_modules/
 /allure-results/
 /allure-report/
 profiles/.env.*
+!profiles/.env.*.example
