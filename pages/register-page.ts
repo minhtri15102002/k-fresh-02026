@@ -1,12 +1,12 @@
-import { expect, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import { CommonPage } from './common-page';
 import { step } from '../utilities/logging';
 import { RegisterLocators } from '../locators/register-locators';
 import { UserProfile } from '../models/user';
-import { Constants } from '../utilities/constants';
+import { Assertions } from '../utilities/assertions';
+import { Messages } from '../data/messages.data';
 
 export class RegisterPage extends RegisterLocators {
-
   commonPage: CommonPage;
 
   constructor(page: Page) {
@@ -20,12 +20,31 @@ export class RegisterPage extends RegisterLocators {
    */
   @step('Fill Registration Form')
   async fillRegistrationForm(userProfile: UserProfile): Promise<void> {
-    await this.inputFirstName.fill(userProfile.firstName);
-    await this.inputLastName.fill(userProfile.lastName);
-    await this.inputEmail.fill(userProfile.email);
-    await this.inputTelephone.fill(userProfile.telephone);
-    await this.inputPassword.fill(userProfile.password);
-    await this.inputPasswordConfirm.fill(userProfile.password);
+    await this.commonPage.fill(this.inputFirstName, userProfile.firstName);
+    await this.commonPage.fill(this.inputLastName, userProfile.lastName);
+    await this.commonPage.fill(this.inputEmail, userProfile.email);
+    await this.commonPage.fill(this.inputTelephone, userProfile.telephone);
+    await this.commonPage.fill(this.inputPassword, userProfile.password);
+    await this.commonPage.fill(
+      this.inputConfirmPassword,
+      userProfile.confirmPassword || userProfile.password,
+    );
+  }
+
+  /**
+   * Selects the "Yes" option for the newsletter.
+   */
+  @step('Select Newsletter Option - Yes')
+  async selectNewsletter(): Promise<void> {
+    await this.commonPage.click(this.radioNewsletterYes);
+  }
+
+  /**
+   * Selects the "No" option for the newsletter.
+   */
+  @step('Select Newsletter Option - No')
+  async unSelectNewsletter(): Promise<void> {
+    await this.commonPage.isChecked(this.radioNewsletterNo);
   }
 
   /**
@@ -44,21 +63,47 @@ export class RegisterPage extends RegisterLocators {
     await this.commonPage.click(this.chkPrivacyPolicy);
   }
 
-  /** 
-   * Verifies that the user has been successfully registered
-   * This method checks if the page URL contains the success message and clicks the continue link.
-  */
-  @step('Verify successful registration')
-  async expectSuccessfulRegistration(): Promise<void> {
-    await expect(this.page).toHaveURL(/.*account\/success/, { timeout: Constants.TIMEOUTS.PERFORM_LOADING * 1000 });
+  /**
+   * Gets the HTML5 validation message for a given input field.
+   * @param locator The locator of the input field.
+   * @returns The validation message string.
+   */
+  @step('Get Input Validation Message')
+  async getInputValidationMessage(locator: Locator): Promise<string> {
+    return await locator.evaluate(async (element): Promise<string> => {
+      const input = element as HTMLInputElement;
+      return input.validationMessage;
+    });
   }
 
-  /** 
-   * Clicks the continue button after verifying a successful registration.
+  /**
+   * Gets the registration success message title text.
+   * @returns The trimmed success message title.
    */
-  @step('Click Continue After Registration')
-  async clickContinueAfterRegistration(): Promise<void> {
-    await this.commonPage.click(this.btnSuccessContinue);
-    await this.page.waitForLoadState('domcontentloaded');
+  @step('Get Success Message Title')
+  async getSuccessMessageText(): Promise<string> {
+    return await this.commonPage.textContent(this.lblSuccessMessage);
+  }
+
+  /**
+   * Gets the registration success page content text.
+   * @returns The trimmed success page content.
+   */
+  @step('Get Success Page Content')
+  async getSuccessPageContentText(): Promise<string> {
+    return await this.commonPage.textContent(this.lblSuccessPageContent);
+  }
+
+  /**
+   * Verifies the error messages for all required fields when they are left empty.
+   */
+  @step('Verify Required Fields Error Messages')
+  async verifyRequiredFieldsErrorMessages(): Promise<void> {
+    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorFirstName), Messages.REGISTER_ERROR_FIRSTNAME);
+    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorLastName), Messages.REGISTER_ERROR_LASTNAME);
+    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorEmail), Messages.REGISTER_ERROR_EMAIL);
+    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorTelephone), Messages.REGISTER_ERROR_TELEPHONE);
+    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorPassword), Messages.REGISTER_ERROR_PASSWORD);
+    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorAgree), Messages.REGISTER_ERROR_PRIVACY_POLICY);
   }
 }
