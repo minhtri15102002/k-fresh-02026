@@ -9,8 +9,8 @@ export class AssertHelper {
 
     /**
      * Asserts that an element is attached to the DOM.
-     * @param {Locator} locator - The element locator.
-     * @param {string} [message] - Optional custom message.
+     * @param Locator - The element locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element is attached to the DOM.')
     async assertElementAttached(locator: Locator, message?: string): Promise<void> {
@@ -19,8 +19,8 @@ export class AssertHelper {
 
     /**
      * Asserts that an element is not attached to the DOM.
-     * @param {Locator} locator - The element locator.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element is not attached to the DOM.')
     async assertElementNotAttached(locator: Locator, message?: string): Promise<void> {
@@ -29,8 +29,8 @@ export class AssertHelper {
 
     /**
     * Asserts that a checkbox is checked.
-    * @param {Locator} locator - The checkbox locator.
-    * @param {string} [message] - Optional custom message.
+    * @param locator - The checkbox locator.
+    * @param message - Optional custom message.
     */
     @step('Asserts that a checkbox is checked.')
     async assertCheckboxChecked(locator: Locator, message?: string): Promise<void> {
@@ -39,8 +39,8 @@ export class AssertHelper {
 
     /**
      * Asserts that a checkbox is unchecked.
-     * @param {Locator} locator - The checkbox locator.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The checkbox locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that a checkbox is unchecked.')
     async assertCheckboxUnchecked(locator: Locator, message?: string): Promise<void> {
@@ -49,8 +49,8 @@ export class AssertHelper {
 
     /**
      * Asserts that an element is disabled.
-     * @param {Locator} locator - The element locator.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element is disabled.')
     async assertElementDisabled(locator: Locator, message?: string): Promise<void> {
@@ -59,8 +59,8 @@ export class AssertHelper {
 
     /**
      * Asserts that an element is visible.
-     * @param {Locator} locator - The element locator.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element is visible.')
     async assertElementVisible(locator: Locator, message?: string): Promise<void> {
@@ -68,9 +68,9 @@ export class AssertHelper {
     }
 
     /**
-     * Asserts that an element is visible.
-     * @param {Locator} locator - The element locator.
-     * @param {string} [message] - Optional custom message.
+     * Asserts that an element is not visible.
+     * @param locator - The element locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element is not visible.')
     async assertElementNotVisible(locator: Locator, message?: string): Promise<void> {
@@ -79,8 +79,8 @@ export class AssertHelper {
 
     /**
      * Asserts that an element is editable.
-     * @param {Locator} locator - The element locator.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element is editable.')
     async assertElementEditable(locator: Locator, message?: string): Promise<void> {
@@ -89,8 +89,8 @@ export class AssertHelper {
 
     /**
      * Asserts that an element is empty.
-     * @param {Locator} locator - The element locator.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element is empty.')
     async assertElementEmpty(locator: Locator, message?: string): Promise<void> {
@@ -99,8 +99,8 @@ export class AssertHelper {
 
     /**
      * Asserts that an element is enabled.
-     * @param {Locator} locator - The element locator.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element is enabled.')
     async assertElementEnabled(locator: Locator, message?: string): Promise<void> {
@@ -109,8 +109,8 @@ export class AssertHelper {
 
     /**
      * Asserts that an element is focused.
-     * @param {Locator} locator - The element locator.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element is focused.')
     async assertElementFocused(locator: Locator, message?: string): Promise<void> {
@@ -119,8 +119,8 @@ export class AssertHelper {
 
     /**
      * Asserts that an element is in the viewport.
-     * @param {Locator} locator - The element locator.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element is in the viewport.')
     async assertElementInViewport(locator: Locator, message?: string): Promise<void> {
@@ -129,8 +129,8 @@ export class AssertHelper {
 
     /**
      * Asserts that an element is hidden.
-     * @param {Locator} locator - The element locator.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element is hidden.')
     async assertElementHidden(locator: Locator, message?: string): Promise<void> {
@@ -139,10 +139,10 @@ export class AssertHelper {
 
     /**
      * Asserts that an element has a specific attribute with the expected value.
-     * @param {Locator} locator - The element locator.
-     * @param {string} attribute - The attribute name to check.
-     * @param {string} expectedValue - The expected value of the attribute.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param attribute - The attribute name to check.
+     * @param expectedValue - The expected value of the attribute.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element has a specific attribute with the expected value.')
     async assertElementHasAttribute(locator: Locator, attribute: string, expectedValue?: string, message?: string): Promise<void> {
@@ -157,10 +157,10 @@ export class AssertHelper {
 
     /**
      * Asserts that an element's attibute is not existing or not equal an expected value.
-     * @param {Locator} locator - The element locator.
-     * @param {string} attribute - The attribute name to check.
-     * @param {string} expectedValue - The expected value of the attribute.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param attribute - The attribute name to check.
+     * @param expectedValue - The expected value of the attribute.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element attibute is not existing or not equal an expected value.')
     async assertElementNoAttribute(locator: Locator, attribute: string, expectedValue?: string, message?: string): Promise<void> {
@@ -175,9 +175,9 @@ export class AssertHelper {
 
     /**
      * Asserts that the class property of an element should contain an expected value.
-     * @param {Locator} locator - The element locator.
-     * @param {string} expectedValue - The expected value of the class.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param expectedValue - The expected value of the class.
+     * @param message - Optional custom message.
      */
     @step('Asserts that the class property of an element should contain an expected value.')
     async assertElementContainClass(locator: Locator, expectedValue: string | Array<string>, message?: string): Promise<void> {
@@ -187,9 +187,9 @@ export class AssertHelper {
 
     /**
      * Asserts that the class property of an element should not contain an expected value.
-     * @param {Locator} locator - The element locator.
-     * @param {string} expectedValue - The expected value of the class.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param expectedValue - The expected value of the class.
+     * @param message - Optional custom message.
      */
     @step('Asserts that the class property of an element should not contain an expected value.')
     async assertElementNotContainClass(locator: Locator, expectedValue: string | Array<string>, message?: string): Promise<void> {
@@ -199,9 +199,9 @@ export class AssertHelper {
 
     /**
      * Asserts that an element contains a specific text.
-     * @param {Locator} locator - The element locator.
-     * @param {string} text - The expected text.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param text - The expected text.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element contains a specific text.')
     async assertElementContainsText(locator: Locator, text: string, message?: string): Promise<void> {
@@ -210,9 +210,9 @@ export class AssertHelper {
 
     /**
      * Asserts that a locator has a specific number of elements.
-     * @param {Locator} locator - The element locator.
-     * @param {number} expectedCount - The expected number of elements.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param expectedCount - The expected number of elements.
+     * @param message - Optional custom message.
      */
     @step('Asserts that a locator has a specific number of elements.')
     async assertElementCount(locator: Locator, expectedCount: number, message?: string): Promise<void> {
@@ -221,9 +221,9 @@ export class AssertHelper {
 
     /**
      * Asserts that an element has a specific text.
-     * @param {Locator} locator - The element locator.
-     * @param {string | RegExp} expectedText - The expected text or regular expression.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param expectedText - The expected text or regular expression.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element has a specific text.')
     async assertElementHasText(locator: Locator, expectedText: string | RegExp, message?: string): Promise<void> {
@@ -232,9 +232,9 @@ export class AssertHelper {
 
     /**
      * Asserts that an input field has a specific value.
-     * @param {Locator} locator - The element locator.
-     * @param {string} expectedValue - The expected value of the input field.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param expectedValue - The expected value of the input field.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an input field has a specific value.')
     async assertElementHasValue(locator: Locator, expectedValue: string, message?: string): Promise<void> {
@@ -244,9 +244,9 @@ export class AssertHelper {
 
     /**
      * Asserts that a multi-select dropdown has specific selected values.
-     * @param {Locator} locator - The select element locator.
-     * @param {string[]} expectedValues - The expected selected values.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The select element locator.
+     * @param expectedValues - The expected selected values.
+     * @param message - Optional custom message.
      */
     @step('Asserts that a multi-select dropdown has specific selected values.')
     async assertElementHasValues(locator: Locator, expectedValues: string[], message?: string): Promise<void> {
@@ -257,8 +257,8 @@ export class AssertHelper {
     /**
      * Asserts that a page has a specific title.
      * @param page
-     * @param {string} title - The expected title.
-     * @param {string} [message] - Optional custom message.
+     * @param title - The expected title.
+     * @param message - Optional custom message.
      */
     @step('Asserts that a page has a specific title.')
     async assertPageHasTitle(page: Page, title: string, message?: string): Promise<void> {
@@ -268,8 +268,8 @@ export class AssertHelper {
     /**
      * Asserts that a page has a specific URL.
      * @param page
-     * @param {string} url - The expected URL.
-     * @param {string} [message] - Optional custom message.
+     * @param url - The expected URL.
+     * @param message - Optional custom message.
      */
     @step('Asserts that a page has a specific URL.')
     async assertPageHasURL(page: Page, url: string, message?: string): Promise<void> {
@@ -278,8 +278,8 @@ export class AssertHelper {
 
     /**
      * Asserts that an API response is OK (status 200-299).
-     * @param {APIResponse} response - The API response object.
-     * @param {string} [message] - Optional custom message.
+     * @param response - The API response object.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an API response is OK (status 200-299).')
     async assertResponseOK(response: APIResponse, message?: string): Promise<void> {
@@ -288,10 +288,10 @@ export class AssertHelper {
 
     /**
      * Asserts that an element matches a stored screenshot.
-     * @param {Locator} locator - The element locator.
-     * @param {string} screenshotPath - The path to store the screenshot or compare against.
-     * @param {Object} [options] - Optional Playwright screenshot comparison options.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param screenshotPath - The path to store the screenshot or compare against.
+     * @param options - Optional Playwright screenshot comparison options.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element matches a stored screenshot.')
     async assertElementHasScreenshot(
@@ -307,10 +307,10 @@ export class AssertHelper {
     /**
      * Asserts that the full page matches a stored screenshot.
      *
-     * @param {Page} page - The Playwright page instance.
-     * @param {string} screenshotPath - The path to store the screenshot or compare against.
-     * @param {Object} [options] - Optional Playwright screenshot comparison options.
-     * @param {string} [message] - Optional custom message.
+     * @param page - The Playwright page instance.
+     * @param screenshotPath - The path to store the screenshot or compare against.
+     * @param options - Optional Playwright screenshot comparison options.
+     * @param message - Optional custom message.
      */
     @step('Asserts that the page matches a stored screenshot.')
     async assertPageHasScreenshot(
@@ -325,10 +325,10 @@ export class AssertHelper {
 
     /**
      * Asserts that an element has a specific CSS property value.
-     * @param {Locator} locator - The element locator.
-     * @param {string} property - The CSS property to check.
-     * @param {string} expectedValue - The expected value of the CSS property.
-     * @param {string} [message] - Optional custom message.
+     * @param locator - The element locator.
+     * @param property - The CSS property to check.
+     * @param expectedValue - The expected value of the CSS property.
+     * @param message - Optional custom message.
      */
     @step('Asserts that an element has a specific CSS property value.')
     async assertElementHasCSS(
@@ -343,9 +343,9 @@ export class AssertHelper {
 
     /**
      * Asserts that a number is greater than or equal to a minimum value.
-     * @param {number} actual - The actual value.
-     * @param {number} min - The minimum expected value.
-     * @param {string} [message] - Optional custom message.
+     * @param actual - The actual value.
+     * @param min - The minimum expected value.
+     * @param message - Optional custom message.
      */
     @step('Asserts that a number is greater than or equal to minimum.')
     assertNumberGreaterThanOrEqual(actual: number, min: number, message?: string): void {
@@ -354,9 +354,9 @@ export class AssertHelper {
 
     /**
      * Asserts that a download has the expected filename.
-     * @param {Download} download - The Playwright download object.
-     * @param {string} expectedFilename - The expected filename.
-     * @param {string} [message] - Optional custom message.
+     * @param download - The Playwright download object.
+     * @param expectedFilename - The expected filename.
+     * @param message - Optional custom message.
      */
     @step('Asserts that download has expected filename.')
     assertDownloadFilename(download: Download, expectedFilename: string, message?: string): void {
@@ -366,9 +366,9 @@ export class AssertHelper {
 
     /**
      * Asserts that a download filename matches a regex pattern.
-     * @param {Download} download - The Playwright download object.
-     * @param {RegExp} pattern - The regex pattern to match.
-     * @param {string} [message] - Optional custom message.
+     * @param download - The Playwright download object.
+     * @param pattern - The regex pattern to match.
+     * @param message - Optional custom message.
      */
     @step('Asserts that download filename matches pattern.')
     assertDownloadFilenameMatches(download: Download, pattern: RegExp, message?: string): void {
@@ -381,9 +381,9 @@ export class AssertHelper {
 
     /**
      * Asserts that a string matches a regex pattern.
-     * @param {string} actual - The actual string value.
-     * @param {RegExp} pattern - The regex pattern to match.
-     * @param {string} [message] - Optional custom message.
+     * @param actual - The actual string value.
+     * @param pattern - The regex pattern to match.
+     * @param message - Optional custom message.
      */
     @step('Asserts that string matches pattern.')
     assertStringMatches(actual: string, pattern: RegExp, message?: string): void {
@@ -394,8 +394,8 @@ export class AssertHelper {
     }
 
     /** To be Truthy
-     *  @param {any} actual - The actual value to check
-     *  @param {string} message - Optional custom message
+     *  @param actual - The actual value to check
+     *  @param message - Optional custom message
      */
     @step('Asserts that a value is truthy.')
     assertTobeTruthy(actual: any, message?: string): void {

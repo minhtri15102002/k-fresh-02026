@@ -42,6 +42,9 @@ export class ProductPage extends ProductLocators {
     await this.commonPage.click(this.btnCompare);
   }
 
+  /**
+   * Verify compare notification box by checking if the notification box is visible and contains the correct success message.
+   */
   @step('Verify compare notification box')
   async expectCompareNotificationBox(): Promise<void> {
     await test.step('Verify compare notification box', async () => {
@@ -120,26 +123,35 @@ export class ProductPage extends ProductLocators {
     });
   }
 
+  /**
+   * Increases the product quantity by clicking the increase quantity button a specified number of times
+   * @param times The number of times to click the increase quantity button.
+   */
   @step('Increment Quantity')
-  async incrementQuantity(productName: string): Promise<void> {
+  async incrementQuantity(times: number): Promise<void> {
     await test.step('Increment quantity', async () => {
       await this.assertHelper.assertElementVisible(this.btnIncreaseQuantity);
-      const times = 3;
       await this.commonPage.click(this.btnIncreaseQuantity, { clickCount: times });
     });
   }
 
+  /**
+   * Decreases the product quantity by clicking the decrease quantity button a specified number of times
+   * @param times The number of times to click the decrease quantity button.
+   */
   @step('Decrement Quantity')
-  async decrementQuantity(productName: string): Promise<void> {
+  async decrementQuantity(times: number): Promise<void> {
     await test.step('Decrement quantity', async () => {
       await this.assertHelper.assertElementVisible(this.btnDecreaseQuantity);
-      const times = 2;
       await this.commonPage.click(this.btnDecreaseQuantity, { clickCount: times });
     });
   }
 
+  /**
+   * Verifies the final quantity value after incrementing and decrementing the quantity
+   */
   @step('Verify Final Quantity Value')
-  async verifyFinalQuantityValue(productName: string): Promise<void> {
+  async verifyFinalQuantityValue(): Promise<void> {
     await test.step('Verify final quantity value', async () => {
       const finalValue = await this.inputQuantity.inputValue();
       // Final quantity should be initial value + 1 (3 increments - 2 decrements)
@@ -148,6 +160,10 @@ export class ProductPage extends ProductLocators {
     });
   }
 
+  /**
+   * Fill quantity input directly and verify
+   * @param quantity The quantity value to fill in the input field.
+   */
   @step('Fill Quantity Input Directly and Verify')
   async fillQuantityInputDirectly(quantity: string): Promise<void> {
     await test.step('Fill quantity input directly and verify', async () => {
@@ -156,6 +172,10 @@ export class ProductPage extends ProductLocators {
     });
   }
 
+  /**
+   * Verifies the final quantity value after fill
+   * @param quantity The quantity value to verify the final quantity value for.
+   */
   @step('Verify Final Quantity Value After Fill')
   async verifyFinalQuantityValueAfterFill(quantity: string): Promise<void> {
     await test.step('Verify final quantity value after fill', async () => {
@@ -180,13 +200,6 @@ export class ProductPage extends ProductLocators {
       await this.assertHelper.assertElementNotVisible(this.tblSizeChart);
     });
   }
-
-  /**
-   * Check Add to Compare functionality by clicking the "Add to Compare" button, verifying the compare notification is visible with correct content
-   * and then clicking the action button in the notification to navigate to the comparison page, and finally verifying the product is listed on the comparison page.
-   * @param productName The name of the product to add to compare and verify on the comparison page.
-   */
-  @step('Check Add to Compare Functionality')
 
   /**
    * check pop-up functionality by opening the pop-up, verifying the content is visible, closing the pop-up, and verifying the content is no longer visible.

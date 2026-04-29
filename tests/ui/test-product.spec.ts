@@ -41,9 +41,9 @@ test.describe('Product Tests', () => {
     productPage,
   }) => {
     await productPage.checkQuantityCounterFunctionality(productData.productName);
-    await productPage.incrementQuantity(productData.productName);
-    await productPage.decrementQuantity(productData.productName);
-    await productPage.verifyFinalQuantityValue(productData.productName);
+    await productPage.incrementQuantity(3);
+    await productPage.decrementQuantity(2);
+    await productPage.verifyFinalQuantityValue();
     await productPage.fillQuantityInputDirectly('10');
     await productPage.verifyFinalQuantityValueAfterFill('10');
   });
