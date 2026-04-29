@@ -4,10 +4,11 @@ export interface User {
 }
 
 export interface UserProfile {
-  email: string;
   firstName: string;
   lastName: string;
-  password: string;
+  email: string;
   telephone: string;
-  phone?: string;
+
+  password: string;
+  confirmPassword?: string;
 }
