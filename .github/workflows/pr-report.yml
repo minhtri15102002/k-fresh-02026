@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Install envsubst
         run: sudo apt-get update && sudo apt-get install -y gettext
@@ -27,7 +27,7 @@ jobs:
           envsubst < .github/templates/report-template.md > PR_REPORT.md
 
       - name: Upload PR Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: pr-report
           path: PR_REPORT.md
