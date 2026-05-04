@@ -20,7 +20,7 @@ test.describe('Cart Tests', () => {
     await registerPage.submitRegistrationForm();
   });
 
-  test('TC01 - Verify Empty Cart', async ({ cartPage }) => {
+  test('TC01 - Verify Empty Cart', { tag: '@regression' }, async ({ cartPage }) => {
     await cartPage.commonPage.goto(Constants.BASE_URL);
     await cartPage.clickCartButton();
     await cartPage.clickEditCartButton();
@@ -28,7 +28,7 @@ test.describe('Cart Tests', () => {
     await cartPage.verifyMainCartIsEmpty(Messages.EMPTY_CART_MESSAGE);
   });
 
-  test('TC02 - Add Product to Cart', async ({ productPage, cartPage }) => {
+  test('TC02 - Add Product to Cart', { tag: '@smoke @regression' }, async ({ productPage, cartPage }) => {
     await productPage.commonPage.goto(Constants.BASE_URL);
     await productPage.searchAndSelectProduct(product);
     await productPage.increaseQuantity(product);
@@ -38,7 +38,7 @@ test.describe('Cart Tests', () => {
     await cartPage.verifyProductAddedToCart(product);
   });
 
-  test('TC03 - Remove Product from Cart', async ({ productPage, cartPage }) => {
+  test('TC03 - Remove Product from Cart', { tag: '@regression' }, async ({ productPage, cartPage }) => {
     await productPage.commonPage.goto(Constants.BASE_URL);
     await productPage.searchAndSelectProduct(product);
     await productPage.clickAddToCart();
@@ -48,7 +48,7 @@ test.describe('Cart Tests', () => {
     await cartPage.verifyProductRemovedFromCart(product);
   });
 
-  test('TC04 - Update Product Quantity', async ({ productPage, cartPage }) => {
+  test('TC04 - Update Product Quantity', { tag: '@regression' }, async ({ productPage, cartPage }) => {
     await productPage.commonPage.goto(Constants.BASE_URL);
     await productPage.searchAndSelectProduct(product);
     await productPage.clickAddToCart();
@@ -61,7 +61,7 @@ test.describe('Cart Tests', () => {
     await cartPage.verifyUpdatedProductQuantity(product);
   });
 
-  test('TC05 - Update Product Quantity to 0 (Remove via Quantity)', async ({ productPage, cartPage }) => {
+  test('TC05 - Update Product Quantity to 0 (Remove via Quantity)', { tag: '@regression' }, async ({ productPage, cartPage }) => {
     await productPage.commonPage.goto(Constants.BASE_URL);
     await productPage.searchAndSelectProduct(product);
     await productPage.clickAddToCart();
@@ -73,7 +73,7 @@ test.describe('Cart Tests', () => {
   });
   
   /** Test case Add-to-Cart of PThao */
-  test('TC_CART_01 - Add product to cart', async ({ homePage, productPage, cartPage }) => {
+  test('TC_CART_01 - Add product to cart', { tag: '@regression' }, async ({ homePage, productPage, cartPage }) => {
       await homePage.commonPage.goto(Constants.BASE_URL);
       await homePage.selectProduct(product.name);
       await productPage.clickAddToCart();
@@ -82,7 +82,7 @@ test.describe('Cart Tests', () => {
       await cartPage.verifyProductAddedToCart(product);
   });
 
-  test('TC_CART_02 - Add product with multiple quantity successfully', async ({ homePage, productPage, cartPage }) => {
+  test('TC_CART_02 - Add product with multiple quantity successfully', { tag: '@regression' }, async ({ homePage, productPage, cartPage }) => {
       await homePage.commonPage.goto(Constants.BASE_URL);
       await homePage.selectProduct(product.name);
       await productPage.setQuantity(3);
@@ -92,7 +92,7 @@ test.describe('Cart Tests', () => {
       await cartPage.verifyUpdatedProductQuantity({ ...product, quantity: 3 });
   });
 
-  test('TC_CART_03 - Add product to cart from homepage', async ({ homePage, productPage, cartPage }) => {
+  test('TC_CART_03 - Add product to cart from homepage', { tag: '@regression' }, async ({ homePage, productPage, cartPage }) => {
       await homePage.commonPage.goto(Constants.BASE_URL);
       await homePage.hoverAndAddToCart(product.name);
       await productPage.verifyAddToCartSuccessMessage(Messages.ADD_TO_CART_SUCCESS_MESSAGE);
@@ -100,7 +100,7 @@ test.describe('Cart Tests', () => {
       await cartPage.verifyProductAddedToCart(product);
   });
 
-  test('TC_CART_04 - Update product quantity in cart successfully', async ({ homePage, productPage, cartPage }) => {
+  test('TC_CART_04 - Update product quantity in cart successfully', { tag: '@regression' }, async ({ homePage, productPage, cartPage }) => {
       await homePage.commonPage.goto(Constants.BASE_URL);
       await homePage.selectProduct(product.name);
       await productPage.clickAddToCart();

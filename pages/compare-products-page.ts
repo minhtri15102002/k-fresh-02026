@@ -16,15 +16,12 @@ export class CompareProductsPage extends CompareProductsLocators {
    * Remove one or multiple products from the compare table
    * @param products List of products to be removed
    */
-  @step('Click Remove Product Button')
-  async clickRemoveProductButton(productName: string): Promise<void> {
-  }
-
   @step('Remove products from compare table')
   async removeProductsFromCompare(products: Product[]): Promise<void> {
     for (const product of products) {
       // Click the remove button for the specific product name
       await this.commonPage.click(this.btnRemove(product.id));
+
       // Verify the product is removed before moving to the next one
       await this.commonPage.waitForHidden(this.btnRemove(product.id));
     }

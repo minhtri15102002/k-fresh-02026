@@ -18,6 +18,16 @@ on:
           - uat
           - production
           - all
+      
+      test_type:
+        description: 'Type of test suite'
+        required: true
+        default: all
+        type: choice
+        options:
+          - smoke
+          - regression
+          - all
 
 jobs:
   test:
@@ -41,11 +51,18 @@ jobs:
       if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.environment == 'all' || github.event.inputs.environment == matrix.env }}
       run: |
         echo "Running tests against environment: $ENV"
-        npx playwright test
+        echo "Running test type: $TEST_TYPE"
+
+        if [ "$TEST_TYPE" = "all" ]; then
+          npx playwright test --project=chromium
+        else
+          npx playwright test --grep "@$TEST_TYPE" --project=chromium
+        fi
       env:
         HEADLESS: true
         CI: true
         ENV: ${{ matrix.env }}
+        TEST_TYPE: ${{ github.event.inputs.test_type || 'all' }}
     - uses: actions/upload-artifact@v5
       if: ${{ !cancelled() }}
       with:

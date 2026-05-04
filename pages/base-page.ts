@@ -1,16 +1,18 @@
 import { test as baseTest, type Page } from '@playwright/test';
-import { LoginPage } from '@pages/login-page';
-import { CommonPage } from '@pages/common-page';
-import { AddressBookPage } from '@pages/address-book-page';
-import { CheckoutPage } from '@pages/checkout-page';
-import { CompareProductsPage } from '@pages/compare-products-page';
-import { HomePage } from '@pages/home-page';
-import { CartPage } from '@pages/cart-page';
-import { MyOrdersPage } from '@pages/my-orders-page';
-import { ProductPage } from '@pages/product-page';
-import { ProfilePage } from '@pages/profile-page';
-import { RegisterPage } from '@pages/register-page';
-import { WishListPage } from '@pages/wish-list-page';
+import { LoginPage } from './login-page';
+import { CommonPage } from './common-page';
+import { AddressBookPage } from './address-book-page';
+import { CheckoutPage } from './checkout-page';
+import { CompareProductsPage } from './compare-products-page';
+import { HomePage } from './home-page';
+import { CartPage } from './cart-page';
+import { MyOrdersPage } from './my-orders-page';
+import { ProductPage } from './product-page';
+import { ProfilePage } from './profile-page';
+import { RegisterPage } from './register-page';
+import { WishListPage } from './wish-list-page';
+import { APIPage } from './api/api-page';
+import { AssertHelper } from './assert-helper-page';
 
 export const test = baseTest.extend<{
     loginPage: LoginPage;
@@ -25,6 +27,8 @@ export const test = baseTest.extend<{
     profilePage: ProfilePage;
     registerPage: RegisterPage;
     wishlistPage: WishListPage;
+    apiPage: APIPage;
+    assertHelper: AssertHelper;
 }>({
     loginPage: async ({ page, context }, use) => {
         const instance = new LoginPage(page);
@@ -108,6 +112,14 @@ export const test = baseTest.extend<{
         context.on('page', (newPage: Page) => {
             instance.setPage(newPage);
         });
+        await use(instance);
+    },
+    apiPage: async ({ request }, use) => {
+        const instance = new APIPage(request);
+        await use(instance);
+    },
+    assertHelper: async ({ }, use) => {
+        const instance = new AssertHelper();
         await use(instance);
     },
 });

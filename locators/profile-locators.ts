@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { CommonLocators } from '@locators/common-locators';
 import { DefaultAddressOption } from '@models/address';
 
@@ -19,6 +19,7 @@ export class ProfileLocators extends CommonLocators {
   selectAddressRegion!: Locator;
   btnNewAddress!: Locator;
   hdrAccount!: Locator;
+  btnMyAccount!: Locator;
   accountRightColumn!: Locator;
   btnEditAccount!: Locator;
   btnUpdatePassword!: Locator;
@@ -26,7 +27,7 @@ export class ProfileLocators extends CommonLocators {
   btnLogout!: Locator;
   alertSuccessUpdate!: Locator;
   btnLogoutContinue!: Locator;
-  btnContinue!: Locator;
+
   constructor(page: Page) {
     super(page);
     this.locatorInitialization();
@@ -36,6 +37,7 @@ export class ProfileLocators extends CommonLocators {
     super.locatorInitialization();
     // My Account page locators
     this.hdrAccount = this.page.getByRole('heading', { name: 'My Account' });
+    this.btnMyAccount = this.page.locator('//a[text()=" My Account"]');
     this.accountRightColumn = this.page.locator("//aside[@id='column-right']");
     this.btnEditAccount = this.page.locator("//a[contains(text(), 'Edit your account')]");
     this.btnUpdatePassword = this.accountRightColumn.locator("a[href*='route=account/password']").first();

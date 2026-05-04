@@ -1,10 +1,11 @@
-import test, { expect, Page } from '@playwright/test';
-import { Constants } from '@utilities/constants';
+import { expect, Page, test } from '@playwright/test';
 import { CommonPage } from '@pages/common-page';
 import { step } from '@utilities/logging';
 import { ProductLocators } from '@locators/product-locators';
 import { Product } from '@models/product';
 import { AssertHelper } from '@pages/assert-helper-page';
+import { ActionType } from '@models/action-type';
+import { Constants } from '@utilities/constants';
 
 export class ProductPage extends ProductLocators {
   commonPage: CommonPage;
@@ -39,7 +40,7 @@ export class ProductPage extends ProductLocators {
   @step('Click Add to Compare Button')
   async clickAddToCompareButton(productName: string): Promise<void> {
     await this.clickProductLink(productName);
-    await this.commonPage.click(this.btnCompare(productName));
+    await this.commonPage.click(this.btnCompare);
   }
 
   /**
@@ -119,7 +120,7 @@ export class ProductPage extends ProductLocators {
       await this.assertHelper.assertElementVisible(this.inputQuantity);
       //check initial quantity is a valid number and greater than 0
       const quantity = await this.commonPage.getAttribute(this.inputQuantity, 'value');
-      await this.assertHelper.assertNumberGreaterThanOrEqual(parseInt(quantity), 1);
+      this.assertHelper.assertNumberGreaterThanOrEqual(Number.parseInt(quantity), 1);
     });
   }
 
@@ -229,6 +230,43 @@ export class ProductPage extends ProductLocators {
   }
 
   /**
+   * Main orchestrator to perform various actions on a product.
+   * Handles scrolling, ID extraction, hovering, and dynamic button selection.
+   * @param product - The product object.
+   * @param action - Action type to execute.
+   */
+  @step('Perform action on product')
+  async performActionOnProduct(product: Product, action: ActionType): Promise<void> {
+    const productName = product.name;
+    // Locate the product thumbnail and ensure it's in the viewport
+    const targetProduct = this.productThumbnaiByName(productName);
+
+    // Select the appropriate locator based on the requested action
+    let btnAction;
+    switch (action) {
+      case ActionType.ADD_TO_CART:
+        btnAction = this.btnAddCart(productName);
+        break;
+      case ActionType.WISHLIST:
+        btnAction = this.btnAddWishlist(productName);
+        break;
+      case ActionType.COMPARE:
+        btnAction = this.btnCompareByProductName(productName);
+        break;
+      case ActionType.QUICK_VIEW:
+        btnAction = this.btnQuickView(productName);
+        break;
+      default:
+        throw new Error(`Unsupported action: "${action}"`);
+    }
+    // Wait for the button to be interactable and click it
+    await this.commonPage.waitForVisible(btnAction);
+    await this.commonPage.hover(targetProduct);
+    await this.commonPage.click(btnAction, { force: true });
+    await this.commonPage.waitForPageLoad();
+  }
+
+  /**
    * Add one or more products to Compare, verify them, and close the Toast message.
    * @param products - List of Product objects that need to be added
    */
@@ -241,12 +279,8 @@ export class ProductPage extends ProductLocators {
   }
 
   /**
-   *  Clicks the "Inquiry" button for the specified product.
-   * @param productName
+   * Clicks the "Add to Cart" button to add the product to the cart.
    */
-  @step('Click Inquiry Button')
-  async clickInqueryButton(productName: string): Promise<void> { }
-
   @step('Clicking the add to cart button to add the product to the cart')
   async clickAddToCart(): Promise<void> {
     await this.commonPage.roleButtonName('Add to Cart').click({ force: true });
@@ -324,9 +358,9 @@ export class ProductPage extends ProductLocators {
   }
 
   /**
-    * Search and Navigate to Product Page via UI Navigation
-     * @param product The name of the product to search for (e.g., 'HP LP3065').
-     */
+   * Search and Navigate to Product Page via UI Navigation
+   * @param product The name of the product to search for (e.g., 'HP LP3065').
+   */
   @step('Search and Navigate to Product Page via UI Navigation')
   async searchAndSelectProduct(product: Product): Promise<void> {
     await this.commonPage.waitForVisible(this.inputProductSearch);

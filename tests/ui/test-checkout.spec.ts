@@ -16,8 +16,10 @@ test.setTimeout(Constants.TIMEOUTS.DEFAULT);
  */
 test.describe('Checkout Tests', () => {
   const targetProduct = 'HP LP3065';
+
   let buyerProfile: UserProfile;
   let buyerAddress: Address;
+
   let receiverProfile: UserProfile;
   let receiverAddress: Address;
 
@@ -29,19 +31,22 @@ test.describe('Checkout Tests', () => {
 
     buyerProfile = generateUserProfile();
     buyerAddress = generateAddress();
+
     receiverProfile = generateUserProfile();
     receiverAddress = generateAddress();
 
     await homePage.navigateToHomePage();
     await homePage.goToRegisterPage();
+
     await registerPage.fillRegistrationForm(buyerProfile);
     await registerPage.clickAgreeTermsCheckbox();
     await registerPage.submitRegistrationForm();
     await registerPage.expectSuccessfulRegistration();
+
     await productPage.buySpecificItemNow(targetProduct);
   });
 
-  test('TC_CHK_001: Verify successful checkout using a different shipping address', async ({ checkoutPage }) => {
+  test('TC_CHK_001: Verify successful checkout using a different shipping address', { tag: '@smoke @regression' }, async ({ checkoutPage }) => {
     await checkoutPage.fillBillingDetails(buyerProfile, buyerAddress);
     await checkoutPage.verifyShippingSectionVisible();
     await checkoutPage.fillShippingDetails(receiverProfile, receiverAddress);
@@ -50,7 +55,7 @@ test.describe('Checkout Tests', () => {
     await checkoutPage.confirmOrderAndVerifySuccess();
   });
 
-  test('TC_CHK_002: Verify checkout recovers successfully when toggling shipping address states', async ({ checkoutPage }) => {
+  test('TC_CHK_002: Verify checkout recovers successfully when toggling shipping address states', { tag: '@regression' }, async ({ checkoutPage }) => {
     await checkoutPage.fillBillingDetails(buyerProfile, buyerAddress);
     await checkoutPage.verifyShippingSectionVisible();
     await checkoutPage.setTermsAndConditions();
@@ -61,7 +66,7 @@ test.describe('Checkout Tests', () => {
     await checkoutPage.confirmOrderAndVerifySuccess();
   });
 
-  test('TC_CHK_003: Mandatory Terms Check - Verify error when Terms & Conditions are not accepted', async ({ checkoutPage }) => {
+  test('TC_CHK_003: Mandatory Terms Check - Verify error when Terms & Conditions are not accepted', { tag: '@regression' }, async ({ checkoutPage }) => {
     await checkoutPage.fillBillingDetails(buyerProfile, buyerAddress);
     await checkoutPage.setTermsAndConditions(false);
     await checkoutPage.clickContinueButton();

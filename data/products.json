@@ -1,20 +1,24 @@
 {
   "qa": {
+    "id": 47,
     "name": "HP LP3065",
     "quantity": 1,
     "price": 122
   },
   "staging": {
+    "id": 47,
     "name": "HP LP3065",
     "quantity": 1,
     "price": 122
   },
   "uat": {
+    "id": 47,
     "name": "HP LP3065",
     "quantity": 1,
     "price": 122
   },
   "production": {
+    "id": 47,
     "name": "HP LP3065",
     "quantity": 1,
     "price": 122

@@ -42,8 +42,6 @@ export class CartPage extends CartLocators {
   @step('Update Quantity')
   async updateQuantity(quantity: number, productName: string): Promise<void> {
     await this.inputQuantity(productName).fill(quantity.toString());
-    await this.commonPage.click(this.roleButtonName('Checkout'));
-
   }
 
   /**
@@ -82,7 +80,7 @@ export class CartPage extends CartLocators {
     await this.assertHelper.assertElementHasValue(this.inputQuantity(product.name), product.quantity.toString());
     const totalText = await this.commonPage.innerText(this.cellTotal(product.name));
     const actualTotal = Currency.parseCurrency(totalText);
-    const expectedTotal = Number(product.price) * product.quantity;
+    const expectedTotal = product.price * product.quantity;
     Assertions.assertEqual(actualTotal, expectedTotal, `Expected total for ${product.name} to be ${expectedTotal}`);
   }
 
@@ -94,7 +92,7 @@ export class CartPage extends CartLocators {
     await this.assertHelper.assertElementVisible(this.miniCartDrawer);
     await this.commonPage.click(this.roleLinkName('View Cart', false));
   }
-  
+
   /**
    * Removes all products from the cart if any exist
    */
@@ -154,8 +152,25 @@ export class CartPage extends CartLocators {
   async verifyUpdatedProductQuantity(product: Product): Promise<void> {
     const totalText = await this.commonPage.innerText(this.cellTotal(product.name));
     const actualTotal = Currency.parseCurrency(totalText);
-    const expectedTotal = Number(product.price) * product.quantity;
+    const expectedTotal = product.price * product.quantity;
     Assertions.assertEqual(actualTotal, expectedTotal, `Expected updated total for ${product.name} to be ${expectedTotal}`);
     await this.assertHelper.assertElementHasValue(this.inputQuantity(product.name), product.quantity.toString());
+  }
+
+  /**
+   * Gets the product key for a specific product name from the cart using the remove button's onclick attribute.
+   * @param productName - The name of the product.
+   * @returns The product key.
+   */
+  @step('Get Product Key by Name')
+  async getProductKey(productName: string): Promise<string> {
+    const onclick = await this.btnRemove(productName).getAttribute('onclick');
+    if (onclick) {
+      const match = onclick.match(/cart\.remove\('([^']+)'\)/);
+      if (match) {
+        return match[1];
+      }
+    }
+    throw new Error(`Could not find product key for product: ${productName}`);
   }
 }

@@ -7,6 +7,7 @@ export class LoginLocators extends CommonLocators {
     super(page);
     this.locatorInitialization();
   }
+
   inputEmail!: Locator;
   inputPassword!: Locator;
   flashMessage!: Locator;
