@@ -24,8 +24,9 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+        env:
           node-version: ${{ env.NODE_VERSION }}
-
+          
       - name: Install envsubst
         run: sudo apt-get update && sudo apt-get install -y gettext
 
@@ -58,6 +59,6 @@ jobs:
         with:
           name: pr-report
           path: PR_REPORT.md
-          node-version: ${{ env.NODE_VERSION }}
         env:
+          node-version: ${{ env.NODE_VERSION }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
