@@ -15,27 +15,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout PR Code
+      - name: Checkout Repository
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
+      - name: Download PR Number Artifact
+        uses: actions/download-artifact@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          name: pr_number
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install envsubst
-        run: sudo apt-get update && sudo apt-get install -y gettext
+      - name: Read PR Number
+        id: pr_num
+        run: echo "nr=$(cat pr_number.txt)" >> $GITHUB_OUTPUT
 
-      # ⬇️ Download Playwright result artifact
-      - name: Download Playwright results
+      - name: Download Playwright Results
         uses: actions/download-artifact@v4
         with:
           name: playwright-report
           path: playwright-report
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # ⬇️ Đọc file summary.json (hoặc file bạn export)
       - name: Extract Playwright Summary
         id: test_summary
         run: |
@@ -48,40 +51,47 @@ jobs:
             echo "TEST_SUMMARY=No summary data available" >> $GITHUB_ENV
           fi
 
-      # ⬇️ Lấy lại metadata của Pull Request
       - name: Get PR Info
-        id: pr
-        uses: juturu/cloud-run-event-parser@v1
-
-      - name: Get PR Commits
-        run: |
-          git fetch origin ${{ steps.pr.outputs.pull_request_base_ref }}
-          COMMITS=$(git log origin/${{ steps.pr.outputs.pull_request_base_ref }}..HEAD \
-            --pretty=format:"* %h - %s (%an)" --no-merges)
+        id: pr_info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: ${{ steps.pr_num.outputs.nr }}
+            });
+            core.setOutput('title', pr.data.title);
+            core.setOutput('body', pr.data.body || '');
+            core.setOutput('author', pr.data.user.login);
+            core.setOutput('head_ref', pr.data.head.ref);
+            core.setOutput('base_ref', pr.data.base.ref);
+            core.setOutput('changed_files', pr.data.changed_files);
 
       - name: Get PR Commits
         id: get_commits
         run: |
-          git fetch origin ${{ github.event.pull_request.base.ref }}
+          git fetch origin ${{ steps.pr_info.outputs.base_ref }}
           # Get commits and format them as a markdown list
-          COMMITS=$(git log origin/${{ github.event.pull_request.base.ref }}..HEAD --pretty=format:"* %h - %s (%an)" --no-merges)
+          COMMITS=$(git log origin/${{ steps.pr_info.outputs.base_ref }}..HEAD --pretty=format:"* %h - %s (%an)" --no-merges)
           
-          # Use GITHUB_ENV to pass multiline string
           echo "PR_COMMITS<<EOF" >> $GITHUB_ENV
           echo "$COMMITS" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Generate PR Report from Template
         env:
-          PR_TITLE: ${{ steps.pr.outputs.pull_request_title }}
-          PR_BODY: ${{ steps.pr.outputs.pull_request_body }}
-          PR_AUTHOR: ${{ steps.pr.outputs.pull_request_user_login }}
-          PR_BRANCH: ${{ steps.pr.outputs.pull_request_head_ref }}
-          BASE_BRANCH: ${{ steps.pr.outputs.pull_request_base_ref }}
-          PR_CHANGED_FILES: ${{ steps.pr.outputs.pull_request_changed_files }}
+          PR_TITLE: ${{ steps.pr_info.outputs.title }}
+          PR_BODY: ${{ steps.pr_info.outputs.body }}
+          PR_AUTHOR: ${{ steps.pr_info.outputs.author }}
+          PR_BRANCH: ${{ steps.pr_info.outputs.head_ref }}
+          BASE_BRANCH: ${{ steps.pr_info.outputs.base_ref }}
+          PR_CHANGED_FILES: ${{ steps.pr_info.outputs.changed_files }}
           PR_COMMITS: ${{ env.PR_COMMITS }}
           TEST_SUMMARY: ${{ env.TEST_SUMMARY }}
         run: |
+          # Use envsubst to replace variables in template
+          # Make sure dependencies are installed if not in runner
           envsubst < .github/templates/report-template.md > PR_REPORT.md
 
       - name: Comment PR Report
@@ -89,13 +99,10 @@ jobs:
         with:
           recreate: true
           path: PR_REPORT.md
-          number: ${{ steps.pr.outputs.pull_request_number }}
+          number: ${{ steps.pr_num.outputs.nr }}
 
-      - name: Upload PR Report
-        uses: actions/upload-artifact@v6
+      - name: Upload PR Report Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: pr-report
           path: PR_REPORT.md
-        env:
-          node-version: ${{ env.NODE_VERSION }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
