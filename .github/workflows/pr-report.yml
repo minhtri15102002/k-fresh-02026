@@ -23,16 +23,6 @@ jobs:
       - name: Install envsubst
         run: sudo apt-get update && sudo apt-get install -y gettext
 
-      
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Check after setup Node version
-        run: node -v
-
       - name: Get PR Commits
         id: get_commits
         run: |
@@ -64,6 +54,3 @@ jobs:
           path: PR_REPORT.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check after setup PR report version
-        run: node -v
