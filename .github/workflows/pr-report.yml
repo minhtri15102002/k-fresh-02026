@@ -7,6 +7,7 @@ on:
 
 env:
     ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+    NODE_VERSION: 24
 
 jobs:
   generate-report:
@@ -17,6 +18,10 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: Check Checkout Node version
         run: node -v
 
