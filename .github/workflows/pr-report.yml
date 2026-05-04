@@ -6,25 +6,24 @@ on:
     branches: [main, master]
 
 env:
-    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     NODE_VERSION: 24
+    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   generate-report:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Check Checkout Node version
         run: node -v
-      - name: Checkout code
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install envsubst
         run: sudo apt-get update && sudo apt-get install -y gettext
@@ -40,7 +39,6 @@ jobs:
           echo "PR_COMMITS<<EOF" >> $GITHUB_ENV
           echo "$COMMITS" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-
       - name: Generate PR Report from Template
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
@@ -52,12 +50,10 @@ jobs:
           PR_COMMITS: ${{ env.PR_COMMITS }}
         run: |
           envsubst < .github/templates/report-template.md > PR_REPORT.md
-
       - name: Upload PR Report
         uses: actions/upload-artifact@v5
         with:
           name: pr-report
           path: PR_REPORT.md
-          node-version: ${{ env.NODE_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
