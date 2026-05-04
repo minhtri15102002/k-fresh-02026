@@ -10,15 +10,24 @@ export function generateUserProfile(): UserProfile {
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
         password: faker.internet.password({ length: 12 }) + '1!Aa',
-        phone: faker.phone.number()
+        telephone: faker.phone.number()
     };
 }
 
 /**  Generates a realistic Vietnamese address */
 export function generateAddress(): Address {
     return {
-        street: faker.location.streetAddress(),
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
+        company: faker.company.name(),
+        address1: faker.location.streetAddress(),
+        address2: faker.location.secondaryAddress(),
         city: faker.location.city(),
+        postCode: '700000',
+        country: 'Vietnam',
+        region: '3200', // Assuming 3200 is a valid region ID/code
+        defaultAddress: 'yes',
+        street: faker.location.streetAddress(),
         state: '3200',
         zipCode: '700000'
     };

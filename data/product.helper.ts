@@ -13,7 +13,7 @@ const productsByEnv: Record<string, Product> = readJsonFile(productsJsonPath);
  * @returns The product data object for the specified environment
  */
 export function getEnvProduct(
-  env: string = (process.env.ENV as ENV) || 'production',
+  env: string = (process.env.ENV as ENV) ?? 'production',
 ): Product {
   return productsByEnv[env] ?? productsByEnv.production;
 }

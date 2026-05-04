@@ -32,6 +32,7 @@ export class CommonPage extends CommonLocators {
         await this.click(this.btnContinue);
         await this.waitForPageLoad();
     }
+
     /**
      * Click on Locator
      * @param locator
@@ -797,6 +798,7 @@ export class CommonPage extends CommonLocators {
             await this.page.waitForLoadState('domcontentloaded');
         }
     }
+
     /**
     * Get Current URL
     * @returns

@@ -11,4 +11,7 @@ export interface Address {
   country: string;
   region: string;
   defaultAddress: DefaultAddressOption;
+  street: string;
+  state?: string;
+  zipCode?: string;
 }

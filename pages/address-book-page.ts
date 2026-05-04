@@ -28,7 +28,7 @@ export class AddressBookPage extends AddressBookLocators {
    */
   @step('Clicking New Address button')
   async clickNewAddress(): Promise<void> {
-    await this.commonPage.click(this.btnAddNew);
+    await this.commonPage.click(this.btnNewAddress);
   }
 
   /**

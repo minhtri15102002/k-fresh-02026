@@ -5,11 +5,6 @@ import { CommonLocators } from '@locators/common-locators';
  * Class representing register locators
  */
 export class RegisterLocators extends CommonLocators {
-  constructor(page: Page) {
-    super(page);
-    this.locatorInitialization();
-  }
-
   inputFirstName!: Locator;
   inputLastName!: Locator;
   inputEmail!: Locator;
@@ -21,6 +16,12 @@ export class RegisterLocators extends CommonLocators {
   radioNewsletterNo!: Locator;
   chkPrivacyPolicy!: Locator;
   btnSuccessContinue!: Locator;
+
+  constructor(page: Page) {
+    super(page);
+    this.locatorInitialization();
+  }
+
   lblSuccessMessage!: Locator;
   lblSuccessPageContent!: Locator;
 
@@ -45,6 +46,7 @@ export class RegisterLocators extends CommonLocators {
     this.radioNewsletterNo = this.page.locator('input[name="newsletter"][value="0"]');
     this.chkPrivacyPolicy = this.page.locator('label[for="input-agree"]');
     this.btnContinue = this.page.locator('input[value="Continue"]');
+
     this.lblSuccessMessage = this.page.locator('#content h1');
     this.lblSuccessPageContent = this.page.locator('#content');
     this.lblErrorFirstName = this.page.locator('#input-firstname + .text-danger');

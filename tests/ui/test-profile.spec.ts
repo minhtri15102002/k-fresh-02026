@@ -1,7 +1,4 @@
 import { test } from '@pages/base-page';
-import { user } from '@data/login.data';
-import { Constants } from '@utilities/constants';
-
 import {
   createAddressData,
   createRegisterData,
@@ -9,17 +6,22 @@ import {
   createUpdateProfileData,
 } from '@data/user.helper';
 import { Constants } from '@utilities/constants';
-import { user } from '@data/login.data';
 import type { UserProfile } from '@models/user';
+import { generateUserProfileData } from '@data/user-data';
 
-test.describe.configure({ timeout: 60000 });
-test.describe('TC001 - My Account Dashboard', () => {
-  test.beforeEach(async ({ homePage, loginPage }) => {
-    await homePage.goToLoginPage();
-    await loginPage.login(user);
+test.describe('My Account Tests', () => {
+  let userProfile: UserProfile;
+
+  test.beforeEach(async ({ commonPage, registerPage, profilePage }) => {
+    userProfile = generateUserProfileData();
+    await commonPage.goto(Constants.REGISTER_URL);
+    await registerPage.fillRegistrationForm(userProfile);
+    await registerPage.clickAgreeTermsCheckbox();
+    await registerPage.submitRegistrationForm();
+    await profilePage.clickMyAccountBtn();
   });
 
-  test('should show dashboard heading, shortcuts and right navigation', async ({
+  test('TC001 - My Account Dashboard', async ({
     profilePage,
   }) => {
     await profilePage.verifyMyAccountPage();
@@ -28,15 +30,8 @@ test.describe('TC001 - My Account Dashboard', () => {
     await profilePage.expectChangePasswordShortcuts();
     await profilePage.expectModifyAddressShortcuts();
   });
-});
 
-test.describe('TC002 - Update Account Information', () => {
-  test.beforeEach(async ({ homePage, loginPage }) => {
-    await homePage.goToLoginPage();
-    await loginPage.login(user);
-  });
-
-  test('should update first name, last name and telephone successfully', async ({
+  test('TC002 - Update Account Information', async ({
     profilePage,
   }) => {
     const updatedData = createUpdateProfileData();
@@ -48,9 +43,30 @@ test.describe('TC002 - Update Account Information', () => {
     await profilePage.openEditAccountPage();
     await profilePage.expectEditAccountValues(updatedDataForProfile);
   });
+
+  test('TC003 - Add New Address', async ({
+    profilePage,
+  }) => {
+    const addressData = createAddressData();
+    await profilePage.openAddAddressPage();
+    await profilePage.addNewAddress(addressData);
+    await profilePage.verifyAddressBookPage();
+    await profilePage.expectAddAddressSuccessMessage();
+    await profilePage.expectAddressPresent(addressData);
+  });
+
+  test('TC004 - Logout', async ({
+    profilePage,
+  }) => {
+    await profilePage.verifyMyAccountPage();
+    await profilePage.logout();
+    await profilePage.verifyLogoutPage();
+    await profilePage.continueAfterLogout();
+    await profilePage.verifyLogoutRedirectPage();
+  });
 });
 
-test.describe('TC003 - Change Password', () => {
+test.describe('TC005 - Change Password', () => {
   test('should change password from My Account right after register', async ({
     commonPage,
     registerPage,
@@ -62,54 +78,21 @@ test.describe('TC003 - Change Password', () => {
       firstName: registerData.firstName,
       lastName: registerData.lastName,
       email: registerData.email,
-      phone: registerData.phone,
+      telephone: registerData.telephone,
       password: registerData.password,
     };
+
     await commonPage.goto(Constants.REGISTER_URL);
     await registerPage.fillRegistrationForm(userProfile);
     await registerPage.clickAgreeTermsCheckbox();
     await registerPage.submitRegistrationForm();
     await profilePage.verifyRegistrationResultPage();
     await profilePage.continueFromRegistrationSuccessIfNeeded();
+
     await profilePage.verifyMyAccountPage();
     await profilePage.openChangePasswordPage();
     await profilePage.changePassword(changedPassword);
     await profilePage.verifyMyAccountPage();
     await profilePage.expectChangePasswordSuccessMessage();
-  });
-});
-
-test.describe('TC004 - Add New Address', () => {
-  test.beforeEach(async ({ homePage, loginPage }) => {
-    await homePage.goToLoginPage();
-    await loginPage.login(user);
-  });
-
-  test('should add a new address and show it in Address Book', async ({
-    profilePage,
-  }) => {
-    const addressData = createAddressData();
-    await profilePage.openAddAddressPage();
-    await profilePage.addNewAddress(addressData);
-    await profilePage.verifyAddressBookPage();
-    await profilePage.expectAddAddressSuccessMessage();
-    await profilePage.expectAddressPresent(addressData);
-  });
-});
-
-test.describe('TC005 - Logout', () => {
-  test.beforeEach(async ({ homePage, loginPage }) => {
-    await homePage.goToLoginPage();
-    await loginPage.login(user);
-  });
-
-  test('should logout from My Account page and show confirmation', async ({
-    profilePage,
-  }) => {
-    await profilePage.verifyMyAccountPage();
-    await profilePage.logout();
-    await profilePage.verifyLogoutPage();
-    await profilePage.continueAfterLogout();
-    await profilePage.verifyLogoutRedirectPage();
   });
 });
