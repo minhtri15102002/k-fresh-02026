@@ -6,7 +6,6 @@ on:
 permissions:
   contents: read
   pull-requests: write
-  issues: write   # 🔥 BẮT BUỘC để comment PR
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -15,6 +14,9 @@ env:
 jobs:
   generate-report:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - name: Checkout Repository
@@ -29,47 +31,52 @@ jobs:
           path: playwright-report
 
       - name: Extract Playwright Summary
+        id: test_summary
         run: |
           if [ -f playwright-report/summary.json ]; then
+            SUMMARY=$(cat playwright-report/summary.json)
             echo "TEST_SUMMARY<<EOF" >> $GITHUB_ENV
-            cat playwright-report/summary.json >> $GITHUB_ENV
+            echo "$SUMMARY" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
           else
             echo "TEST_SUMMARY=No summary data available" >> $GITHUB_ENV
           fi
 
       - name: Get PR Commits
+        id: get_commits
         run: |
-          git fetch origin ${{ github.ref_name }}
-
-          COMMITS=$(git log origin/${{ github.ref_name }}..HEAD --pretty=format:"* %h - %s (%an)" --no-merges)
-
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          # Get commits and format them as a markdown list
+          COMMITS=$(git log origin/${{ github.event.pull_request.base.ref }}..HEAD --pretty=format:"* %h - %s (%an)" --no-merges)
+          
           echo "PR_COMMITS<<EOF" >> $GITHUB_ENV
           echo "$COMMITS" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Generate PR Report from Template
         env:
-          PR_TITLE: ${{ github.event.pull_request.title || github.ref_name }}
-          PR_BODY: ${{ github.event.pull_request.body || '' }}
-          PR_AUTHOR: ${{ github.event.pull_request.user.login || 'unknown' }}
-          PR_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
-          BASE_BRANCH: ${{ github.event.pull_request.base.ref || 'main' }}
-          PR_CHANGED_FILES: ${{ github.event.pull_request.changed_files || 'N/A' }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          PR_CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
           PR_COMMITS: ${{ env.PR_COMMITS }}
           TEST_SUMMARY: ${{ env.TEST_SUMMARY }}
         run: |
+          # Use envsubst to replace variables in template
           envsubst < .github/templates/report-template.md > PR_REPORT.md
 
       - name: Comment PR Report
         uses: marocchino/sticky-pull-request-comment@v2
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           recreate: true
           path: PR_REPORT.md
           number: ${{ github.event.pull_request.number }}
 
       - name: Upload PR Report Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: pr-report
           path: PR_REPORT.md
