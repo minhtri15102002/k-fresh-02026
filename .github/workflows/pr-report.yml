@@ -4,16 +4,43 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main, master]
+
+env:
+    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    NODE_VERSION: 24
+
 jobs:
   generate-report:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Check Checkout Node version
+        run: node -v
       - name: Checkout code
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+        env:
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install envsubst
         run: sudo apt-get update && sudo apt-get install -y gettext
+
+      - name: Get PR Commits
+        id: get_commits
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          # Get commits and format them as a markdown list
+          COMMITS=$(git log origin/${{ github.event.pull_request.base.ref }}..HEAD --pretty=format:"* %h - %s (%an)" --no-merges)
+          
+          # Use GITHUB_ENV to pass multiline string
+          echo "PR_COMMITS<<EOF" >> $GITHUB_ENV
+          echo "$COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Generate PR Report from Template
         env:
@@ -23,20 +50,15 @@ jobs:
           PR_CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
           PR_BRANCH: ${{ github.event.pull_request.head.ref }}
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          PR_COMMITS: ${{ env.PR_COMMITS }}
         run: |
           envsubst < .github/templates/report-template.md > PR_REPORT.md
 
       - name: Upload PR Report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: pr-report
           path: PR_REPORT.md
-
-      - name: Comment PR
-        uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            ## 📄 PR Report Generated Successfully
-            Download file: **PR_REPORT.md** (Artifact)
         env:
+          node-version: ${{ env.NODE_VERSION }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

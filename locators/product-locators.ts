@@ -40,7 +40,6 @@ export class ProductLocators extends CommonLocators {
   btnAddToCart!: Locator;
   lnkViewCart!: Locator;
   searchInput!: Locator;
-  btnSearch!: Locator;
   inputProductSearch!: Locator;
   firstProductImage!: Locator;
   btnBuyNow!: Locator;

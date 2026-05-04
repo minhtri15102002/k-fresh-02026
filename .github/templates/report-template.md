@@ -9,7 +9,13 @@
 
 ---
 
-## 2. Context & Objective
+## 2. Commits
+
+$PR_COMMITS
+
+---
+
+## 3. Context & Objective
 
 > Why does this PR exist?
 
@@ -17,7 +23,7 @@ $PR_BODY
 
 ---
 
-## 3. Key Changes
+## 4. Key Changes
 
 > High-level overview of what was implemented
 
@@ -35,7 +41,7 @@ $PR_BODY
 
 ---
 
-## 4. Reviewer Focus Areas
+## 5. Reviewer Focus Areas
 
 > Where reviewers should spend the most attention
 
@@ -46,7 +52,7 @@ $PR_BODY
 
 ---
 
-## 5. Testing & Validation
+## 6. Testing & Validation
 
 > Evidence that this change works as expected
 
@@ -70,7 +76,7 @@ $PR_BODY
 
 ---
 
-## 6. Impact Assessment
+## 7. Impact Assessment
 
 > Scope and potential side effects
 
@@ -81,7 +87,7 @@ $PR_BODY
 
 ---
 
-## 7. Risks & Mitigations
+## 8. Risks & Mitigations
 
 > Be explicit—this builds trust in the PR
 
@@ -90,7 +96,7 @@ $PR_BODY
 
 ---
 
-## 8. Deployment Notes
+## 9. Deployment Notes
 
 > Anything ops/release should know
 
@@ -100,7 +106,7 @@ $PR_BODY
 
 ---
 
-## 9. Additional Artifacts
+## 10. Additional Artifacts
 
 > Optional but valuable
 
@@ -110,7 +116,7 @@ $PR_BODY
 
 ---
 
-## 10. Checklist
+## 11. Checklist
 
 * [ ] Code follows project standards
 * [ ] Tests added/updated where necessary
