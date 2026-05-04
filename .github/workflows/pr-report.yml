@@ -58,5 +58,6 @@ jobs:
         with:
           name: pr-report
           path: PR_REPORT.md
+          node-version: ${{ env.NODE_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
