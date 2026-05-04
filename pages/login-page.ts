@@ -1,4 +1,4 @@
-import test, { expect, Page } from '@playwright/test';
+import test, { Page } from '@playwright/test';
 import { UserProfile } from '@models/user';
 import { Constants } from '@utilities/constants';
 import { Messages } from '@data/messages.data';

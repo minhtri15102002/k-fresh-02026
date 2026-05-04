@@ -8,7 +8,6 @@ export interface UserProfile {
   lastName: string;
   email: string;
   telephone: string;
-
   password: string;
   confirmPassword?: string;
 }

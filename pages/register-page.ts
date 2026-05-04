@@ -1,10 +1,11 @@
-import { Locator, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import { CommonPage } from '@pages/common-page';
 import { step } from '@utilities/logging';
 import { RegisterLocators } from '@locators/register-locators';
 import { UserProfile } from '@models/user';
 import { Assertions } from '@utilities/assertions';
 import { Messages } from '@data/messages.data';
+import { Constants } from '@utilities/constants';
 
 export class RegisterPage extends RegisterLocators {
   commonPage: CommonPage;
@@ -106,4 +107,14 @@ export class RegisterPage extends RegisterLocators {
     Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorPassword), Messages.REGISTER_ERROR_PASSWORD);
     Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorAgree), Messages.REGISTER_ERROR_PRIVACY_POLICY);
   }
+
+  /** 
+   * Verifies that the user has been successfully registered
+   * This method checks if the page URL contains the success message and clicks the continue link.
+  */
+  @step('Verify successful registration')
+  async expectSuccessfulRegistration(): Promise<void> {
+    await expect(this.page).toHaveURL(/.*account\/success/, { timeout: Constants.TIMEOUTS.PERFORM_LOADING * 1000 });
+  }
+
 }

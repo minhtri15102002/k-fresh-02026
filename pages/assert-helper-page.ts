@@ -1,6 +1,9 @@
 import { expect, Locator, type APIResponse, type Page, type Download } from '@playwright/test';
 import { step } from '@utilities/logging';
 
+/**
+ * Shared assertion helpers for page objects (visibility, text, value, count, API response, downloads).
+ */
 export class AssertHelper {
 
     /**
@@ -141,7 +144,7 @@ export class AssertHelper {
      * @param message - Optional custom message.
      */
     @step('Asserts that an element has a specific attribute with the expected value.')
-    async assertElementHasAttribute(locator: Locator, attribute: string, expectedValue?: string, message?: string): Promise<void> {
+    async assertElementHasAttribute(locator: Locator, attribute: string, expectedValue?: string | RegExp, message?: string): Promise<void> {
         if (expectedValue) {
             await expect.soft(locator, message ?? `Expected element to have attribute '${attribute}' with value '${expectedValue}'`)
                 .toHaveAttribute(attribute, expectedValue);
@@ -200,7 +203,7 @@ export class AssertHelper {
      * @param message - Optional custom message.
      */
     @step('Asserts that an element contains a specific text.')
-    async assertElementContainsText(locator: Locator, text: string, message?: string): Promise<void> {
+    async assertElementContainsText(locator: Locator, text: string | RegExp, message?: string): Promise<void> {
         await expect.soft(locator, message ?? `Expected element to contain text: "${text}"`).toContainText(text);
     }
 
@@ -233,7 +236,7 @@ export class AssertHelper {
      * @param message - Optional custom message.
      */
     @step('Asserts that an input field has a specific value.')
-    async assertElementHasValue(locator: Locator, expectedValue: string, message?: string): Promise<void> {
+    async assertElementHasValue(locator: Locator, expectedValue: string | RegExp, message?: string): Promise<void> {
         await expect.soft(locator, message ?? `Expected element to have value '${expectedValue}'`)
             .toHaveValue(expectedValue);
     }
@@ -257,7 +260,7 @@ export class AssertHelper {
      * @param message - Optional custom message.
      */
     @step('Asserts that a page has a specific title.')
-    async assertPageHasTitle(page: Page, title: string, message?: string): Promise<void> {
+    async assertPageHasTitle(page: Page, title: string | RegExp, message?: string): Promise<void> {
         await expect.soft(page, message ?? `Expected page title to be "${title}"`).toHaveTitle(title);
     }
 
@@ -268,7 +271,7 @@ export class AssertHelper {
      * @param message - Optional custom message.
      */
     @step('Asserts that a page has a specific URL.')
-    async assertPageHasURL(page: Page, url: string, message?: string): Promise<void> {
+    async assertPageHasURL(page: Page, url: string | RegExp, message?: string): Promise<void> {
         await expect.soft(page, message ?? `Expected page URL to be "${url}"`).toHaveURL(url);
     }
 
@@ -397,4 +400,5 @@ export class AssertHelper {
     assertTobeTruthy(actual: any, message?: string): void {
         expect.soft(actual, message ?? `Expected ${actual} to be truthy`).toBeTruthy();
     }
+
 }

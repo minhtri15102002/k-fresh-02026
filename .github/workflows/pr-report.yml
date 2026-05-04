@@ -59,6 +59,14 @@ jobs:
           COMMITS=$(git log origin/${{ steps.pr.outputs.pull_request_base_ref }}..HEAD \
             --pretty=format:"* %h - %s (%an)" --no-merges)
 
+      - name: Get PR Commits
+        id: get_commits
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          # Get commits and format them as a markdown list
+          COMMITS=$(git log origin/${{ github.event.pull_request.base.ref }}..HEAD --pretty=format:"* %h - %s (%an)" --no-merges)
+          
+          # Use GITHUB_ENV to pass multiline string
           echo "PR_COMMITS<<EOF" >> $GITHUB_ENV
           echo "$COMMITS" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -88,3 +96,6 @@ jobs:
         with:
           name: pr-report
           path: PR_REPORT.md
+        env:
+          node-version: ${{ env.NODE_VERSION }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -7,6 +7,7 @@ export class CompareProductsLocators extends CommonLocators {
     super(page);
     this.locatorInitialization();
   }
+
   table!: Locator;
   btnRemove!: (id?: string) => Locator;
   btnAddToCart!: Locator;

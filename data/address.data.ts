@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { Address } from '@models/address'; 
+import { Address } from '@models/address';
 
 export const generateAddressData = (): Address => {
   return {

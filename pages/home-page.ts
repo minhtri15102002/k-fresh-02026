@@ -5,6 +5,7 @@ import { step } from '@utilities/logging';
 import { HomeLocators } from '@locators/home-locators';
 import { AssertHelper } from '@pages/assert-helper-page';
 import { Assertions } from '@utilities/assertions';
+
 export class HomePage extends HomeLocators {
   commonPage: CommonPage;
   assertHelper: AssertHelper;
@@ -71,6 +72,8 @@ export class HomePage extends HomeLocators {
   @step('Hover over product and click Add to Cart')
   async hoverAndAddToCart(productName: string): Promise<void> {
     const productCard = this.productCard(productName);
+    await this.assertHelper.assertElementVisible(productCard);
+    await productCard.scrollIntoViewIfNeeded();
     await this.commonPage.hover(productCard);
     await this.commonPage.click(this.getAddToCartButton(productName));
   }

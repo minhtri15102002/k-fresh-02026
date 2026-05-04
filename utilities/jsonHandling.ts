@@ -1,4 +1,4 @@
-import { existsSync,readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import path from 'path';
 
 /**
@@ -9,28 +9,13 @@ import path from 'path';
  * @returns Parsed JSON data or the env-specific subset.
  */
 export function readJsonFile<T = unknown>(filePath: string, env?: string): T {
-  const resolvedPath = path.isAbsolute(filePath)
-    ? filePath
-    : existsSync(path.resolve(process.cwd(), filePath))
-      ? path.resolve(process.cwd(), filePath)
-      : path.resolve(__dirname, '..', filePath);
+  const resolvedPath = path.resolve(filePath);
   const rawData = readFileSync(resolvedPath, 'utf8');
   const data = JSON.parse(rawData);
 
   if (!env) {
     return data as T;
   }
+
   return data[env.toLowerCase()] as T;
 }
-
-/**
- * Writes data to a JSON file.
- * @param filePath - Path to the JSON file.
- * @param data - Data to be written.
- */
-export function writeJsonFile(filePath: string, data: any): void {
-  const resolvedPath = path.resolve(filePath);
-  const jsonData = JSON.stringify(data, null, 2);
-  writeFileSync(resolvedPath, jsonData, 'utf8');
-}
-

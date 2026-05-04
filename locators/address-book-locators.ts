@@ -18,6 +18,7 @@ export class AddressBookLocators extends CommonLocators {
   regionDropdown!: Locator;
   btnBack!: Locator;
   lnkAddressBook!: Locator;
+  btnNewAddress!: Locator;
 
   locatorsInitialization(): void {
     super.locatorInitialization();
@@ -31,6 +32,8 @@ export class AddressBookLocators extends CommonLocators {
     this.lnkAddressBook = this.page.locator('//a[contains(normalize-space(.), "Address Book")]');
     this.countryDropdown = this.page.locator('//select[@name="country_id"]');
     this.regionDropdown = this.page.locator('//select[@name="zone_id"]');
+    this.btnNewAddress = this.page.locator('//a[text()="New Address"]');
+
   }
   actionButton(text: string): Locator {
     return this.page.locator(`//a[contains(text(),"${text}")]`);
