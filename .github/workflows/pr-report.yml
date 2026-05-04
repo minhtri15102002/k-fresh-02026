@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main, master]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  
 jobs:
   generate-report:
     runs-on: ubuntu-latest
@@ -16,6 +20,9 @@ jobs:
 
       - name: Install envsubst
         run: sudo apt-get update && sudo apt-get install -y gettext
+
+      - name: Check Node version
+        run: node -v
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
