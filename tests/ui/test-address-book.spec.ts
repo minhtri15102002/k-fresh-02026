@@ -1,8 +1,8 @@
-import { test } from '../../pages/base-page';
-import { generateAddressData } from '../../data/address.data';
-import { generateUserProfileData } from '../../data/user-data';
-import { UserProfile } from '../../models/user';
-import { Constants } from '../../utilities/constants';
+import { test } from '@pages/base-page';
+import { generateAddressData } from '@data/address.data';
+import { generateUserProfileData } from '@data/user-data';
+import { UserProfile } from '@models/user';
+import { Constants } from '@utilities/constants';
 
 let userProfile: UserProfile;
 test.describe('Address Book', () => {

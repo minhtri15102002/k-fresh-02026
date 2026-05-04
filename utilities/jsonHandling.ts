@@ -1,4 +1,4 @@
-import { existsSync,readFileSync } from 'fs';
+import { existsSync,readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
 /**
@@ -20,6 +20,17 @@ export function readJsonFile<T = unknown>(filePath: string, env?: string): T {
   if (!env) {
     return data as T;
   }
-
   return data[env.toLowerCase()] as T;
 }
+
+/**
+ * Writes data to a JSON file.
+ * @param filePath - Path to the JSON file.
+ * @param data - Data to be written.
+ */
+export function writeJsonFile(filePath: string, data: any): void {
+  const resolvedPath = path.resolve(filePath);
+  const jsonData = JSON.stringify(data, null, 2);
+  writeFileSync(resolvedPath, jsonData, 'utf8');
+}
+

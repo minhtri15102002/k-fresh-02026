@@ -1,16 +1,16 @@
 import { test as baseTest, type Page } from '@playwright/test';
-import { LoginPage } from './login-page';
-import { CommonPage } from './common-page';
-import { AddressBookPage } from './address-book-page';
-import { CheckoutPage } from './checkout-page';
-import { CompareProductsPage } from './compare-products-page';
-import { HomePage } from './home-page';
-import { CartPage } from './cart-page';
-import { MyOrdersPage } from './my-orders-page';
-import { ProductPage } from './product-page';
-import { ProfilePage } from './profile-page';
-import { RegisterPage } from './register-page';
-import { WishListPage } from './wish-list-page';
+import { LoginPage } from '@pages/login-page';
+import { CommonPage } from '@pages/common-page';
+import { AddressBookPage } from '@pages/address-book-page';
+import { CheckoutPage } from '@pages/checkout-page';
+import { CompareProductsPage } from '@pages/compare-products-page';
+import { HomePage } from '@pages/home-page';
+import { CartPage } from '@pages/cart-page';
+import { MyOrdersPage } from '@pages/my-orders-page';
+import { ProductPage } from '@pages/product-page';
+import { ProfilePage } from '@pages/profile-page';
+import { RegisterPage } from '@pages/register-page';
+import { WishListPage } from '@pages/wish-list-page';
 
 export const test = baseTest.extend<{
     loginPage: LoginPage;

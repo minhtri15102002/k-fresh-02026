@@ -188,7 +188,7 @@ export class LoginLocators extends CommonLocators {
 ```TypeScript
 import { Page } from '@playwright/test';
 import { LoginLocators } from '@locators/login-locators';
-import { CommonPage } from '../common-page';
+import { CommonPage } from '@common-page';
 import { step } from '@utilities/logging';
 import { assertHelper } from '@utilities/assertions';
 import { User } from '@models/user';
@@ -238,7 +238,7 @@ export class LoginPage extends LoginLocators {
 ```TypeScript
 import { Page } from '@playwright/test';
 import { AppointmentLocators } from '@locators/appointment-locators';
-import { CommonPage } from '../common-page';
+import { CommonPage } from '@common-page';
 import { step } from '@utilities/logging';
 import { assertHelper } from '@utilities/assertions';
 import { Appointment } from '@models/appointment';

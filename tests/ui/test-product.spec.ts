@@ -8,14 +8,12 @@ test.describe('Product Tests', () => {
   });
 
   test(`TC01 - Verify product detail page for ${Constants.ENV} environment`, async ({
-    commonPage,
     productPage,
   }) => {
     await productPage.openProductDetail(productData.productName);
   });
 
   test(`TC02 - Verify add to compare functionality for ${Constants.ENV} environment`, async ({
-    commonPage,
     productPage,
   }) => {
     await productPage.clickAddToCompareButton(productData.productName);
@@ -23,21 +21,18 @@ test.describe('Product Tests', () => {
   });
 
   test(`TC03 - Verify size chart functionality for ${Constants.ENV} environment`, async ({
-    commonPage,
     productPage,
   }) => {
     await productPage.checkSizeChartFunctionality(productData.productName);
   });
 
   test(`TC04 - Verify pop-up functionality for ${Constants.ENV} environment`, async ({
-    commonPage,
     productPage,
   }) => {
     await productPage.checkPopupFunctionality(productData.productName);
   });
 
   test(`TC05 - Verify quantity counter functionality for ${Constants.ENV} environment`, async ({
-    commonPage,
     productPage,
   }) => {
     await productPage.checkQuantityCounterFunctionality(productData.productName);

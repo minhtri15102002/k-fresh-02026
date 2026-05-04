@@ -1,13 +1,13 @@
 import { expect, Page, Locator } from '@playwright/test';
-import { Constants } from '../utilities/constants';
-import { CommonPage } from './common-page';
-import { step } from '../utilities/logging';
-import { CheckoutLocators } from '../locators/checkout-locators';
-import { Address } from '../models/address';
-import { UserProfile } from '../models/user';
-import { Currency } from '../utilities/currency';
-import { Logger } from '../utilities/logger';
-import { AssertHelper } from './assert-helper-page';
+import { Constants } from '@utilities/constants';
+import { CommonPage } from '@pages/common-page';
+import { step } from '@utilities/logging';
+import { CheckoutLocators } from '@locators/checkout-locators';
+import { Address } from '@models/address';
+import { UserProfile } from '@models/user';
+import { Currency } from '@utilities/currency';
+import { Logger } from '@utilities/logger';
+import { AssertHelper } from '@pages/assert-helper-page';
 
 /**
  * Page Object Model for the Checkout Page.
