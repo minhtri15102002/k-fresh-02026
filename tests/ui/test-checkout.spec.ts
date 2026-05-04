@@ -1,10 +1,9 @@
-import { test } from '../../pages/base-page';
-import { generateUserProfile } from '../../data/checkout-data';
-import { Logger } from '../../utilities/logger';
-import { Constants } from '../../utilities/constants';
-import { UserProfile } from '../../models/user';
-import { Address } from '../../models/address';
-import { generateAddress } from '../../data/checkout-data';
+import { test } from '@pages/base-page';
+import { generateUserProfile, generateAddress } from '@data/checkout-data';
+import { Logger } from '@utilities/logger';
+import { Constants } from '@utilities/constants';
+import { UserProfile } from '@models/user';
+import { Address } from '@models/address';
 
 // Set the global timeout for all test cases within this specific test suite
 test.setTimeout(Constants.TIMEOUTS.DEFAULT);
@@ -17,10 +16,8 @@ test.setTimeout(Constants.TIMEOUTS.DEFAULT);
  */
 test.describe('Checkout Tests', () => {
   const targetProduct = 'HP LP3065';
-
   let buyerProfile: UserProfile;
   let buyerAddress: Address;
-
   let receiverProfile: UserProfile;
   let receiverAddress: Address;
 
@@ -32,18 +29,15 @@ test.describe('Checkout Tests', () => {
 
     buyerProfile = generateUserProfile();
     buyerAddress = generateAddress();
-
     receiverProfile = generateUserProfile();
     receiverAddress = generateAddress();
 
     await homePage.navigateToHomePage();
     await homePage.goToRegisterPage();
-
     await registerPage.fillRegistrationForm(buyerProfile);
     await registerPage.clickAgreeTermsCheckbox();
     await registerPage.submitRegistrationForm();
     await registerPage.expectSuccessfulRegistration();
-
     await productPage.buySpecificItemNow(targetProduct);
   });
 

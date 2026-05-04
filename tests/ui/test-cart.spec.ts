@@ -1,10 +1,10 @@
-import { test } from '../../pages/base-page';
-import { Constants } from '../../utilities/constants';
-import { Messages } from '../../data/messages.data';
-import { UserProfile } from '../../models/user';
-import { generateUserProfileData } from '../../data/user-data';
-import { Product } from '../../models/product';
-import { getEnvProduct } from '../../data/product.helper';
+import { test } from '@pages/base-page';
+import { Constants } from '@utilities/constants';
+import { Messages } from '@data/messages.data';
+import { UserProfile } from '@models/user';
+import { generateUserProfileData } from '@data/user-data';
+import { Product } from '@models/product';
+import { getEnvProduct } from '@data/product.helper';
 
 const product: Product = getEnvProduct();
 let userProfile: UserProfile;

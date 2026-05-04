@@ -1,6 +1,6 @@
 import './env.loader';
 import { defineConfig, devices } from '@playwright/test';
-import { Constants } from './utilities/constants';
+import { Constants } from '@utilities/constants';
 
 /**
  * See https://playwright.dev/docs/test-configuration.

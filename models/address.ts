@@ -1,3 +1,5 @@
+export type DefaultAddressOption = 'yes' | 'no';
+
 export interface Address {
   firstName: string;
   lastName: string;
@@ -8,4 +10,5 @@ export interface Address {
   postCode: string;
   country: string;
   region: string;
+  defaultAddress: DefaultAddressOption;
 }
