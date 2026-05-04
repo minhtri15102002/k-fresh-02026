@@ -1,11 +1,10 @@
-import { Page } from '@playwright/test';
-import { CommonPage } from './common-page';
+import test, { expect, Page } from '@playwright/test';
+import { Constants } from '@utilities/constants';
+import { CommonPage } from '@pages/common-page';
 import { step } from '@utilities/logging';
 import { ProductLocators } from '@locators/product-locators';
 import { Product } from '@models/product';
-import { AssertHelper } from './assert-helper-page';
-import { Product } from '../models/product';
-import { ActionType } from '../models/action-type';
+import { AssertHelper } from '@pages/assert-helper-page';
 
 export class ProductPage extends ProductLocators {
   commonPage: CommonPage;
@@ -40,7 +39,7 @@ export class ProductPage extends ProductLocators {
   @step('Click Add to Compare Button')
   async clickAddToCompareButton(productName: string): Promise<void> {
     await this.clickProductLink(productName);
-    await this.commonPage.click(this.btnCompare);
+    await this.commonPage.click(this.btnCompare(productName));
   }
 
   /**
@@ -230,43 +229,6 @@ export class ProductPage extends ProductLocators {
   }
 
   /**
-   * Main orchestrator to perform various actions on a product.
-   * Handles scrolling, ID extraction, hovering, and dynamic button selection.
-   * @param product - The product object.
-   * @param action - Action type to execute.
-   */
-  @step('Perform action on product')
-  async performActionOnProduct(product: Product, action: ActionType): Promise<void> {
-    const productName = product.name;
-    // Locate the product thumbnail and ensure it's in the viewport
-    const targetProduct = this.productThumbnaiByName(productName);
-
-    // Select the appropriate locator based on the requested action
-    let btnAction;
-    switch (action) {
-      case ActionType.ADD_TO_CART:
-        btnAction = this.btnAddCart(productName);
-        break;
-      case ActionType.WISHLIST:
-        btnAction = this.btnAddWishlist(productName);
-        break;
-      case ActionType.COMPARE:
-        btnAction = this.btnCompare(productName);
-        break;
-      case ActionType.QUICK_VIEW:
-        btnAction = this.btnQuickView(productName);
-        break;
-      default:
-        throw new Error(`Unsupported action: "${action}"`);
-    }
-    // Wait for the button to be interactable and click it
-    await this.commonPage.waitForVisible(btnAction);
-    await this.commonPage.hover(targetProduct);
-    await this.commonPage.click(btnAction, { force: true });
-    await this.commonPage.waitForPageLoad();
-  }
-
-  /**
    * Add one or more products to Compare, verify them, and close the Toast message.
    * @param products - List of Product objects that need to be added
    */
@@ -276,11 +238,15 @@ export class ProductPage extends ProductLocators {
       await this.performActionOnProduct(product, ActionType.COMPARE);
       await this.commonPage.waitForVisible(this.toastMessage(product.name));
     }
+  }
+
+  /**
    *  Clicks the "Inquiry" button for the specified product.
    * @param productName
    */
   @step('Click Inquiry Button')
   async clickInqueryButton(productName: string): Promise<void> { }
+
   @step('Clicking the add to cart button to add the product to the cart')
   async clickAddToCart(): Promise<void> {
     await this.commonPage.roleButtonName('Add to Cart').click({ force: true });
@@ -309,7 +275,7 @@ export class ProductPage extends ProductLocators {
     await this.assertHelper.assertElementVisible(this.divSuccessAlert);
     await this.commonPage.click(this.roleLinkName('View Cart', false));
   }
-  
+
   /**
      * Sets the quantity of the product to be added to the cart.
      * @param qty 
@@ -318,7 +284,7 @@ export class ProductPage extends ProductLocators {
   async setQuantity(qty: number): Promise<void> {
     await this.commonPage.fill(this.inputQuantity, qty.toString());
   }
- 
+
   /**
   * Adds an item to the cart using standard UI navigation (Search -> Product Detail -> Add to Cart).
   * @param searchTerm The name of the product to search for (e.g., 'HP LP3065').
@@ -355,9 +321,12 @@ export class ProductPage extends ProductLocators {
     const btnNavigate = this.btnNavigateToComparePage(productName);
     await this.commonPage.waitForVisible(btnNavigate);
     await this.commonPage.click(btnNavigate);
-   * Search and Navigate to Product Page via UI Navigation
-   * @param product The name of the product to search for (e.g., 'HP LP3065').
-   */
+  }
+
+  /**
+    * Search and Navigate to Product Page via UI Navigation
+     * @param product The name of the product to search for (e.g., 'HP LP3065').
+     */
   @step('Search and Navigate to Product Page via UI Navigation')
   async searchAndSelectProduct(product: Product): Promise<void> {
     await this.commonPage.waitForVisible(this.inputProductSearch);

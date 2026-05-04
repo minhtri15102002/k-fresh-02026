@@ -1,7 +1,8 @@
-import { test } from '../../pages/base-page';
-import { Constants } from '../../utilities/constants';
-import { UserProfile } from '../../models/user';
-import { generateUserProfileData } from '../../data/user-data';
+import { test } from '@pages/base-page';
+import { user } from '@data/login.data';
+import { Constants } from '@utilities/constants';
+import { UserProfile } from '@models/user';
+import { generateUserProfileData } from '@data/user-data';
 
 test.describe('Wish List Tests', () => {
   let userProfile: UserProfile;
@@ -30,6 +31,5 @@ test.describe('Wish List Tests', () => {
   test('TC-WL-005: link to product detail', async ({ wishlistPage }) => {
     await wishlistPage.verifyWishlistNotEmpty();
     await wishlistPage.openFirstProductAndVerifyDetail();
-
   });
 });

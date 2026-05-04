@@ -1,11 +1,11 @@
-import test, { Page } from '@playwright/test';
-import { UserProfile } from '../models/user';
-import { Constants } from '../utilities/constants';
-import { Messages } from '../data/messages.data';
-import { LoginLocators } from '../locators/login-locators';
-import { step } from '../utilities/logging';
-import { CommonPage } from './common-page';
-import { AssertHelper } from './assert-helper-page';
+import test, { expect, Page } from '@playwright/test';
+import { UserProfile } from '@models/user';
+import { Constants } from '@utilities/constants';
+import { Messages } from '@data/messages.data';
+import { LoginLocators } from '@locators/login-locators';
+import { step } from '@utilities/logging';
+import { CommonPage } from '@pages/common-page';
+import { AssertHelper } from '@pages/assert-helper-page';
 
 export class LoginPage extends LoginLocators {
 

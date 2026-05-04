@@ -1,12 +1,13 @@
 import { Locator, Page } from '@playwright/test';
-import { CommonLocators } from './common-locators';
+import { CommonLocators } from '@locators/common-locators';
 
 export class HomeLocators extends CommonLocators {
     constructor(page: Page) {
         super(page);
         this.locatorInitialization();
     }
-
+    shopByCategoryMenu!: Locator;
+    itemTopCategory!: (itemName: string) => Locator;
     iconWishList!: Locator;
     divSuccessAlert!: Locator;
     spanSuccessAlertMessage!: Locator;
@@ -25,6 +26,8 @@ export class HomeLocators extends CommonLocators {
     addToCart!: Locator;
     btnMyAccount!: Locator;
     lnkRegister!: Locator;
+
+    locatorsInitialization(): void {
     ddlMyAccount!: Locator;
     lnkMyAccountLogin!: Locator;
     locatorInitialization() {
@@ -50,9 +53,8 @@ export class HomeLocators extends CommonLocators {
             productNameLink: (name: string) => `//a[contains(text(),"${name}")]`
         };
         this.btnAddToCart = this.page.locator('button[title="Add to Cart"]');
-
-        this.menuLink = (menuName: string) =>
-            this.page.locator('nav').locator(`a:has-text("${menuName}")`);
+        this.menuLink = (menuName: string) => this.page.locator('nav').locator(`a:has-text("${menuName}")`);
+        this.menuLink = (menuName: string) => this.page.locator('nav').locator(`a:has-text("${menuName}")`);
         this.btnMyAccount = this.page.getByRole('button', { name: /My account/i }).first();
         this.lnkRegister = this.page.getByRole('link', { name: 'Register' }).first();
     }

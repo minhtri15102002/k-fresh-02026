@@ -1,8 +1,9 @@
 import { Page } from '@playwright/test';
-import { CommonPage } from './common-page';
-import { step } from '../utilities/logging';
-import { WishListLocators } from '../locators/wish-list-locators';
-import { AssertHelper } from './assert-helper-page';
+import { CommonPage } from '@pages/common-page';
+import { step } from '@utilities/logging';
+import { WishListLocators } from '@locators/wish-list-locators';
+import { Product } from '@models/product';
+import { AssertHelper } from '@pages/assert-helper-page';
 
 export class WishListPage extends WishListLocators {
   commonPage: CommonPage;

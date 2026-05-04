@@ -1,7 +1,7 @@
 import { resolve } from 'node:path';
-import { readJsonFile } from '../utilities/jsonHandling';
-import { Product } from '../models/product';
-import { ENV } from '../models/index';
+import { readJsonFile } from '@utilities/jsonHandling';
+import { Product } from '@models/product';
+import { ENV } from '@models/index';
 
 const productsJsonPath = resolve(__dirname, 'products.json');
 const productsByEnv: Record<string, Product> = readJsonFile(productsJsonPath);

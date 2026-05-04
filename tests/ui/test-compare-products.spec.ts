@@ -1,6 +1,6 @@
-import { test } from '../../pages/base-page';
-import { Constants } from '../../utilities/constants';
-import { products } from '../../data/products.data';
+import { test } from '@pages/base-page';
+import { Constants } from '@utilities/constants';
+import { products } from '@data/products.data';
 
 test.describe('Compare Products Tests', () => {
 

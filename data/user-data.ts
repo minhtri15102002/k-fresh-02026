@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { UserProfile } from '../models/user';
+import { UserProfile } from '@models/user';
 
 /**
  * Generates random user data using faker-js

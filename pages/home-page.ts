@@ -1,10 +1,10 @@
 import { Page } from '@playwright/test';
-import { Constants } from '../utilities/constants';
-import { CommonPage } from './common-page';
-import { step } from '../utilities/logging';
-import { HomeLocators } from '../locators/home-locators';
-import { AssertHelper } from './assert-helper-page';
-import { Assertions } from '../utilities/assertions';
+import { Constants } from '@utilities/constants';
+import { CommonPage } from '@pages/common-page';
+import { step } from '@utilities/logging';
+import { HomeLocators } from '@locators/home-locators';
+import { AssertHelper } from '@pages/assert-helper-page';
+import { Assertions } from '@utilities/assertions';
 export class HomePage extends HomeLocators {
   commonPage: CommonPage;
   assertHelper: AssertHelper;
@@ -35,6 +35,9 @@ export class HomePage extends HomeLocators {
   async selectMenu(menuName: string): Promise<void> {
     await this.commonPage.click(this.menuLink(menuName));
     await this.page.waitForLoadState('networkidle');
+    await this.commonPage.click(this.shopByCategoryMenu);
+    await this.commonPage.waitForVisible(this.itemTopCategory(menuName));
+    await this.commonPage.click(this.itemTopCategory(menuName));
   }
 
   /**

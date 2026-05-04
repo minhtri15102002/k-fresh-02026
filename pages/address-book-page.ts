@@ -1,10 +1,9 @@
-import { Page } from '@playwright/test';
 import { expect, Page } from '@playwright/test';
-import { AddressBookLocators } from '../locators/address-book-locators';
-import { Address } from '../models/address';
-import { CommonPage } from './common-page';
-import { step } from '../utilities/logging';
-import { AssertHelper } from './assert-helper-page';
+import { AddressBookLocators } from '@locators/address-book-locators';
+import { Address } from '@models/address';
+import { CommonPage } from '@pages/common-page';
+import { step } from '@utilities/logging';
+import { AssertHelper } from '@pages/assert-helper-page';
 
 export class AddressBookPage extends AddressBookLocators {
   commonPage: CommonPage;

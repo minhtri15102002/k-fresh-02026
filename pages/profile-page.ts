@@ -1,12 +1,13 @@
-import { Page } from '@playwright/test';
-import { ProfileLocators } from '../locators/profile-locators';
-import { CommonPage } from './common-page';
-import { UserProfile } from '../models/user';
-import { Address } from '../models/address';
-import { step } from '../utilities/logging';
-import { Messages } from '../data/messages.data';
-import { AssertHelper } from './assert-helper-page';
-import { Assertions } from '../utilities/assertions';
+import test, { expect, Page } from '@playwright/test';
+import { Constants } from '@utilities/constants';
+import { CommonPage } from '@pages/common-page';
+import { step } from '@utilities/logging';
+import { ProfileLocators } from '@locators/profile-locators';
+import { UserProfile } from '@models/user';
+import { Address } from '@models/address';
+import { Messages } from '@data/messages.data';
+import { AssertHelper } from '@pages/assert-helper-page';
+import { Assertions } from '@utilities/assertions';
 
 /**
  * Page object for user profile actions in My Account area.
@@ -215,9 +216,7 @@ export class ProfilePage extends ProfileLocators {
     await this.commonPage.fill(this.inputAddressLine2, data.address2);
     await this.commonPage.fill(this.inputAddressCity, data.city);
     await this.commonPage.fill(this.inputAddressPostcode, data.postCode);
-
     await this.selectCountryAndRegion(data.country, data.region);
-
     await this.getDefaultAddressRadio(data.defaultAddress).check();
     await this.commonPage.click(this.btnContinue);
   }
@@ -237,12 +236,10 @@ export class ProfilePage extends ProfileLocators {
 
     await this.selectAddressCountry.selectOption({ label: country });
     await this.selectAddressRegion.waitFor({ state: 'visible' });
-
     await this.assertHelper.assertElementAttached(
       this.regionOptionByName(region),
       `region option ${region}`,
     );
-
     await this.selectAddressRegion.selectOption({ label: region });
   }
 
@@ -425,4 +422,3 @@ export class ProfilePage extends ProfileLocators {
       'Logout redirect');
   }
 }
-

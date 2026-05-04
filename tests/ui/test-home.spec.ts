@@ -1,7 +1,8 @@
-import { test } from '../../pages/base-page';
-import { Constants } from '../../utilities/constants';
-import { UserProfile } from '../../models/user';
-import { generateUserProfileData } from '../../data/user-data';
+import { test } from '@pages/base-page';
+import { user } from '@data/login.data';
+import { Constants } from '@utilities/constants';
+import { UserProfile } from '@models/user';
+import { generateUserProfileData } from '@data/user-data';
 
 test.describe('Home Tests', () => {
   let userProfile: UserProfile;

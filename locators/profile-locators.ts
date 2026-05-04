@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
-import { CommonLocators } from './common-locators';
-import { DefaultAddressOption } from '../models/address';
+import { CommonLocators } from '@locators/common-locators';
+import { DefaultAddressOption } from '@models/address';
 
 export class ProfileLocators extends CommonLocators {
   inputFirstName!: Locator;

@@ -1,5 +1,5 @@
 import { Locator, Page } from '@playwright/test';
-import { CommonLocators } from './common-locators';
+import { CommonLocators } from '@locators/common-locators';
 
 /** CheckoutLocators class extends CommonLocators and defines specific locators for the checkout page of the e-commerce application.
  * It includes locators for billing and shipping sections, as well as the confirm order section.

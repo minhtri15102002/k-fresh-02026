@@ -1,5 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs';
-import { existsSync,readFileSync } from 'fs';
+import { existsSync,readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
 /**

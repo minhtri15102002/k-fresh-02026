@@ -1,16 +1,18 @@
-import { test } from '../../pages/base-page';
+import { test } from '@pages/base-page';
+import { user } from '@data/login.data';
+import { Constants } from '@utilities/constants';
+
 import {
   createAddressData,
   createRegisterData,
   createStrongPassword,
   createUpdateProfileData,
-} from '../../data/user.helper';
-import { Constants } from '../../utilities/constants';
-import { user } from '../../data/login.data';
-import type { UserProfile } from '../../models/user';
+} from '@data/user.helper';
+import { Constants } from '@utilities/constants';
+import { user } from '@data/login.data';
+import type { UserProfile } from '@models/user';
 
 test.describe.configure({ timeout: 60000 });
-
 test.describe('TC001 - My Account Dashboard', () => {
   test.beforeEach(async ({ homePage, loginPage }) => {
     await homePage.goToLoginPage();
@@ -63,14 +65,12 @@ test.describe('TC003 - Change Password', () => {
       phone: registerData.phone,
       password: registerData.password,
     };
-
     await commonPage.goto(Constants.REGISTER_URL);
     await registerPage.fillRegistrationForm(userProfile);
     await registerPage.clickAgreeTermsCheckbox();
     await registerPage.submitRegistrationForm();
     await profilePage.verifyRegistrationResultPage();
     await profilePage.continueFromRegistrationSuccessIfNeeded();
-
     await profilePage.verifyMyAccountPage();
     await profilePage.openChangePasswordPage();
     await profilePage.changePassword(changedPassword);

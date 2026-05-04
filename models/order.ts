@@ -1,6 +1,6 @@
-import { Address } from './address';
-import { Customer } from './customer';
-import { Product } from './product';
+import { Address } from '@models/address';
+import { Customer } from '@models/customer';
+import { Product } from '@models/product';
 
 export interface Order {
     id: number;
