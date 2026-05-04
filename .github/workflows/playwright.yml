@@ -18,6 +18,33 @@ on:
           - uat
           - production
           - all
+      test_suite:
+        description: 'Select test suite to run'
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - cart
+          - checkout
+          - login
+          - product
+          - home
+          - profile
+          - register
+          - address-book
+          - compare
+          - wish-list
+          - e2e
+          - my-orders
+      grep:
+        description: 'Test name to run (regex)'
+        required: false
+        default: ''
+      test_file:
+        description: 'Specific test file to run (optional)'
+        required: false
+        default: ''
 
 env:
   NODE_VERSION: 24
@@ -45,11 +72,35 @@ jobs:
       if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.environment == 'all' || github.event.inputs.environment == matrix.env }}
       run: |
         echo "Running tests against environment: $ENV"
-        npx playwright test
+        
+        # Determine test target based on suite selection
+        TEST_TARGET="${TEST_FILE}"
+        if [ "$TEST_SUITE" != "all" ] && [ -z "$TEST_FILE" ]; then
+          case $TEST_SUITE in
+            cart) TEST_TARGET="tests/ui/test-cart.spec.ts" ;;
+            checkout) TEST_TARGET="tests/ui/test-checkout.spec.ts" ;;
+            login) TEST_TARGET="tests/ui/test-login.spec.ts" ;;
+            product) TEST_TARGET="tests/ui/test-product.spec.ts" ;;
+            home) TEST_TARGET="tests/ui/test-home.spec.ts" ;;
+            profile) TEST_TARGET="tests/ui/test-profile.spec.ts" ;;
+            register) TEST_TARGET="tests/ui/test-register.spec.ts" ;;
+            address-book) TEST_TARGET="tests/ui/test-address-book.spec.ts" ;;
+            compare) TEST_TARGET="tests/ui/test-compare-products.spec.ts" ;;
+            wish-list) TEST_TARGET="tests/ui/test-wish-list.spec.ts" ;;
+            e2e) TEST_TARGET="tests/ui/test-e2e.spec.ts" ;;
+            my-orders) TEST_TARGET="tests/ui/test-my-orders.spec.ts" ;;
+          esac
+        fi
+        
+        echo "Executing: npx playwright test $TEST_TARGET ${GREP:+ -g \"$GREP\"}"
+        npx playwright test $TEST_TARGET ${GREP:+ -g "$GREP"}
       env:
         HEADLESS: true
         CI: true
         ENV: ${{ matrix.env }}
+        TEST_SUITE: ${{ github.event.inputs.test_suite || 'all' }}
+        GREP: ${{ github.event.inputs.grep }}
+        TEST_FILE: ${{ github.event.inputs.test_file }}
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
@@ -66,4 +117,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: pr_number
-        path: pr_number.txt
+        path: pr_number.txt

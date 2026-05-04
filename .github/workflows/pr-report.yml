@@ -32,17 +32,21 @@ jobs:
       - name: Download Playwright results
         uses: actions/download-artifact@v4
         with:
-          name: playwright-results
-          path: test-results
+          name: playwright-report
+          path: playwright-report
 
       # ⬇️ Đọc file summary.json (hoặc file bạn export)
       - name: Extract Playwright Summary
         id: test_summary
         run: |
-          SUMMARY=$(cat test-results/summary.json)
-          echo "TEST_SUMMARY<<EOF" >> $GITHUB_ENV
-          echo "$SUMMARY" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          if [ -f playwright-report/summary.json ]; then
+            SUMMARY=$(cat playwright-report/summary.json)
+            echo "TEST_SUMMARY<<EOF" >> $GITHUB_ENV
+            echo "$SUMMARY" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "TEST_SUMMARY=No summary data available" >> $GITHUB_ENV
+          fi
 
       # ⬇️ Lấy lại metadata của Pull Request
       - name: Get PR Info
