@@ -3,6 +3,10 @@ name: Auto Generate PR Report
 on:
   workflow_call:
 
+permissions:
+  contents: read
+  pull-requests: write
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24
@@ -68,7 +72,7 @@ jobs:
           number: ${{ github.event.pull_request.number }}
 
       - name: Upload PR Report Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: pr-report
           path: PR_REPORT.md
