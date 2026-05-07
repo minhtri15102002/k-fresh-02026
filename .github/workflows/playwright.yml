@@ -1,17 +1,19 @@
 
 name: Playwright Tests
-
 on:
   push:
     branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
+    branches:
+      - main
+      - master
+      - develop
   workflow_dispatch:
     inputs:
       environment:
         description: 'Environment to run tests against'
         required: true
-        default: all
+        default: qa
         type: choice
         options:
           - qa
@@ -19,41 +21,34 @@ on:
           - uat
           - production
           - all
-      test_suite:
-        description: 'Select test suite to run'
+      
+      browser:
+        description: 'Browser to run tests in'
         required: true
-        default: cart
+        default: 'Desktop Chrome'
         type: choice
         options:
+          - 'Desktop Chrome'
+          - 'Desktop Firefox'
+          - 'Desktop Safari'
+          - 'Microsoft Edge'
+          - 'Mobile Chrome'
+      
+      test_type:
+        description: 'Type of test suite'
+        required: true
+        default: all
+        type: choice
+        options:
+          - smoke
+          - regression
           - all
-          - cart
-          - checkout
-          - login
-          - product
-          - home
-          - profile
-          - register
-          - address-book
-          - compare
-          - wish-list
-          - e2e
-          - my-orders
-      grep:
-        description: 'Test name to run (regex)'
+      
+      spec_file:
+        description: 'Specific spec file to run (optional, e.g., tests/ui/login.spec.ts)'
         required: false
         default: ''
-      test_file:
-        description: 'Specific test file to run (optional)'
-        required: false
-        default: ''
-
-permissions:
-  contents: read
-  pull-requests: write
-
-env:
-  NODE_VERSION: 24
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+        type: string
 
 jobs:
   test:
@@ -61,71 +56,63 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env: [qa, staging, uat, production]
+        env: ${{ fromJson((github.event_name == 'workflow_dispatch' && github.event.inputs.environment != 'all') && format('["{0}"]', github.event.inputs.environment) || '["qa","staging","uat"]') }}
+        
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
     - uses: actions/setup-node@v5
       with:
-        node-version: ${{ env.NODE_VERSION }}
+        node-version: lts/*
         cache: 'npm'
     - name: Install dependencies
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+    - name: Install Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    - name: Install Allure
+      run: npm install -g allure
     - name: Run Playwright tests
-      if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.environment == 'all' || github.event.inputs.environment == matrix.env }}
       run: |
         echo "Running tests against environment: $ENV"
-        
-        # Determine test target based on suite selection
-        TEST_TARGET="${TEST_FILE}"
-        if [ "$TEST_SUITE" != "all" ] && [ -z "$TEST_FILE" ]; then
-          case $TEST_SUITE in
-            cart) TEST_TARGET="tests/ui/test-cart.spec.ts" ;;
-            checkout) TEST_TARGET="tests/ui/test-checkout.spec.ts" ;;
-            login) TEST_TARGET="tests/ui/test-login.spec.ts" ;;
-            product) TEST_TARGET="tests/ui/test-product.spec.ts" ;;
-            home) TEST_TARGET="tests/ui/test-home.spec.ts" ;;
-            profile) TEST_TARGET="tests/ui/test-profile.spec.ts" ;;
-            register) TEST_TARGET="tests/ui/test-register.spec.ts" ;;
-            address-book) TEST_TARGET="tests/ui/test-address-book.spec.ts" ;;
-            compare) TEST_TARGET="tests/ui/test-compare-products.spec.ts" ;;
-            wish-list) TEST_TARGET="tests/ui/test-wish-list.spec.ts" ;;
-            e2e) TEST_TARGET="tests/ui/test-e2e.spec.ts" ;;
-            my-orders) TEST_TARGET="tests/ui/test-my-orders.spec.ts" ;;
-          esac
+        echo "Running test type: $TEST_TYPE"
+        echo "Browser: $BROWSER"
+        echo "Spec file: $SPEC_FILE"
+
+        if [ -n "$SPEC_FILE" ] && [ "$SPEC_FILE" != "" ]; then
+          echo "Running specific spec file: $SPEC_FILE"
+          npx playwright test "$SPEC_FILE" --project="$BROWSER"
+        elif [ "$TEST_TYPE" = "all" ]; then
+          npx playwright test --project="$BROWSER"
+        else
+          npx playwright test --grep "@$TEST_TYPE" --project="$BROWSER"
         fi
-        
-        echo "Executing: npx playwright test $TEST_TARGET ${GREP:+ -g \"$GREP\"}"
-        npx playwright test $TEST_TARGET ${GREP:+ -g "$GREP"}
       env:
         HEADLESS: true
         CI: true
         ENV: ${{ matrix.env }}
-        TEST_SUITE: ${{ github.event.inputs.test_suite || 'product' }}
-        GREP: ${{ github.event.inputs.grep }}
-        TEST_FILE: ${{ github.event.inputs.test_file }}
-    - uses: actions/upload-artifact@v4
+        BROWSER: ${{ github.event.inputs.browser || 'Desktop Chrome' }}
+        TEST_TYPE: ${{ github.event.inputs.test_type || 'all' }}
+        SPEC_FILE: ${{ github.event.inputs.spec_file || '' }}
+    - uses: actions/upload-artifact@v5
       if: ${{ !cancelled() }}
       with:
         name: playwright-report
         path: playwright-report/
-        retention-days: 30
-
-    - name: Save PR number
-      if: github.event_name == 'pull_request'
-      run: echo ${{ github.event.number }} > pr_number.txt
-
-    - name: Upload PR number
-      if: github.event_name == 'pull_request'
-      uses: actions/upload-artifact@v4
+        retention-days: 10
+    
+    - name: Generate Allure Report
+      if: ${{ !cancelled() }}
+      run: npm run allure-report
+    
+    - uses: actions/upload-artifact@v5
+      if: ${{ !cancelled() }}
       with:
-        name: pr_number
-        path: pr_number.txt
+        name: Upload Allure Report
+        path: playwright-report/
+        retention-days: 10
 
-  report:
-    needs: test
-    if: always() && github.event_name == 'pull_request'
-    uses: ./.github/workflows/pr-report.yml
-    secrets: inherit
