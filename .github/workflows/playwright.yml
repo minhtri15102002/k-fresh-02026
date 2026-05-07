@@ -28,11 +28,11 @@ on:
         default: 'chromium'
         type: choice
         options:
-          - 'chromium'
-          - 'firefox'
-          - 'webkit'
+          - 'Desktop Chrome'
+          - 'Desktop Firefox'
+          - 'Desktop Safari'
+          - 'Microsoft Edge'
           - 'Mobile Chrome'
-          - 'Mobile Safari'
       
       test_type:
         description: 'Type of test suite'
