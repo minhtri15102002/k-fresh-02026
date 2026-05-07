@@ -25,14 +25,14 @@ on:
       browser:
         description: 'Browser to run tests in'
         required: true
-        default: 'Desktop Chrome'
+        default: 'chromium'
         type: choice
         options:
-          - 'Desktop Chrome'
-          - 'Desktop Firefox'
-          - 'Desktop Safari'
-          - 'Microsoft Edge'
+          - 'chromium'
+          - 'firefox'
+          - 'webkit'
           - 'Mobile Chrome'
+          - 'Mobile Safari'
       
       test_type:
         description: 'Type of test suite'
