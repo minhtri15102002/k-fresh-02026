@@ -12,7 +12,7 @@ export default {
       options: {
         // Heading shown inside the report.
         reportName: 'Daily Regression Report',
-        logo: 'https://github.com/khanhdodang/ai-qa-training/blob/main/assets/kd.jpg',
+        logo: 'https://github.com/khanhdodang/ai-qa-training/blob/main/assets/kd.jpg?raw=true',
       },
     },
   },
