@@ -220,7 +220,7 @@ The Allure CLI is a project devDependency, so no global install is needed. Confi
 Generate a static HTML report into `./allure-report/`:
 
 ```bash
-npm run allure-report
+npm run report
 ```
 
 Or serve it on the fly with a live local server:

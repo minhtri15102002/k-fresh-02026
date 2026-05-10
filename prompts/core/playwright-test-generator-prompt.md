@@ -21,9 +21,11 @@ You are a Playwright + TypeScript test generator. You **explore live web behavio
 1. **Never generate test code from a written scenario alone.** Always exercise the flow with MCP first.
 2. **Never use `page.waitForTimeout`** — rely on Playwright auto-waiting and `expect(...)` retries.
 3. **Never hardcode UI strings, URLs, or messages** in specs — pull from `translations/`, `data/`, or `utilities/constants.ts`.
-4. **Never call `expect()` directly inside a spec** when an `assertHelper` exists — go through it.
+4. **Never call `expect()` directly** in a spec or page object. Element/Page/APIResponse state goes through `this.assertHelper.*` (auto-retries), in-memory values go through the static `Assertions.*` utility. The full forbidden / allowed mapping is in [`prompts/core/pom-generator.md` → "ASSERTION ROUTING — FORBIDDEN"](./pom-generator.md#assertion-routing--forbidden). If the helper you need does not exist, emit a `## Missing Helper` follow-up — do not fall back to raw `expect()`.
 5. **Never inline locators** in pages or specs — they live in `locators/`.
 6. **Never commit secrets** — credentials come from `.env` via the loader.
+7. **Inside a page object, never call action methods directly on a `Locator` or on `this.page`.** Every `click`, `fill`, `hover`, `check`, `uncheck`, `clear`, `press`, `selectOption`, `innerText`, `textContent`, `getAttribute`, `isVisible`, `isChecked`, `scrollIntoViewIfNeeded`, `waitFor({ state })`, etc. **must** route through `this.commonPage.<verb>(this.<locator>, ...)`. The full forbidden / allowed mapping lives in [`prompts/core/pom-generator.md` → "DIRECT-LOCATOR ACTIONS — FORBIDDEN"](./pom-generator.md#direct-locator-actions--forbidden). If the helper you need does not exist yet, stop and emit a `## Missing Helper` follow-up — do not bypass.
+8. **Snapshot-then-match against the page is forbidden.** Never write `Assertions.assertTextMatch(this.page.url(), …)` or `Assertions.assertEqual(await commonPage.textContent(loc), …)` — those capture a stale value with no retry. Use `assertHelper.assertPageHasURL` / `assertHelper.assertElementHasText` instead.
 
 ---
 
@@ -84,8 +86,8 @@ project-root/
 | Locator strategy | `getByRole` → `getByLabel` → `getByPlaceholder` → `getByTestId` → text → CSS → XPath (last resort) |
 | UI text | All visible text routed through `TRANSLATIONS[Constants.LANGUAGE]` |
 | Page objects | Extend `<Feature>Locators`. Hold a `commonPage: CommonPage` for shared primitives. |
-| Action methods | Annotated with `@step('...')` from `utilities/logging.ts`. |
-| Assertions | `AssertHelper` instance per spec — never call `expect()` directly. |
+| Action methods | Annotated with `@step('...')` from `utilities/logging.ts`. **Every** locator interaction goes through `this.commonPage` — see Hard Rule 7. |
+| Assertions | `this.assertHelper.*` for DOM/Page/APIResponse, `Assertions.*` for in-memory values — never raw `expect()`. Specs invoke `verify<X>` / `expect<X>` page methods, not `assertHelper` directly. See Hard Rule 4 + the canonical mapping in [`pom-generator.md` → "ASSERTION ROUTING — FORBIDDEN"](./pom-generator.md#assertion-routing--forbidden). |
 | Tags | `@smoke`, `@regression`, `@critical`, `@<module>` |
 | Test independence | Each test starts from a clean state via fixtures. No shared mutable state. |
 
@@ -183,9 +185,6 @@ export class LoginPage extends LoginLocators {
 // tests/login.spec.ts
 import { test } from '@pages/base-page';
 import { validUser } from '@data/user-data';
-import { AssertHelper } from '@utilities/assertions';
-
-const assertHelper = new AssertHelper();
 
 test.describe('Login', () => {
   test('logs in with valid credentials',
@@ -193,11 +192,13 @@ test.describe('Login', () => {
     async ({ loginPage }) => {
       await loginPage.navigate();
       await loginPage.login(validUser);
-      await assertHelper.toBeVisible(loginPage.btnLogout);
+      await loginPage.verifyLoginSuccess();
     },
   );
 });
 ```
+
+> Spec **never** imports `AssertHelper` / `Assertions`, **never** instantiates them, **never** calls `expect()`. Verifications are page methods (`verifyLoginSuccess`, `expectErrorMessage`, …) which internally use `this.assertHelper.*` (DOM/Page) or `Assertions.*` (in-memory values).
 
 ---
 

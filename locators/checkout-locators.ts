@@ -18,9 +18,13 @@ export class CheckoutLocators extends CommonLocators {
     inputBillingFirstName!: Locator;
     inputBillingLastName!: Locator;
     inputBillingAddress1!: Locator;
+    inputBillingAddress2!: Locator;
+    inputBillingCompany!: Locator;
     inputBillingCity!: Locator;
+    inputBillingPostcode!: Locator;
     ddlBillingCountry!: Locator;
     ddlBillingZone!: Locator;
+    ddlPaymentZone!: Locator;
     radioBillingExistingAddress!: Locator;
 
     divShippingNewBlock!: Locator;
@@ -33,7 +37,10 @@ export class CheckoutLocators extends CommonLocators {
     radioShippingNewAddress!: Locator;
     inputShippingFirstName!: Locator;
     inputShippingLastName!: Locator;
+    inputShippingCompany!: Locator;
+    inputShippingPostcode!: Locator;
     inputShippingAddress1!: Locator;
+    inputShippingAddress2!: Locator;
     inputShippingCity!: Locator;
     ddlShippingCountry!: Locator;
     ddlShippingZone!: Locator;
@@ -72,11 +79,14 @@ export class CheckoutLocators extends CommonLocators {
         this.inputBillingFirstName = this.divPaymentSection.locator('input[name="firstname"]');
         this.inputBillingLastName = this.divPaymentSection.locator('input[name="lastname"]');
         this.inputBillingAddress1 = this.divPaymentSection.locator('input[name="address_1"]');
+        this.inputBillingAddress2 = this.divPaymentSection.locator('input[name="address_2"]');
+        this.inputBillingCompany = this.divPaymentSection.locator('input[name="company"]');
         this.inputBillingCity = this.divPaymentSection.locator('input[name="city"]');
+        this.inputBillingPostcode = this.divPaymentSection.locator('input[name="postcode"]');
         this.ddlBillingCountry = this.divPaymentSection.locator('select[name="country_id"]');
         this.ddlBillingZone = this.divPaymentSection.locator('select[name="zone_id"]');
         this.radioBillingExistingAddress = this.divPaymentSection.getByText('I want to use an existing address');
-
+        this.ddlPaymentZone = this.divPaymentSection.locator('select[name="zone_id"]');
         // --- SHIPPING SECTION ---
         this.divShippingSection = this.page.locator('#shipping-address');
         this.chkSameAddress = this.page.getByText('My delivery and billing addresses are the same.');
@@ -85,8 +95,11 @@ export class CheckoutLocators extends CommonLocators {
 
         this.inputShippingFirstName = this.page.locator('#input-shipping-firstname');
         this.inputShippingLastName = this.page.locator('#input-shipping-lastname');
+        this.inputShippingCompany = this.page.locator('#input-shipping-company');
         this.inputShippingAddress1 = this.page.locator('#input-shipping-address-1');
+        this.inputShippingAddress2 = this.page.locator('#input-shipping-address-2');
         this.inputShippingCity = this.page.locator('#input-shipping-city');
+        this.inputShippingPostcode = this.page.locator('#input-shipping-postcode');
         this.ddlShippingCountry = this.page.locator('#input-shipping-country');
         this.ddlShippingZone = this.page.locator('#input-shipping-zone');
 

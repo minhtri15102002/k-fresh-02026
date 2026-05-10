@@ -1,10 +1,9 @@
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { Constants } from '@utilities/constants';
 import { CommonPage } from '@pages/common-page';
 import { step } from '@utilities/logging';
 import { HomeLocators } from '@locators/home-locators';
 import { AssertHelper } from '@utilities/assert-helper';
-import { Assertions } from '@utilities/assertions';
 
 export class HomePage extends HomeLocators {
   commonPage: CommonPage;
@@ -59,7 +58,7 @@ export class HomePage extends HomeLocators {
   async selectProduct(productName: string): Promise<void> {
     const product = this.productLink(productName);
     await this.assertHelper.assertElementVisible(product);
-    await product.scrollIntoViewIfNeeded();
+    await this.commonPage.scrollTo(product);
     await this.commonPage.click(product, { force: true });
     await this.page.waitForURL(/route=product\/product|route=product%2Fproduct/);
   }
@@ -92,7 +91,7 @@ export class HomePage extends HomeLocators {
     await this.commonPage.scrollIntoView(productCard);
 
     await this.commonPage.hover(productCard);
-    await expect(this.btnAddToCartByProductName(productName)).toBeVisible();
+    await this.assertHelper.assertElementVisible(this.btnAddToCartByProductName(productName));
     await this.commonPage.click(this.btnAddToCartByProductName(productName), { force: true });
   }
 
@@ -165,7 +164,7 @@ export class HomePage extends HomeLocators {
     // Hard-wait the toast first so we don't race the auto-dismiss animation.
     // `assertHelper.assertElementContainsText` is `expect.soft` and would only
     // record a failure rather than gate the next step.
-    await this.spanSuccessAlertMessage.waitFor({ state: 'visible' });
+    await this.commonPage.waitForVisible(this.spanSuccessAlertMessage);
     await this.assertHelper.assertElementContainsText(
       this.spanSuccessAlertMessage,
       expectedMessage,
@@ -180,7 +179,7 @@ export class HomePage extends HomeLocators {
    */
   @step('Click View Cart in homepage toast')
   async clickViewCartInToast(): Promise<void> {
-    await this.btnViewCartInToast.waitFor({ state: 'visible' });
+    await this.commonPage.waitForVisible(this.btnViewCartInToast);
     await this.commonPage.click(this.btnViewCartInToast);
   }
 
@@ -207,8 +206,6 @@ export class HomePage extends HomeLocators {
     await this.openMyAccountDropdown();
     await this.commonPage.click(this.lnkMyAccountLogin);
     await this.page.waitForURL(/route=account\/login/);
-    Assertions.assertTextMatch(this.page.url(),
-      /route=account\/login/,
-      'Login page');
+    await this.assertHelper.assertPageHasURL(this.page, /route=account\/login/, 'Login page URL');
   }
 }

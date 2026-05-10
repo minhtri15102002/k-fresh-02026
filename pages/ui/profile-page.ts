@@ -34,9 +34,7 @@ export class ProfilePage extends ProfileLocators {
   @step('Verify My Account page is displayed')
   async verifyMyAccountPage(): Promise<void> {
     await this.page.waitForURL(/route=account\/account/);
-    Assertions.assertTextMatch(this.page.url(),
-      /route=account\/account/,
-      'My Account');
+    await this.assertHelper.assertPageHasURL(this.page, /route=account\/account/, 'My Account page URL');
     await this.assertHelper.assertElementVisible(
       this.hdrAccount,
       'My Account heading');
@@ -235,7 +233,7 @@ export class ProfilePage extends ProfileLocators {
     );
 
     await this.selectAddressCountry.selectOption({ label: country });
-    await this.selectAddressRegion.waitFor({ state: 'visible' });
+    await this.commonPage.waitForVisible(this.selectAddressRegion);
 
     await this.assertHelper.assertElementAttached(
       this.regionOptionByName(region),
@@ -251,9 +249,7 @@ export class ProfilePage extends ProfileLocators {
   @step('Verify Address Book page is displayed')
   async verifyAddressBookPage(): Promise<void> {
     await this.page.waitForURL(/route=account\/address/);
-    Assertions.assertTextMatch(this.page.url(),
-      /route=account\/address/,
-      'Address Book');
+    await this.assertHelper.assertPageHasURL(this.page, /route=account\/address/, 'Address Book page URL');
     await this.assertHelper.assertElementVisible(
       this.btnNewAddress,
       'New Address button'
@@ -266,10 +262,10 @@ export class ProfilePage extends ProfileLocators {
   @step('Verify registration result page is displayed')
   async verifyRegistrationResultPage(): Promise<void> {
     await this.page.waitForURL(/route=account\/success|route=account\/account/);
-    Assertions.assertTextMatch(
-      this.page.url(),
+    await this.assertHelper.assertPageHasURL(
+      this.page,
       /route=account\/success|route=account\/account/,
-      'Registration result',
+      'Registration result page URL',
     );
   }
 
@@ -385,9 +381,7 @@ export class ProfilePage extends ProfileLocators {
   @step('Verify Logout confirmation page')
   async verifyLogoutPage(): Promise<void> {
     await this.page.waitForURL(/route=account\/logout/);
-    Assertions.assertTextMatch(this.page.url(),
-      /route=account\/logout/,
-      'Logout');
+    await this.assertHelper.assertPageHasURL(this.page, /route=account\/logout/, 'Logout page URL');
     await this.expectLogoutSuccessMessage();
     await this.assertHelper.assertElementVisible(
       this.btnLogoutContinue,
@@ -419,8 +413,6 @@ export class ProfilePage extends ProfileLocators {
   @step('Verify user is redirected after logout')
   async verifyLogoutRedirectPage(): Promise<void> {
     await this.page.waitForURL(/route=common\/home/);
-    Assertions.assertTextMatch(this.page.url(),
-      /route=common\/home/,
-      'Logout redirect');
+    await this.assertHelper.assertPageHasURL(this.page, /route=common\/home/, 'Logout redirect URL');
   }
 }

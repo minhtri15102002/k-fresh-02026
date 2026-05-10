@@ -26,10 +26,12 @@ You will receive any combination of:
 - **Fixtures:** Always import `test` from `@pages/base-page` — it exposes `loginPage`, `cartPage`, `checkoutPage`, `homePage`, `productPage`, `profilePage`, `registerPage`, `addressBookPage`, `compareProductsPage`, `myOrdersPage`, `wishlistPage`, `commonPage`, `apiPage`, `assertHelper`. Never instantiate page objects with `new` inside a spec.
 - **Path aliases (from `tsconfig.json`):** `@pages/*`, `@locators/*`, `@models/*`, `@data/*`, `@utilities/*`, `@tests/*`. Use them — never relative `../../`.
 - **Locators:** Live in `locators/<feature>-locators.ts`; each `<Feature>Locators` extends `CommonLocators` and exposes a `locatorInitialization()` method. Never define raw selectors in pages or specs.
-- **Page Objects:** `pages/<feature>-page.ts`. Each `<Feature>Page extends <Feature>Locators` and decorates public actions with `@step('...')` from `@utilities/logging`.
-- **Assertions:** `AssertHelper` (from `@pages/assert-helper-page`) is the **only** place `expect()` lives, and it is used **inside page objects**, never inside specs.
-  - Every assertion must be wrapped in a page method named `verify<X>()` or `expect<X>()` that internally calls `assertHelper` / the shared `Assertions` utility.
-  - Specs call those `verify…` / `expect…` methods — they never import `AssertHelper`, never call `expect()` directly.
+- **Page Objects:** `pages/<feature>-page.ts`. Each `<Feature>Page extends <Feature>Locators` and decorates public actions with `@step('...')` from `@utilities/logging`. **Every locator interaction inside a page object** (`click`, `fill`, `hover`, `check`, `uncheck`, `clear`, `innerText`, `textContent`, `getAttribute`, `isVisible`, `isChecked`, `waitFor({ state })`, …) **must** route through `this.commonPage.<verb>(this.<locator>, ...)` — never call methods directly on a `Locator` or on `this.page`. Full forbidden / allowed mapping: [`prompts/core/pom-generator.md` → "DIRECT-LOCATOR ACTIONS — FORBIDDEN"](./pom-generator.md#direct-locator-actions--forbidden).
+- **Assertions:** Two utilities, one rule for each (full mapping in [`prompts/core/pom-generator.md` → "ASSERTION ROUTING — FORBIDDEN"](./pom-generator.md#assertion-routing--forbidden)):
+  - `this.assertHelper.*` (instance, from `@utilities/assert-helper`) — every `Locator` / `Page` / `APIResponse` state check. Auto-retries via `expect.soft`.
+  - `Assertions.*` (static, from `@utilities/assertions`) — every primitive / object / array comparison whose inputs are already in JS memory.
+  - **Both live inside page objects only.** Wrap them in a page method named `verify<X>()` or `expect<X>()`. Specs call those page methods; specs never import `AssertHelper` / `Assertions`, never call `expect()` directly.
+  - **Forbidden snapshot-then-match:** never write `Assertions.assertTextMatch(this.page.url(), …)` or `Assertions.assertEqual(await commonPage.textContent(loc), …)`. Use `assertHelper.assertPageHasURL` / `assertHelper.assertElementHasText` instead.
 - **Constants:** URLs, timeouts, language, env values come from `@utilities/constants` (`Constants.BASE_URL`, `Constants.REGISTER_URL`, `Constants.TIMEOUTS.*`, etc.). Never hardcode.
 - **Messages / strings:** Pull static UI strings from `@data/messages.data` (`Messages.*`); pull localized labels from `@translations/translations` (`TRANSLATIONS.labels[Constants.LANGUAGE].*`). Never hardcode UI text in a spec.
 - **Test data:** `data/<entity>.data.ts` (deterministic) + `data/<entity>-data.ts` / `*.helper.ts` (factories like `generateUserProfileData()`, `getEnvProduct()`). Models live in `models/`.
@@ -89,9 +91,9 @@ test.describe('<Feature> Tests', () => {
 });
 ```
 
-> The spec NEVER imports or instantiates `AssertHelper`, NEVER calls `expect()`, and NEVER uses `new <Feature>Page()`.
+> The spec NEVER imports or instantiates `AssertHelper` / `Assertions`, NEVER calls `expect()`, and NEVER uses `new <Feature>Page()`.
 
-## Page method — the only place `AssertHelper` lives
+## Page method — the only place `AssertHelper` / `Assertions` live
 
 ```typescript
 @step('Verify <outcome>')
@@ -123,7 +125,7 @@ Every generated test must:
 2. Be **idempotent** — re-runnable without manual cleanup (use freshly-generated users via `generateUserProfileData()` instead of seed accounts).
 3. End on a `verify…` / `expect…` page-method call, never on a click/fill.
 4. Use Playwright auto-waiting and the project's `assertHelper` instead of `page.waitForTimeout`.
-5. Contain **zero** `expect()` / `AssertHelper` references — assertions belong in page methods.
+5. Contain **zero** `expect()` / `AssertHelper` / `Assertions` references — assertions belong in page methods.
 
 ---
 

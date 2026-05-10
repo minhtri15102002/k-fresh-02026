@@ -1,15 +1,19 @@
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { CommonPage } from '@pages/common-page';
 import { step } from '@utilities/logging';
 import { CompareProductsLocators } from '@locators/compare-products-locators';
 import { Product } from '@models/product';
+import { AssertHelper } from '@utilities/assert-helper';
+import { Assertions } from '@utilities/assertions';
 
 export class CompareProductsPage extends CompareProductsLocators {
   commonPage: CommonPage;
+  assertHelper: AssertHelper;
 
   constructor(page: Page) {
     super(page);
     this.commonPage = new CommonPage(page);
+    this.assertHelper = new AssertHelper();
   }
 
   /**
@@ -42,7 +46,7 @@ export class CompareProductsPage extends CompareProductsLocators {
    * @returns Array of strings containing the values from the specified row.
    */
   private async getRowValuesInternal(rowLabel: string): Promise<string[]> {
-    await expect(this.table).toBeVisible();
+    await this.assertHelper.assertElementVisible(this.table);
     const allTexts = await this.lblRowName(rowLabel).locator('td').allInnerTexts();
     return allTexts
       .map(text => text.trim())
@@ -60,10 +64,11 @@ export class CompareProductsPage extends CompareProductsLocators {
 
     // Iterate through the list of expected Product objects.
     for (const product of expectedProducts) {
-      expect(
+      Assertions.assertContains(
         actualProductNamesOnUI,
-        `Expected product "${product.name}" to be in the compare table`
-      ).toContain(product.name);
+        product.name,
+        `Expected product "${product.name}" to be in the compare table`,
+      );
     }
   }
 
@@ -74,7 +79,7 @@ export class CompareProductsPage extends CompareProductsLocators {
   async verifyNoDuplicateProducts(): Promise<void> {
     const productNames = await this.getProductNames();
     const uniqueProductNames = [...new Set(productNames)];
-    expect(productNames).toEqual(uniqueProductNames);
+    Assertions.assertDeepEqual(productNames, uniqueProductNames, 'No duplicate products in compare table');
   }
 
   /**

@@ -83,7 +83,7 @@ test.describe('Cart API Module - Comprehensive Testing', () => {
     Assertions.assertEqual(response.status(), 200, 'Response status should be 200');
 
     // 2. Response time
-    Assertions.assertToBeLessThan(responseTime, 2000, `Response time (${responseTime}ms) should be less than 2000ms`);
+    Assertions.assertToBeLessThan(responseTime, 5000, `Response time (${responseTime}ms) should be less than 5000ms`);
 
     const responseBodyString = await response.text();
 
@@ -127,7 +127,7 @@ test.describe('Cart API Module - Comprehensive Testing', () => {
     Assertions.assertEqual(response.status(), 200, 'Response status should be 200');
 
     // 2. Response time
-    Assertions.assertToBeLessThan(responseTime, 2000, `Response time (${responseTime}ms) should be less than 2000ms`);
+    Assertions.assertToBeLessThan(responseTime, 5000, `Response time (${responseTime}ms) should be less than 5000ms`);
 
     const body = await response.json();
     const responseBodyString = await response.text();

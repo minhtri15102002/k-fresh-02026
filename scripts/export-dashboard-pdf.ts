@@ -2,6 +2,9 @@
  * Renders `templates/qa-metrics-dashboard.html` to:
  *   - artifacts/qa-metrics-dashboard.pdf       (printable report)
  *   - artifacts/qa-metrics-dashboard.live.html (self-contained snapshot)
+ *   - artifacts/index.html                     (clone of .live.html, or bare template
+ *                                               when no live data — guarantees a
+ *                                               landing page for static deployments)
  * using the Playwright Chromium that's already installed in this repo.
  *
  * Usage:
@@ -10,7 +13,7 @@
  *   npm run export:dashboard
  */
 import { chromium, type Page } from '@playwright/test';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -100,8 +103,15 @@ async function renderPdf(page: Page, p: Paths): Promise<void> {
 }
 
 function emitLiveSnapshot(p: Paths, sources: Sources): void {
+  const liveHtmlPath = resolve(p.artifactsDir, 'qa-metrics-dashboard.live.html');
+  const indexPath    = resolve(p.artifactsDir, 'index.html');
+
   if (!sources.summary && !sources.trend && !sources.defects) {
     console.log('▸ Skipped .live.html snapshot — no run/defect JSON to inline.');
+    // Still produce index.html from the bare template so static deployments
+    // always have a landing page (no 404 when GitHub Pages serves /).
+    copyFileSync(p.htmlPath, indexPath);
+    console.log(`✓ Wrote ${indexPath} (clone of bare template — no live data)`);
     return;
   }
 
@@ -125,11 +135,15 @@ function emitLiveSnapshot(p: Paths, sources: Sources): void {
     defectsDataUrl ? `globalThis.__DEFECTS_URL__ = ${JSON.stringify(defectsDataUrl)};` : '',
   ].filter(Boolean).join('\n    ');
 
-  const liveHtmlPath = resolve(p.artifactsDir, 'qa-metrics-dashboard.live.html');
-  const injection    = `\n  <script>\n    ${inlineLines}\n  </script>\n</head>`;
-  const snapshot     = readFileSync(p.htmlPath, 'utf8').replace('</head>', injection);
+  const injection = `\n  <script>\n    ${inlineLines}\n  </script>\n</head>`;
+  const snapshot  = readFileSync(p.htmlPath, 'utf8').replace('</head>', injection);
   writeFileSync(liveHtmlPath, snapshot);
   console.log(`✓ Wrote ${liveHtmlPath}`);
+
+  // Mirror the snapshot to index.html so static deployments (e.g. GitHub Pages,
+  // S3 static sites) can serve the dashboard at the root URL without renames.
+  copyFileSync(liveHtmlPath, indexPath);
+  console.log(`✓ Wrote ${indexPath} (clone of .live.html)`);
 }
 
 async function main(): Promise<void> {

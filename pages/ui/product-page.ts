@@ -90,7 +90,7 @@ export class ProductPage extends ProductLocators {
       // Main product image should be visible and have a valid src attribute
       await this.assertHelper.assertElementVisible(this.imgMainProduct);
       await this.assertHelper.assertElementHasAttribute(this.imgMainProduct, 'src', ProductPage.REGEX.IMAGE_URL);
-      const imageSrc = await this.imgMainProduct.getAttribute('src');
+      const imageSrc = await this.commonPage.getAttribute(this.imgMainProduct, 'src');
       Assertions.assertToBeTruthy(imageSrc !== null);
     });
 
@@ -332,7 +332,7 @@ export class ProductPage extends ProductLocators {
     await this.commonPage.click(this.firstProductImage);
     await this.commonPage.waitForVisible(this.btnBuyNow);
     await this.commonPage.click(this.btnBuyNow);
-    await expect(this.page).toHaveURL(/.*checkout\/checkout/, { timeout: Constants.TIMEOUTS.PAGE_EVENT_LOAD });
+    await this.assertHelper.assertPageHasURL(this.page, /.*checkout\/checkout/, 'Buy Now redirects to checkout');
   }
 
   /**

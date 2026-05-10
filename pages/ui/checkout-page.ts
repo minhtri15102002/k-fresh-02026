@@ -1,4 +1,4 @@
-import { expect, Page, Locator } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 import { Constants } from '@utilities/constants';
 import { CommonPage } from '@pages/common-page';
 import { step } from '@utilities/logging';
@@ -8,6 +8,7 @@ import { UserProfile } from '@models/user';
 import { Currency } from '@utilities/currency';
 import { Logger } from '@utilities/logger';
 import { AssertHelper } from '@utilities/assert-helper';
+import { Assertions } from '@utilities/assertions';
 
 /**
  * Page Object Model for the Checkout Page.
@@ -32,7 +33,7 @@ export class CheckoutPage extends CheckoutLocators {
   @step('Click Place Order Button')
   async clickPlaceOrderButton(): Promise<void> {
     await this.commonPage.click(this.btnConfirmOrder);
-    await expect(this.page).toHaveURL(/.*checkout\/confirm/, { timeout: Constants.TIMEOUTS.PAGE_EVENT_LOAD });
+    await this.assertHelper.assertPageHasURL(this.page, /.*checkout\/confirm/, 'Checkout confirm page');
   }
 
   /**
@@ -93,18 +94,19 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Fill Billing Details (New Address)')
   async fillBillingDetails(user: UserProfile, address: Address): Promise<void> {
-    if (await this.radioBillingNewAddress.isVisible()) {
+    if (await this.commonPage.isVisible(this.radioBillingNewAddress)) {
       await this.commonPage.click(this.radioBillingNewAddress);
     }
 
     await this.commonPage.fill(this.inputBillingFirstName, user.firstName);
     await this.commonPage.fill(this.inputBillingLastName, user.lastName);
+    await this.commonPage.fill(this.inputBillingCompany, address.company);
 
     await this.commonPage.fill(this.inputBillingAddress1, address.street);
+    await this.commonPage.fill(this.inputBillingAddress2, address.address2);
     await this.commonPage.fill(this.inputBillingCity, address.city);
-
-    await this.ddlBillingCountry.selectOption('230');
-    await this.ddlBillingZone.selectOption({ index: 1 });
+    await this.commonPage.fill(this.inputBillingPostcode, address.postCode);
+    await this.commonPage.click(this.ddlPaymentZone);
   }
 
   /**
@@ -116,17 +118,19 @@ export class CheckoutPage extends CheckoutLocators {
   async fillShippingDetails(user: UserProfile, address: Address): Promise<void> {
     await this.commonPage.uncheck(this.chkSameAddress);
 
-    if (await this.radioShippingNewAddress.isVisible()) {
+    if (await this.commonPage.isVisible(this.radioShippingNewAddress)) {
       await this.commonPage.click(this.radioShippingNewAddress);
     }
 
     await this.commonPage.fill(this.inputShippingFirstName, user.firstName);
     await this.commonPage.fill(this.inputShippingLastName, user.lastName);
+    await this.commonPage.fill(this.inputShippingCompany, address.company);
 
     await this.commonPage.fill(this.inputShippingAddress1, address.street);
+    await this.commonPage.fill(this.inputShippingAddress2, address.address2);
     await this.commonPage.fill(this.inputShippingCity, address.city);
-
-    await this.ddlShippingCountry.selectOption('230');
+    await this.commonPage.fill(this.inputShippingPostcode, address.postCode);
+    await this.commonPage.click(this.ddlShippingZone);
     await this.ddlShippingZone.selectOption({ index: 1 });
   }
 
@@ -135,7 +139,7 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Select Existing Billing Address and Hide Shipping')
   async useExistingAddressAndHideShipping(): Promise<void> {
-    if (await this.radioBillingExistingAddress.isVisible()) {
+    if (await this.commonPage.isVisible(this.radioBillingExistingAddress)) {
       await this.commonPage.click(this.radioBillingExistingAddress);
     }
     await this.commonPage.check(this.chkSameAddress);
@@ -159,14 +163,21 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Clear all inputs in Billing Form')
   async clearBillingAddressForm(): Promise<void> {
-    if (await this.radioBillingNewAddress.isVisible()) {
+    if (await this.commonPage.isVisible(this.radioBillingNewAddress)) {
       await this.commonPage.click(this.radioBillingNewAddress);
     }
-    await this.inputBillingFirstName.clear();
-    await this.inputBillingLastName.clear();
-    await this.inputBillingAddress1.clear();
-    await this.inputBillingCity.clear();
-    await this.ddlBillingCountry.selectOption('');
+    await this.commonPage.fill(this.inputBillingCompany, '');
+    await this.commonPage.fill(this.inputBillingAddress2, '');
+    await this.commonPage.fill(this.inputBillingCity, '');
+    await this.commonPage.fill(this.inputBillingPostcode, '');
+
+
+    await this.commonPage.clear(this.inputBillingFirstName);
+    await this.commonPage.clear(this.inputBillingLastName);
+    await this.commonPage.clear(this.inputBillingAddress1);
+    await this.commonPage.clear(this.inputBillingCity);
+    await this.commonPage.click(this.ddlBillingCountry);
+    await this.commonPage.selectOption(this.ddlBillingCountry, '');
   }
 
   /**
@@ -196,7 +207,7 @@ export class CheckoutPage extends CheckoutLocators {
   async getPriceValue(locator: Locator, stepLogName: string): Promise<number> {
     let text = '';
     if (await locator.isVisible({ timeout: Constants.TIMEOUTS.WAIT_ELEMENT_INVISIBLE }).catch(() => false)) {
-      text = await locator.innerText();
+      text = await this.commonPage.innerText(locator);
     } else {
       Logger.error(`Could not locate or read price value for: ${stepLogName}`);
     }
@@ -209,7 +220,7 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Calculate Initial Unit Price from Sub-Total')
   async calculateInitialUnitPrice(): Promise<number> {
-    await this.inputQty.waitFor({ state: 'visible' });
+    await this.commonPage.waitForVisible(this.inputQty);
     const initialSubTotal = await this.getPriceValue(this.lblSubTotal, 'Sub-Total');
     const initialQty = Number.parseInt(await this.inputQty.inputValue());
     return initialSubTotal / initialQty;
@@ -223,11 +234,11 @@ export class CheckoutPage extends CheckoutLocators {
   @step('Verify Math accuracy of Cart Totals')
   async verifyCartTotals(quantity: number, unitPrice: number): Promise<void> {
     const newSubTotal = await this.getPriceValue(this.lblSubTotal, 'Sub-Total');
-    expect(newSubTotal).toBeCloseTo(unitPrice * quantity, 1);
+    Assertions.assertAlmostEqual(newSubTotal, unitPrice * quantity, 0.05, 'Sub-Total matches unit price * quantity');
 
     const flatShipping = await this.getPriceValue(this.lblFlatShipping, 'Flat Shipping Rate');
     const total = await this.getPriceValue(this.lblTotal, 'Total');
-    expect(total).toBeCloseTo(newSubTotal + flatShipping, 1);
+    Assertions.assertAlmostEqual(total, newSubTotal + flatShipping, 0.05, 'Total matches Sub-Total + Flat Shipping');
   }
 
   /**
@@ -273,7 +284,7 @@ export class CheckoutPage extends CheckoutLocators {
   @step('Confirm Order and Verify Success')
   async confirmOrderAndVerifySuccess(): Promise<void> {
     await this.commonPage.click(this.btnConfirmOrder);
-    await expect(this.page).toHaveURL(/.*checkout\/success/, { timeout: Constants.TIMEOUTS.PAGE_EVENT_LOAD });
+    await this.assertHelper.assertPageHasURL(this.page, /.*checkout\/success/, 'Checkout success page');
   }
 
   /**
@@ -282,14 +293,14 @@ export class CheckoutPage extends CheckoutLocators {
   @step('Clear Shipping Address Form')
   async clearShippingAddressForm(): Promise<void> {
     await this.commonPage.uncheck(this.chkSameAddress);
-    if (await this.radioShippingNewAddress.isVisible()) {
+    if (await this.commonPage.isVisible(this.radioShippingNewAddress)) {
       await this.commonPage.click(this.radioShippingNewAddress);
     }
-    await this.inputShippingFirstName.clear();
-    await this.inputShippingLastName.clear();
-    await this.inputShippingAddress1.clear();
-    await this.inputShippingCity.clear();
-    await this.ddlShippingCountry.selectOption('');
+    await this.commonPage.clear(this.inputShippingFirstName);
+    await this.commonPage.clear(this.inputShippingLastName);
+    await this.commonPage.clear(this.inputShippingAddress1);
+    await this.commonPage.clear(this.inputShippingCity);
+    await this.commonPage.selectOption(this.ddlShippingCountry, '');
   }
 
   /**
@@ -306,7 +317,7 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Select Existing Billing Address')
   async selectExistingBillingAddress(): Promise<void> {
-    if (await this.radioBillingExistingAddress.isVisible()) {
+    if (await this.commonPage.isVisible(this.radioBillingExistingAddress)) {
       await this.commonPage.click(this.radioBillingExistingAddress);
     }
   }
@@ -383,9 +394,9 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Verify Zone Dropdown Contains Specific State')
   async verifyZoneContains(expectedZone: string): Promise<void> {
-    await this.ddlBillingZone.waitFor({ state: 'visible' });
-    const zoneOptionsText = await this.ddlBillingZone.innerText();
-    expect(zoneOptionsText).toContain(expectedZone);
+    await this.commonPage.waitForVisible(this.ddlBillingZone);
+    const zoneOptionsText = await this.commonPage.innerText(this.ddlBillingZone);
+    Assertions.assertContains(zoneOptionsText, expectedZone, `Zone dropdown contains "${expectedZone}"`);
   }
 
   /**
@@ -397,7 +408,7 @@ export class CheckoutPage extends CheckoutLocators {
   @step('Toggle "Same Address" Checkbox')
   async toggleSameAddressCheckbox(check: boolean): Promise<void> {
     await this.commonPage.scrollTo(this.chkSameAddress);
-    if ((await this.chkSameAddress.isChecked()) !== check) {
+    if ((await this.commonPage.isChecked(this.chkSameAddress)) !== check) {
       await this.commonPage.click(this.chkSameAddress);
     }
   }

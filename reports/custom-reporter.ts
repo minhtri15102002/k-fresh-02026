@@ -352,6 +352,9 @@ interface RunSummaryArtifact {
   build: string;
   ranAt: string;
   ranAtDisplay: string;
+  env: string;
+  envDisplay: string;
+  baseUrl: string;
   status: FullResult['status'];
   total: number;
   passed: number;
@@ -375,8 +378,19 @@ interface RunSummaryArtifact {
 interface TrendEntry {
   build: string;
   ranAt: string;
+  env: string;
   passRate: number;
   failRate: number;
+}
+
+function resolveEnv(): { env: string; envDisplay: string; baseUrl: string } {
+  const env = (process.env['ENV'] ?? 'local').toLowerCase();
+  const envDisplay = env.toUpperCase();
+  const baseUrl =
+    process.env['BASE_URL'] ??
+    process.env['PLAYWRIGHT_BASE_URL'] ??
+    '';
+  return { env, envDisplay, baseUrl };
 }
 
 const TREND_WINDOW = 10;
@@ -397,10 +411,14 @@ function persistRunArtifacts(
   const failRate = Number((((summary.failed + summary.flaky) / denom) * 100).toFixed(1));
 
   const tagBuckets = buildTagAggregations(suite);
+  const envInfo = resolveEnv();
   const artifact: RunSummaryArtifact = {
     build: resolveBuildLabel(),
     ranAt: ran.toISOString(),
     ranAtDisplay: nowDisplay(ran),
+    env: envInfo.env,
+    envDisplay: envInfo.envDisplay,
+    baseUrl: envInfo.baseUrl,
     status: result.status,
     total: summary.total,
     passed: summary.passed,
@@ -438,13 +456,18 @@ function persistRunArtifacts(
   trend.push({
     build: artifact.build,
     ranAt: artifact.ranAt,
+    env: artifact.env,
     passRate,
     failRate,
   });
-  if (trend.length > TREND_WINDOW) trend = trend.slice(-TREND_WINDOW);
+  // Keep last N entries for the *current* environment plus a small cross-env
+  // tail so trend lines stay environment-coherent in the dashboard.
+  trend = trend.filter((t) => t.env === artifact.env || !t.env).slice(-TREND_WINDOW);
   fs.writeFileSync(trendPath, JSON.stringify(trend, null, 2));
 
-  console.log(`Dashboard data: wrote ${summaryPath} (${artifact.build}, ${passRate}% pass).`);
+  console.log(
+    `Dashboard data: wrote ${summaryPath} (${artifact.envDisplay} · ${artifact.build} · ${passRate}% pass).`,
+  );
 }
 
 function formatPassRate(summary: RunSummary): string {

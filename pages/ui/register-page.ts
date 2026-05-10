@@ -1,18 +1,19 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { CommonPage } from '@pages/common-page';
 import { step } from '@utilities/logging';
 import { RegisterLocators } from '@locators/register-locators';
 import { UserProfile } from '@models/user';
-import { Assertions } from '@utilities/assertions';
+import { AssertHelper } from '@utilities/assert-helper';
 import { Messages } from '@data/messages-data';
-import { Constants } from '@utilities/constants';
 
 export class RegisterPage extends RegisterLocators {
   commonPage: CommonPage;
+  assertHelper: AssertHelper;
 
   constructor(page: Page) {
     super(page);
     this.commonPage = new CommonPage(page);
+    this.assertHelper = new AssertHelper();
   }
 
   /**
@@ -100,12 +101,12 @@ export class RegisterPage extends RegisterLocators {
    */
   @step('Verify Required Fields Error Messages')
   async verifyRequiredFieldsErrorMessages(): Promise<void> {
-    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorFirstName), Messages.REGISTER_ERROR_FIRSTNAME);
-    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorLastName), Messages.REGISTER_ERROR_LASTNAME);
-    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorEmail), Messages.REGISTER_ERROR_EMAIL);
-    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorTelephone), Messages.REGISTER_ERROR_TELEPHONE);
-    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorPassword), Messages.REGISTER_ERROR_PASSWORD);
-    Assertions.assertEqual(await this.commonPage.textContent(this.lblErrorAgree), Messages.REGISTER_ERROR_PRIVACY_POLICY);
+    await this.assertHelper.assertElementHasText(this.lblErrorFirstName, Messages.REGISTER_ERROR_FIRSTNAME);
+    await this.assertHelper.assertElementHasText(this.lblErrorLastName, Messages.REGISTER_ERROR_LASTNAME);
+    await this.assertHelper.assertElementHasText(this.lblErrorEmail, Messages.REGISTER_ERROR_EMAIL);
+    await this.assertHelper.assertElementHasText(this.lblErrorTelephone, Messages.REGISTER_ERROR_TELEPHONE);
+    await this.assertHelper.assertElementHasText(this.lblErrorPassword, Messages.REGISTER_ERROR_PASSWORD);
+    await this.assertHelper.assertElementHasText(this.lblErrorAgree, Messages.REGISTER_ERROR_PRIVACY_POLICY);
   }
 
   /**
@@ -114,7 +115,7 @@ export class RegisterPage extends RegisterLocators {
   */
   @step('Verify successful registration')
   async expectSuccessfulRegistration(): Promise<void> {
-    await expect(this.page).toHaveURL(/.*account\/success/, { timeout: Constants.TIMEOUTS.PERFORM_LOADING * 1000 });
+    await this.assertHelper.assertPageHasURL(this.page, /.*account\/success/, 'Registration success page');
   }
 
 }

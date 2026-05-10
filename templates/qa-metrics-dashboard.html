@@ -112,6 +112,80 @@
     .theme-toggle:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
     @media print { .theme-toggle { display: none !important; } }
 
+    /* Environment-specific UI. The ENV pill, switcher, and run-context card
+       all share the same data-env attribute so the palette stays consistent. */
+    .env-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid currentColor;
+      vertical-align: middle;
+    }
+    .env-pill::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    [data-env="qa"]      { color: #3B82F6; }   /* blue */
+    [data-env="uat"]     { color: #8B5CF6; }   /* violet */
+    [data-env="staging"] { color: #F59E0B; }   /* amber */
+    [data-env="prod"]    { color: #10B981; }   /* green */
+    [data-env="local"]   { color: #6B7280; }   /* gray */
+
+    .env-switcher {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 12px 0 0;
+    }
+    .env-switcher a {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+    }
+    .env-switcher a:hover { border-color: var(--info); color: var(--info); }
+    .env-switcher a[aria-current="true"] {
+      border-color: currentColor;
+      color: var(--text);
+      background: var(--code-bg);
+    }
+    @media print { .env-switcher { display: none !important; } }
+
+    .ctx-card { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); }
+    .ctx-card .ctx-cell { display: flex; flex-direction: column; gap: 2px; }
+    .ctx-card .ctx-cell .k {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .ctx-card .ctx-cell .v {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 13px;
+      color: var(--text);
+      word-break: break-all;
+    }
+    @media (min-width: 720px) {
+      .ctx-card { grid-template-columns: repeat(4, 1fr); }
+    }
+
     * { box-sizing: border-box; }
 
     html, body {
@@ -370,6 +444,55 @@
       color: var(--tertiary);
       font-size: 12px;
     }
+    footer .footer-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 720px) {
+      footer .footer-grid { grid-template-columns: 2fr 1fr; align-items: start; }
+    }
+    footer .footer-author {
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--code-bg);
+    }
+    footer .footer-author .name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+    footer .footer-author .role {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    footer .footer-author a {
+      color: var(--info);
+      text-decoration: none;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+    }
+    footer .footer-author a:hover { text-decoration: underline; }
+    footer .footer-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    footer .footer-meta span::after {
+      content: '·';
+      margin-left: 16px;
+      color: var(--tertiary);
+    }
+    footer .footer-meta span:last-child::after { content: ''; margin-left: 0; }
 
     @media print {
       html, body { background: white !important; color: #111 !important; }
@@ -429,7 +552,15 @@
         <strong>ai-qa-training</strong> &middot; Playwright + TypeScript &middot;
         last refreshed <span id="lastRefreshed">2026-05-09 14:02 ICT</span>
         (build <span id="buildId">#247</span>)
+        &middot;
+        <span id="envBadge" class="env-pill" data-env="local" title="Test environment">LOCAL</span>
       </p>
+
+      <nav class="env-switcher" id="envSwitcher" aria-label="Environment switcher">
+        <a href="../qa/"      data-env="qa"      data-env-key="qa">QA</a>
+        <a href="../uat/"     data-env="uat"     data-env-key="uat">UAT</a>
+        <a href="../staging/" data-env="staging" data-env-key="staging">Staging</a>
+      </nav>
 
       <div class="hero-stats">
         <div class="hero-stat">
@@ -450,6 +581,39 @@
         </div>
       </div>
     </header>
+
+    <!-- 0. RUN CONTEXT -->
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>0 &middot; Run Context</h2>
+          <p class="sub">Where and when this run executed &middot; sourced from <code>reports/run-summary.json</code></p>
+        </div>
+        <span id="ctxEnvPill" class="env-pill" data-env="local">LOCAL</span>
+      </div>
+
+      <div class="card">
+        <div class="card-head">Environment</div>
+        <div class="ctx-card">
+          <div class="ctx-cell">
+            <span class="k">Environment</span>
+            <span class="v" id="ctxEnv">local</span>
+          </div>
+          <div class="ctx-cell">
+            <span class="k">Base URL</span>
+            <span class="v" id="ctxBaseUrl">—</span>
+          </div>
+          <div class="ctx-cell">
+            <span class="k">Build</span>
+            <span class="v" id="ctxBuild">#247</span>
+          </div>
+          <div class="ctx-cell">
+            <span class="k">Ran at</span>
+            <span class="v" id="ctxRanAt">2026-05-09 14:02 ICT</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- 1. TEST CASE COVERAGE -->
     <section>
@@ -659,14 +823,33 @@
     </section>
 
     <footer>
-      Data sources &middot; Test cases &amp; coverage parsed from
-      <code>documents/manual-testcases/</code> + <code>tests/</code>. Execution metrics should
-      come from <code>reports/custom-reporter.ts</code> JSON output. Defects: connect Jira /
-      GitHub Issues via MCP and replace the illustrative values.
-      <br /><br />
-      <em>This dashboard is the PDF/HTML export of the live Cursor Canvas at
-      <code>~/.cursor/projects/Users-khanhdo-Documents-KD-ai-qa-training/canvases/qa-metrics-dashboard.canvas.tsx</code>.
-      Regenerate after each CI run or nightly.</em>
+      <div class="footer-grid">
+        <div>
+          <p style="margin: 0 0 8px;">
+            <strong>Data sources</strong> &middot; Test cases &amp; coverage parsed from
+            <code>documents/manual-testcases/</code> + <code>tests/</code>.
+            Execution metrics from <code>reports/custom-reporter.ts</code> &rarr;
+            <code>run-summary.json</code> + <code>run-trend.json</code>.
+            Defects from GitHub Issues via <code>scripts/fetch-defects.ts</code>.
+          </p>
+          <p style="margin: 0;">
+            <em>Regenerate after each CI run with</em>
+            <code>npm run export:dashboard</code>.
+          </p>
+
+          <div class="footer-meta">
+            <span>&copy; <span id="footerYear">2026</span> ai-qa-training</span>
+            <span>Playwright + TypeScript</span>
+            <span>Allure 3 &middot; Chart.js</span>
+          </div>
+        </div>
+
+        <address class="footer-author" style="font-style: normal;">
+          <div class="role">Author &middot; Maintainer</div>
+          <div class="name">Khanh Do</div>
+          <a href="mailto:khanhdo.pmp@gmail.com" rel="author">khanhdo.pmp@gmail.com</a>
+        </address>
+      </div>
     </footer>
   </div>
 
@@ -704,6 +887,9 @@
   let LATEST = {
     build: '#247',
     ranAtDisplay: '2026-05-09 14:02 ICT',
+    env: 'local',
+    envDisplay: 'LOCAL',
+    baseUrl: '',
     total: 46,
     passed: 44,
     failed: 1,
@@ -713,6 +899,12 @@
     durationMin: 7.4,
     failedTests: [],
   };
+
+  const KNOWN_ENVS = ['qa', 'uat', 'staging', 'prod', 'local'];
+  function normalizeEnv(e) {
+    const v = String(e ?? 'local').toLowerCase();
+    return KNOWN_ENVS.includes(v) ? v : 'local';
+  }
 
   let RECENT_FAILURES = [
     ['TC-CART-API-02', 'Update product quantity in cart', 'Cart API', 'Fixed', 'Edit endpoint payload shape'],
@@ -794,9 +986,13 @@
   }
 
   function applyLatestStats(data) {
+    const env = normalizeEnv(data.env ?? LATEST.env);
     LATEST = {
       build:        data.build        ?? LATEST.build,
       ranAtDisplay: data.ranAtDisplay ?? LATEST.ranAtDisplay,
+      env,
+      envDisplay:   data.envDisplay   ?? env.toUpperCase(),
+      baseUrl:      data.baseUrl      ?? LATEST.baseUrl,
       total:        data.total        ?? LATEST.total,
       passed:       data.passed       ?? LATEST.passed,
       failed:       data.failed       ?? LATEST.failed,
@@ -1021,6 +1217,53 @@
     const hero = document.getElementById('heroPassRate').parentElement;
     hero.classList.remove('success', 'warning', 'danger');
     hero.classList.add(passRateTone(LATEST.passRate));
+
+    applyEnvironment();
+  }
+
+  function applyEnvironment() {
+    const env = LATEST.env;
+    const display = LATEST.envDisplay;
+
+    // Pills (hero + section heading)
+    [document.getElementById('envBadge'), document.getElementById('ctxEnvPill')]
+      .filter(Boolean)
+      .forEach((el) => {
+        el.dataset.env = env;
+        el.textContent = display;
+      });
+
+    // Run-context card
+    setText('ctxEnv', display);
+    setText('ctxBaseUrl', LATEST.baseUrl || '—');
+    setText('ctxBuild', LATEST.build);
+    setText('ctxRanAt', LATEST.ranAtDisplay);
+
+    // Switcher: hide the active env's link, mark current
+    const switcher = document.getElementById('envSwitcher');
+    if (!switcher) return;
+    const links = switcher.querySelectorAll('a[data-env-key]');
+    let visible = 0;
+    links.forEach((a) => {
+      const key = a.dataset.envKey;
+      const isCurrent = key === env;
+      a.setAttribute('aria-current', isCurrent ? 'true' : 'false');
+      // Only show siblings when the current page lives under /<env>/ on a
+      // multi-env GitHub Pages deploy. Detect by checking the URL path.
+      const onMultiEnvSite = /\/(qa|uat|staging|prod)\/?$/i.test(location.pathname.replace(/[^/]*$/, ''));
+      if (!onMultiEnvSite) {
+        a.style.display = 'none';
+      } else {
+        a.style.display = '';
+        visible++;
+      }
+    });
+    switcher.style.display = visible > 0 ? '' : 'none';
+  }
+
+  function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
   }
 
   function passRateTone(rate) {
@@ -1440,11 +1683,17 @@
     syncThemeToggle();
   }
 
+  function applyFooterYear() {
+    const el = document.getElementById('footerYear');
+    if (el) el.textContent = String(new Date().getFullYear());
+  }
+
   /* ─── Boot ─── */
   (async () => {
     await hydrateFromReports();
     applyLatestToHero();
     applyLatestToExecutionBlock();
+    applyFooterYear();
     renderCharts();
     renderTables();
     bindThemeToggle();

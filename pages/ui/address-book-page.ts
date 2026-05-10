@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { AddressBookLocators } from '@locators/address-book-locators';
 import { Address } from '@models/address';
 import { CommonPage } from '@pages/common-page';
@@ -104,13 +104,15 @@ export class AddressBookPage extends AddressBookLocators {
     ];
 
     for (const field of requiredFields) {
-      await expect(field.locator).toHaveText(
-        `${field.fieldKey} must be between ${field.min} and ${field.max} characters!`
+      await this.assertHelper.assertElementHasText(
+        field.locator,
+        `${field.fieldKey} must be between ${field.min} and ${field.max} characters!`,
       );
     }
 
-    await expect(this.regionError()).toHaveText(
-      'Please select a region / state!'
+    await this.assertHelper.assertElementHasText(
+      this.regionError(),
+      'Please select a region / state!',
     );
   }
 
@@ -151,8 +153,8 @@ export class AddressBookPage extends AddressBookLocators {
   @step('Click Delete button of address at index')
   async clickDeleteAddressAt(index: number): Promise<void> {
     const target = this.actionButton('Delete').nth(index);
-    await target.scrollIntoViewIfNeeded();
-    await target.click();
+    await this.commonPage.scrollTo(target);
+    await this.commonPage.click(target);
   }
 
   /**
