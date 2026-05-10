@@ -1,6 +1,6 @@
 ---
 name: spec-to-code-compliance
-description: "Validate that test implementations actually match the API or feature specifications. Catches drift between documentation and code."
+description: "Validates that test implementations actually match the API or feature specifications, catching drift between documentation and code before it ships. Use when the user asks to ‘check tests against the spec’, ‘verify our suite covers the OpenAPI/PRD’, or worries that code and docs have diverged."
 risk: safe
 source: community
 date_added: "2026-02-27"

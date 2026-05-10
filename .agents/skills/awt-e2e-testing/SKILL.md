@@ -1,6 +1,6 @@
 ---
 name: awt-e2e-testing
-description: "AI-powered E2E web testing — eyes and hands for AI coding tools. Declarative YAML scenarios, Playwright execution, visual matching (OpenCV + OCR), platform auto-detection (Flutter/React/Vue), learning DB. Install: npx skills add ksgisang/awt-skill --skill awt -g"
+description: "Runs AI-powered end-to-end web tests from declarative YAML scenarios, executing them with Playwright and verifying with visual matching (OpenCV + OCR) plus platform auto-detection (Flutter / React / Vue). Use when the user asks to ‘write an E2E test in YAML’, wants visual + DOM assertions in one step, or needs a learning-DB-backed self-healing flow. Install: npx skills add ksgisang/awt-skill --skill awt -g"
 risk: unknown
 source: "https://github.com/ksgisang/awt-skill"
 ---

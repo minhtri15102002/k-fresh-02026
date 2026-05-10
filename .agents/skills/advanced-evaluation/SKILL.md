@@ -1,6 +1,6 @@
 ---
 name: advanced-evaluation
-description: "Advanced LLM output evaluation using direct scoring, pairwise comparison, and rubric generation. For evaluating AI agent outputs systematically."
+description: "Evaluates LLM and AI-agent outputs systematically using direct scoring, pairwise comparison, and rubric generation. Use when the user asks to ‘grade these AI responses’, ‘compare model A vs B’, ‘build a rubric for prompt outputs’, or needs reliable judge/eval pipelines beyond ad-hoc spot checks."
 risk: safe
 source: community
 date_added: "2026-02-27"

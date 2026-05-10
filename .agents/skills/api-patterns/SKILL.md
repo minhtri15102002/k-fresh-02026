@@ -1,6 +1,6 @@
 ---
 name: api-patterns
-description: "API design principles and decision-making. REST vs GraphQL vs tRPC selection, response formats, versioning, pagination."
+description: "Picks an API style (REST vs GraphQL vs tRPC), response format, versioning policy, and pagination strategy for a new or existing service. Use when the user asks ‘how should I design this API?’, ‘REST or GraphQL for X?’, ‘how do I version this endpoint?’, or wants principled trade-off guidance instead of cargo-culted patterns."
 risk: unknown
 source: community
 date_added: "2026-02-27"

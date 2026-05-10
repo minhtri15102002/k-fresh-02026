@@ -1,6 +1,6 @@
 ---
 name: ask-questions-if-underspecified
-description: Clarify requirements before implementing. Use when serious doubts arise.
+description: "Surfaces and asks the minimum set of clarifying questions before writing code when requirements are ambiguous, conflicting, or missing critical detail. Use when the user’s request has serious doubts about scope, inputs, edge cases, or acceptance criteria — and guessing would be more expensive than a one-round clarification."
 risk: unknown
 source: community
 ---

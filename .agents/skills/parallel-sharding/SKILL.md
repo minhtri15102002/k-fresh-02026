@@ -1,6 +1,8 @@
 ---
 name: parallel-sharding
 description: Sizes Playwright workers, shards, and projects for the ai-qa-training suite so that total wall time is minimized and per-shard runtime stays within ±15% of the mean. Configures `playwright.config.ts`, the GitHub Actions matrix, and `playwright merge-reports` so sharded jobs produce a single reviewable HTML artifact. Use when designing or rebalancing parallel CI jobs, or when shards diverge in runtime.
+optionalRefs:
+  - documents/automation-framework/perf-history.md   # output — captured per-spec timing baseline
 ---
 
 # Parallel Sharding

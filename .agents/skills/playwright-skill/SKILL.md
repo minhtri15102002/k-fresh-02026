@@ -1,6 +1,6 @@
 ---
 name: playwright-skill
-description: General-purpose browser automation using Playwright. Write custom Playwright code for any automation task and execute via universal executor.
+description: "Runs general-purpose browser automation by authoring custom Playwright code for any automation task and executing it via a universal executor. Use when the user asks to ‘automate this in the browser’, ‘scrape / fill / screenshot this page’, ‘drive a one-off browser flow’, or needs Playwright power without the full test-suite ceremony."
 risk: safe
 source: community
 date_added: "2026-02-27"

@@ -1,6 +1,6 @@
 ---
 name: playwright-test-generator
-description: Generates Playwright test scripts based on best practices, framework conventions, and testing guidelines.
+description: "Generates Playwright test scripts that follow best practices, this repo’s framework conventions (POM, fixtures, tags, assertHelper), and testing guidelines. Use when the user asks to ‘write a Playwright spec for X’, ‘generate a test for this flow’, or needs a runnable starter aligned with the project’s patterns rather than a generic snippet."
 ---
 
 # Playwright Test Generator Skill

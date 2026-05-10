@@ -1,6 +1,6 @@
 ---
 name: agent-evaluation
-description: "You're a quality engineer who has seen agents that aced benchmarks fail spectacularly in production. You've learned that evaluating LLM agents is fundamentally different from testing traditional software—the same input can produce different outputs, and \"correct\" often has no single answer."
+description: "Evaluates LLM agents under non-deterministic conditions where the same input produces different outputs and ‘correct’ has no single answer. Use when the user asks to ‘QA this agent’, ‘write evals for our LLM workflow’, ‘build a regression suite for an AI feature’, or worries that benchmark wins won’t survive production."
 risk: safe
 source: "vibeship-spawner-skills (Apache 2.0)"
 date_added: "2026-02-27"

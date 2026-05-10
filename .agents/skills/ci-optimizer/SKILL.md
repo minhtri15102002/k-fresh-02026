@@ -1,6 +1,8 @@
 ---
 name: ci-optimizer
 description: Optimizes the ai-qa-training Playwright + TypeScript CI workflow for wall-clock time and CPU-minutes without sacrificing reliability. Tunes test selection, sharding, workers, browser scope, caching, artifacts, and reporters in `playwright.config.ts`, `package.json`, and `.github/workflows/*.yml`. Use when reducing CI runtime, designing a new e2e workflow, or justifying performance changes with measured before/after numbers.
+optionalRefs:
+  - documents/automation-framework/ci-history.md   # output — created on first baseline capture
 ---
 
 # CI Optimizer

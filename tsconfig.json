@@ -43,9 +43,12 @@
     "skipLibCheck": true
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    ".agents/skills/*/scripts/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".agents/skills/*/references/**",
+    ".agents/skills/*/resources/**"
   ]
 }

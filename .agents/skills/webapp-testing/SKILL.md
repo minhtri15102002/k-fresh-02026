@@ -1,6 +1,6 @@
 ---
 name: webapp-testing
-description: "To test local web applications, write native Python Playwright scripts."
+description: "Tests local web applications by writing native Python Playwright scripts that drive a real browser against a localhost server. Use when the user asks to ‘test my local webapp’, ‘write a Python Playwright check against localhost:3000’, or needs ad-hoc browser-driven verification without standing up a full TS test framework."
 risk: unknown
 source: community
 date_added: "2026-02-27"

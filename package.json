@@ -26,7 +26,14 @@
     "check:all": "npm run linter && npm run typecheck",
     "fetch:defects": "tsx scripts/fetch-defects.ts",
     "export:dashboard": "npm run fetch:defects --silent && tsx scripts/export-dashboard-pdf.ts",
-    "bootstrap:milestones": "bash scripts/bootstrap-milestones.sh"
+    "bootstrap:milestones": "bash scripts/bootstrap-milestones.sh",
+    "bootstrap:defect-labels": "bash scripts/bootstrap-defect-labels.sh",
+    "seed:demo-defects": "bash scripts/seed-demo-defects.sh",
+    "validate:tags": "tsx .agents/skills/test-tags-validator/scripts/validate-tags.ts",
+    "validate:skills": "tsx .agents/skills/skill-validator/scripts/validate-skill.ts",
+    "roi:brief": "tsx .agents/skills/roi-brief/scripts/draft-roi-brief.ts",
+    "charter:draft": "tsx .agents/skills/quality-org-charter/scripts/draft-charter.ts",
+    "analyse:requirement": "tsx .agents/skills/requirement-analysis/scripts/score-requirement.ts"
   },
   "keywords": [
     "playwright",
@@ -45,7 +52,7 @@
     "@faker-js/faker": "^10.4.0",
     "@playwright/test": "^1.59.1",
     "@types/dotenv": "^6.1.1",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.6.2",
     "@types/nodemailer": "^7.0.4",
     "cross-env": "^10.1.0",
     "date-fns": "^4.1.0",

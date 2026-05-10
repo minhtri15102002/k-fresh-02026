@@ -1,6 +1,8 @@
 ---
 name: git-pr-workflows-git-workflow
-description: "Orchestrate a comprehensive git workflow from code review through PR creation, leveraging specialized agents for quality assurance, testing, and deployment readiness. This workflow implements modern g"
+description: "Orchestrates a comprehensive git workflow from code review through PR creation, leveraging specialised agents for QA, testing, and deployment readiness. Use when the user asks to ‘drive this branch to a merged PR’, ‘run my pre-PR checklist’, or wants a modern, end-to-end review-and-merge flow rather than scattered manual steps. This workflow implements modern g"
+optionalRefs:
+  - resources/implementation-playbook.md   # optional sibling — provided by host repo if used
 risk: critical
 source: community
 date_added: "2026-02-27"

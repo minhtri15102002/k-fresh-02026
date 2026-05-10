@@ -1,6 +1,8 @@
 ---
 name: git-advanced-workflows
-description: "Master advanced Git techniques to maintain clean history, collaborate effectively, and recover from any situation with confidence."
+description: "Masters advanced Git techniques — interactive rebase, cherry-pick, reflog recovery, bisect, worktrees — to maintain clean history, collaborate effectively, and recover from broken states with confidence. Use when the user asks ‘how do I rebase / squash / un-commit / recover lost work?’, hits a merge mess, or needs a non-trivial Git operation walked through carefully."
+optionalRefs:
+  - resources/implementation-playbook.md   # optional sibling — provided by host repo if used
 risk: critical
 source: community
 date_added: "2026-02-27"

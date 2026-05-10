@@ -76,7 +76,7 @@ export class APIPage {
  * getBaseHostname(); // returns Constants.BASE_API_URL
  */
   protected getBaseHostname(): string {
-    return this.baseUrl || Constants.BASE_API_URL;
+    return this.baseUrl ?? Constants.BASE_API_URL;
   }
 
   /**
@@ -169,10 +169,12 @@ export class APIPage {
   /**
    * Makes an asynchronous request to the specified path with the given options.
    *
-   * @param { string } path - The path to append to the base API URL.
-   * @param { string } method - The HTTP method(GET, POST, PUT, DELETE).
-   * @param { any } [requestBody] - The body of the request, if applicable.
-   * @returns { Promise<any> } - A promise that resolves to the JSON - parsed response body.
+   * @param path - The path to append to the base API URL.
+   * @param method - The HTTP method (GET, POST, PUT, DELETE).
+   * @param requestBody - Optional body for the request. Either an `ApiRequestOptions`
+   *                     object (with `data` / `form` / `multipart` / `headers`) or a raw
+   *                     payload that will be wrapped as `{ data: requestBody }`.
+   * @returns The Playwright `APIResponse`.
    */
   private async apiRequest(
     path: string,
@@ -195,11 +197,11 @@ export class APIPage {
 
     Logger.log(`Making ${method} request to: ${baseURL}${path}`);
 
-    const context: APIRequestContext = this.requestContext || await request.newContext({
+    const context: APIRequestContext = this.requestContext ?? (await request.newContext({
       baseURL,
       extraHTTPHeaders: this.headers,
       ignoreHTTPSErrors: true,
-    });
+    }));
     const maybeOpts = requestBody as ApiRequestOptions | undefined;
     const options: ApiRequestOptions = (maybeOpts && (maybeOpts.data || maybeOpts.form || maybeOpts.multipart))
       ? maybeOpts
@@ -224,10 +226,10 @@ export class APIPage {
   /**
    * Makes an asynchronous POST request to the specified path with the given request body.
    *
-   * @param {string} path - The optional path to append to the base API URL.
-   * @param {any} requestBody - The body of the POST request.
-   * @param {string} token - Authen of the POST request.
-   * @returns {Promise<any>} - A promise that resolves to the JSON-parsed response body.
+   * @param path - The optional path to append to the base API URL.
+   * @param token - Bearer token for the `Authorization` header (optional).
+   * @param requestBody - Body of the POST request (typed `T`, defaults to `unknown`).
+   * @returns The Playwright `APIResponse`.
    */
   @step(
     'Makes an asynchronous POST request to the specified path with the given request body.',
@@ -254,9 +256,9 @@ export class APIPage {
   /**
    * Makes an asynchronous GET request to the specified path.
    *
-   * @param {string} path - The optional path to append to the base API URL.
-   * @param {string} token - Authen of the GET request.
-   * @returns {Promise<any>} - A promise that resolves to the JSON-parsed response body.
+   * @param path - The optional path to append to the base API URL.
+   * @param token - Bearer token for the `Authorization` header (optional).
+   * @returns The Playwright `APIResponse`.
    */
   @step('Makes an asynchronous GET request to the specified path.')
   async apiGetRequest(path: string = '', token?: string): Promise<APIResponse> {
@@ -270,10 +272,10 @@ export class APIPage {
   /**
    * Makes an asynchronous PUT request to the specified path with the given request body.
    *
-   * @param {string} path - The optional path to append to the base API URL.
-   * @param {any} requestBody - The body of the PUT request.
-   * @param {string} token - Authen of the PUT request.
-   * @returns {Promise<any>} - A promise that resolves to the JSON-parsed response body.
+   * @param path - The optional path to append to the base API URL.
+   * @param token - Bearer token for the `Authorization` header (optional).
+   * @param requestBody - Body of the PUT request (typed `T`, defaults to `unknown`).
+   * @returns The Playwright `APIResponse`.
    */
   @step(
     'Makes an asynchronous PUT request to the specified path with the given request body.',
@@ -300,9 +302,10 @@ export class APIPage {
   /**
    * Makes an asynchronous DELETE request to the specified path.
    *
-   * @param {string} path - The optional path to append to the base API URL.
-   * @param {string} token - Authen of the DELETE request.
-   * @returns {Promise<any>} - A promise that resolves to the JSON-parsed response body.
+   * @param path - The optional path to append to the base API URL.
+   * @param token - Bearer token for the `Authorization` header (optional).
+   * @param requestBody - Optional body of the DELETE request (typed `T`, defaults to `unknown`).
+   * @returns The Playwright `APIResponse`.
    */
   @step('Makes an asynchronous DELETE request to the specified path.')
   async apiDeleteRequest<T = unknown>(
@@ -327,10 +330,10 @@ export class APIPage {
   /**
    * Makes an asynchronous PATCH request to the specified path with the given request body.
    *
-   * @param {string} path - The optional path to append to the base API URL.
-   * @param {string} token - Authen of the PATCH request.
-   * @param {any} requestBody - The body of the PUT request.
-   * @returns {Promise<any>} - A promise that resolves to the JSON-parsed response body.
+   * @param path - The optional path to append to the base API URL.
+   * @param token - Bearer token for the `Authorization` header (optional).
+   * @param requestBody - Body of the PATCH request (typed `T`, defaults to `unknown`).
+   * @returns The Playwright `APIResponse`.
    */
   @step(
     'Makes an asynchronous PATCH request to the specified path with the given request body.',

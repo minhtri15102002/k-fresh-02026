@@ -1,6 +1,6 @@
 ---
 name: generate-testcase
-description: Generates an automated test script from a manual test case description, utilizing domain knowledge from the project's skills folder, and updating the domain documentation afterward.
+description: "Generates an automated Playwright test script from a manual test-case description, drawing on domain knowledge in the project’s skills folder and updating the domain documentation afterward. Use when the user asks to ‘automate this manual case’, ‘convert TC-XX into a spec’, or hands the agent a written test scenario expecting a runnable .spec.ts in return."
 ---
 
 # Generate Test Case Skill

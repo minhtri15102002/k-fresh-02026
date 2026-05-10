@@ -1,6 +1,6 @@
 ---
 name: e2e-testing-patterns
-description: "Build reliable, fast, and maintainable end-to-end test suites that provide confidence to ship code quickly and catch regressions before users do."
+description: "Builds reliable, fast, and maintainable end-to-end test suites that ship confidence and catch regressions before users do. Use when the user asks ‘why are my E2E tests flaky?’, ‘how do I structure a Playwright/Cypress suite at scale?’, ‘what patterns reduce E2E maintenance?’, or wants principled guidance on POMs, fixtures, and test isolation."
 risk: safe
 source: community
 date_added: "2026-02-27"

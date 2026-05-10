@@ -1,6 +1,6 @@
 ---
 name: typescript-expert
-description: "Deep TypeScript expertise covering advanced type-level programming, performance optimization, complex error resolution, migration strategies, and modern tooling."
+description: "Provides deep TypeScript expertise covering advanced type-level programming, performance optimisation, complex error resolution, migration strategies, and modern tooling. Use when the user asks ‘why does this TS error happen?’, ‘how do I express X at the type level?’, ‘how do I migrate this JS project to TS?’, or hits a hairy generic / inference / variance problem."
 risk: safe
 source: community
 date_added: "2026-02-27"

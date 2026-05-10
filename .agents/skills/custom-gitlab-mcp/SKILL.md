@@ -1,6 +1,9 @@
 ---
 name: custom-gitlab-mcp
-description: "Equips the agent with tools to interact with a bespoke GitLab Code Review MCP server. Helps with fetching merge request details, summarizing changes, posting inline feedback, and managing discussion threads directly within GitLab."
+description: "Equips the agent with tools to interact with a bespoke GitLab Code Review MCP server: fetches merge request details, summarises changes, posts inline feedback, and manages discussion threads directly within GitLab. Use when the user asks to ‘review this MR’, ‘leave comments on GitLab MR !123’, or wants the agent to drive a GitLab review without leaving the chat."
+optionalRefs:
+  - scripts/gitlab/mcp.ts                            # third-party — set up per consumer repo
+  - .gitlab/merge_request_templates/Default.md       # third-party — provided by GitLab project
 ---
 
 # Custom GitLab MCP

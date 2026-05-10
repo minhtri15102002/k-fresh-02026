@@ -1,0 +1,58 @@
+{
+  "_comment": "Example inputs for draft-roi-brief.ts. Mirrors documents/roi/calculator.md Worked Example #1 (AI-assisted POM authoring). Copy this file, edit for your workflow, and run: npm run roi:brief -- /tmp/roi-inputs.json",
+
+  "workflow_name": "AI-assisted POM authoring",
+  "formula_shape": "TIME-SAVING",
+  "adoption_stage": 1,
+  "owner": "Khanh Do",
+  "reviewers": ["Alice (Tech Lead)", "Bob (Finance Partner)"],
+  "baseline_ref": "documents/roi/baseline-template.md",
+  "period_start": "2026-01-01",
+  "period_end": "2026-03-31",
+  "tool_versions": "Cursor 1.x · prompts/core/pom-generator.md v3 · pom-architect skill",
+
+  "scope_description": "AI-assisted authoring of new Page Objects and Locator files for `pages/ui/*` features added in Q1 2026. AI drafts the locators class, page class, and adapts to the three-layer architecture; engineer reviews, fixes selector ambiguities, runs the spec, and merges. Excludes maintenance edits to existing POMs.",
+
+  "metrics_before_after": [
+    { "name": "POM setup time per feature (h)",  "before": 6.0,  "after": 1.5,  "sample": "24 features",            "source": "PR open→merge timestamps" },
+    { "name": "Locator-collision rate (%)",       "before": 8.2,  "after": 4.1,  "sample": "24 features",            "source": "skill-validator + grep audit" },
+    { "name": "Code-review approval rate (%)",    "before": 97.1, "after": 97.4, "sample": "24 PRs",                 "source": "GitHub PR review history" },
+    { "name": "AI-generated POM rejected (%)",    "before": 0.0,  "after": 6.2,  "sample": "24 PRs (1.5 rejected)",  "source": "PR review comments" }
+  ],
+
+  "gross_inputs": {
+    "input_label":      "POM setup time (h)",
+    "input_before":     6.0,
+    "input_after":      1.5,
+    "multiplier_label": "features per quarter",
+    "multiplier_value": 24,
+    "unit_cost_label":  "$/hour",
+    "unit_cost_value":  125
+  },
+
+  "costs": {
+    "tool_licenses_usd":     1200,
+    "governance_hours":      4,
+    "training_hours":        4,
+    "incident_recovery_usd": 0,
+    "eval_infra_usd":        0,
+    "hourly_rate":           125
+  },
+
+  "quality_control": {
+    "metric_name": "Code-review approval rate (%)",
+    "before":      97.1,
+    "after":       97.4,
+    "verdict":     "improved"
+  },
+
+  "stop_check": {
+    "no_recent_incidents":       true,
+    "eval_pass_rate_above_gate": true,
+    "engineers_reading_prs":     true,
+    "cost_per_release_stable":   true,
+    "governance_owner_stable":   true
+  },
+
+  "recommendation": "advance"
+}

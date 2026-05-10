@@ -1,6 +1,6 @@
 ---
 name: test-fixing
-description: "Systematically identify and fix all failing tests using smart grouping strategies. Use when explicitly asks to fix tests (\"fix these tests\", \"make tests pass\"), reports test failures (\"tests are failing\", \"test suite is broken\"), or completes implementation and wants tests passing."
+description: "Identifies and fixes all failing tests systematically using smart grouping strategies (root-cause clustering, shared-fixture batches, cheapest-first). Use when the user explicitly asks to fix tests (‘fix these tests’, ‘make tests pass’), reports failures (‘tests are failing’, ‘suite is broken’), or finishes an implementation and wants the suite green."
 risk: safe
 source: community
 date_added: "2026-02-27"

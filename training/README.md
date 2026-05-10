@@ -21,22 +21,37 @@ The curriculum is **practice-driven**: every module ends with an exercise you co
 ## Curriculum at a glance
 
 ```
-Phase 0: Foundations           (5 modules) — QA mindset, test design, manual TCs
+Phase 0: Foundations             (5 modules) — QA mindset, test design, manual TCs
    │
-Phase 1: Engineering Toolkit   (4 modules) — Git, TypeScript, Web, HTTP
+Phase 1: Engineering Toolkit     (4 modules) — Git, TypeScript, Web, HTTP
    │
-Phase 2: Playwright Core       (6 modules) — Locators, actions, fixtures, trace
+Phase 2: Playwright Core         (6 modules) — Locators, actions, fixtures, trace
    │
-Phase 3: Framework Architecture(5 modules) — 3-layer POM + commonPage + assertions
+Phase 3: Framework Architecture  (5 modules) — 3-layer POM + commonPage + assertions
    │
-Phase 4: API & Cross-cutting   (4 modules) — API, security, visual, a11y
+Phase 4: API & Cross-cutting     (4 modules) — API, security, visual, a11y
    │
-Phase 5: Quality at Scale      (5 modules) — CI, sharding, reporting, dashboards
+Phase 5: Quality at Scale        (5 modules) — CI, sharding, reporting, dashboards
    │
-Phase 6: AI-Assisted QA        (4 modules) — Prompts, MCP, LLM eval, capstone
+Phase 6: AI-Assisted QA          (6 modules) — Prompts, MCP, AI QA continuous flow,
+                                                AI feature testing, capstone
+   │
+Phase 7: AI-Era QA Leadership    (6 modules) — Strategy, governance, AI testing, ROI
+   │
+Phase 8: Quality Architecture    (5 modules) — RFC craft, platform, deep AI testing,
+                                                Compliance-as-Code, transformation
+
+   ┊  parallel to Phases 7-8, opt-in:
+   └─ Track P: People & Management (5 modules) — identity shift, hiring,
+                                                 communication, program at scale,
+                                                 Quality Org Charter (capstone)
 ```
 
-Approx. effort: **80–120 hours** of focused learning + lab work.
+Approx. effort:
+
+- **Phases 0–6 (engineering tier):** 90–130 hours of focused learning + lab work (Phase 6 expanded with operational AI-feature testing in Modules 33a/33b).
+- **Phases 7–8 (leadership tier — IC fork):** +50–60 hours; assumes a multi-team scope or near-term path to one.
+- **Track P (manager fork, opt-in):** +25–30 hours; parallel to Phases 7–8, not a prerequisite for any other phase.
 
 ---
 
@@ -108,7 +123,44 @@ Approx. effort: **80–120 hours** of focused learning + lab work.
 | 30 | [Prompt engineering for QA](./phase-6-ai-assisted-qa/30-prompt-engineering-for-qa.md) | Effective prompts; the prompts/ library tour |
 | 31 | [Using the prompt library](./phase-6-ai-assisted-qa/31-using-the-prompt-library.md) | POM, test, manual TC, defect-label generators |
 | 32 | [MCP & browser agents](./phase-6-ai-assisted-qa/32-mcp-and-browser-agents.md) | Playwright MCP-first discipline |
+| 33a | [The AI QA Continuous Flow](./phase-6-ai-assisted-qa/33a-the-ai-qa-continuous-flow.md) | 9-stage operational loop; Senior Mindset; AI-First Quality Principles → assertion vocabulary |
+| 33b | [Testing AI Features in Practice — Hallucination, Grounding, RAG](./phase-6-ai-assisted-qa/33b-testing-ai-features-in-practice.md) | `@grounding` spec patterns; hallucination detection; 9-metric scoring rubric |
 | 33 | [Capstone & career paths](./phase-6-ai-assisted-qa/33-capstone-and-career-paths.md) | Ship a feature end-to-end; SDET vs QE vs Architect |
+
+### Phase 7 — AI-Era QA Leadership & Strategy · [`phase-7-ai-era-leadership/`](./phase-7-ai-era-leadership/README.md)
+
+| # | Module | What you learn |
+|---|---|---|
+| 34 | [The AI transformation of QA teams & roles](./phase-7-ai-era-leadership/34-ai-transformation-of-qa-teams.md) | What shrinks/grows/is born; QA Manager → AI Quality Leader |
+| 35 | [Future-ready skills & continuous upskilling](./phase-7-ai-era-leadership/35-future-ready-skills-and-upskilling.md) | Five pillars (AI, cloud, APIs, DevOps, obs+sec); 12-month roadmap |
+| 36 | [Testing modern AI systems](./phase-7-ai-era-leadership/36-testing-modern-ai-systems.md) | Eval sets, fairness, hallucination, drift, prompt injection |
+| 37 | [Trust, governance & responsible AI](./phase-7-ai-era-leadership/37-trust-governance-and-responsible-ai.md) | Governance layers, Go/No-Go, kill-switches, overuse risks |
+| 38 | [AI adoption strategy & ROI](./phase-7-ai-era-leadership/38-ai-adoption-strategy-and-roi.md) | Adoption ladder; business-impact metrics; ROI in dollars |
+| 39 | [The 2026+ engineer & graduation](./phase-7-ai-era-leadership/39-the-2026-engineer.md) | Four traits; ADR-AI; portfolio-grade graduation artifact |
+
+### Phase 8 — AI Quality Architecture & Platform Engineering · [`phase-8-quality-architecture/`](./phase-8-quality-architecture/README.md)
+
+> **Precondition:** multi-team scope (or within ~12 months of one). Use as a forward-looking reference otherwise.
+
+| # | Module | What you learn |
+|---|---|---|
+| 40 | [From Engineer to AI Quality Architect](./phase-8-quality-architecture/40-from-engineer-to-ai-quality-architect.md) | RFC craft, C4-lite diagrams, standards-craft loop; owns the graduation RFC template |
+| 41 | [Designing & Building an AI Quality Platform](./phase-8-quality-architecture/41-designing-and-building-an-ai-quality-platform.md) | 7-component reference architecture + 1-page self-service contract + platform SLOs |
+| 42 | [Deep-Dive AI Testing — Data, Bias, Explainability, Observability](./phase-8-quality-architecture/42-deep-dive-ai-testing.md) | 4 spec patterns + tag conventions + gating policy |
+| 43 | [Compliance-as-Code (EU AI Act / NIST AI RMF / ISO 42001)](./phase-8-quality-architecture/43-compliance-as-code.md) | Clause→gate→evidence matrix + a real CI workflow |
+| 44 | [Running an Enterprise AI Transformation (Graduation)](./phase-8-quality-architecture/44-running-an-enterprise-ai-transformation.md) | Multi-team backlog, change network, executive cockpit, stop-loss, **graduation RFC** |
+
+### Track P — People, Career & Management (opt-in, parallel to Phases 7-8) · [`track-p-people-and-management/`](./track-p-people-and-management/README.md)
+
+> **Crosscutting track for the manager fork.** Not a prerequisite for any phase. Take it if your destination is QA Manager / Director / VP Quality.
+
+| # | Module | What you learn |
+|---|---|---|
+| P1 | [From engineer to QA manager — the identity shift](./track-p-people-and-management/p01-from-engineer-to-manager.md) | 4 identity shifts; first-90-days; structured 1:1s; delegation; anti-principles |
+| P2 | [Hiring, leveling & growing QA testers](./track-p-people-and-management/p02-hiring-leveling-growing-testers.md) | JD discipline; 4-stage interview loop; debrief calibration; QA ladder; growth plans; performance mgmt |
+| P3 | [Communication & influence without authority](./track-p-people-and-management/p03-communication-and-influence.md) | Audience spectrum; BLUF; 3 forms of "no"; conflict mediation; trust capital |
+| P4 | [Running a QA program at scale](./track-p-people-and-management/p04-running-qa-program-at-scale.md) | Quarterly plan; OKRs vs SLOs; vendor RFCs; budget defence; capacity planning |
+| P5 | [People-first incident & change leadership (capstone)](./track-p-people-and-management/p05-people-first-incident-and-change-leadership.md) | War-room roles; blameless post-mortem; Kotter change mgmt; psychological safety; **Quality Org Charter** (graduation artifact) |
 
 ---
 
@@ -136,7 +188,11 @@ The phase boundaries map to hiring rubrics:
 | Junior QA / Manual | Phase 0 |
 | QA Automation Engineer | Phase 3 |
 | Senior QA / SDET | Phase 5 |
-| Quality Engineer / Lead / Architect | Phase 6 + capstone |
+| Quality Engineer / Lead | Phase 6 + capstone |
+| AI Quality Leader | Phase 7 + portfolio graduation |
+| Quality Architect / Head of AI Quality | Phase 8 + graduation RFC |
+| **QA Manager / Director / VP Quality** | **Phase 7 + Track P + Quality Org Charter** |
+| Head of Quality (T-shape: people × architecture) | Phase 7 + Phase 8 + Track P |
 
 ---
 

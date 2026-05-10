@@ -1,6 +1,6 @@
 ---
-name: api-testing-observability-api-mock
-description: "You are an API mocking expert specializing in realistic mock services for development, testing, and demos. Design mocks that simulate real API behavior and enable parallel development."
+name: api-testing-mock
+description: "Designs realistic API mocks for development, testing, and demos that simulate real backend behaviour (latency, errors, pagination, auth) so frontend and backend can be built in parallel. Use when the user asks to ‘mock this endpoint’, ‘stand up a fake API for tests’, ‘unblock UI work before backend is ready’, or needs deterministic fixtures for E2E suites."
 risk: unknown
 source: community
 date_added: "2026-02-27"

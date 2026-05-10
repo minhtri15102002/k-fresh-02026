@@ -1,0 +1,142 @@
+{
+  "_comment": "Example inputs for draft-charter.ts. The Phoenix QA team — a hypothetical e-commerce checkout & cart QA org of 6 ICs reporting to a QA Director. This same set of inputs produces the worked example at training/sandbox/example/manager/quality-org-charter.md.",
+
+  "team_name": "Phoenix QA — e-commerce checkout & cart",
+  "author": "Khanh Do",
+  "author_role": "QA Director",
+  "version": "1.0",
+  "next_review_date": "2027-05-10",
+  "reviewers": [
+    "Alice Chen (Peer Director, Platform Engineering)",
+    "Bob Singh (VP Engineering)"
+  ],
+
+  "mission": "We make it impossible to ship a critical regression to checkout without a named human accepting the risk.",
+
+  "principles": [
+    "Numbers over vibes — every release decision cites a dashboard panel or a JSON field, not a feeling",
+    "Blameless by default — incidents teach the system, not punish the human; every 'Alice didn't catch it' is rewritten as 'our process had no second-pair-of-eyes for cart deploys'",
+    "Quality bar is shared, not delegated — devs own quality of their code; QA owns the quality of the safety net; the bar is the same",
+    "Transparent disagreement — peers correct each other in public, including correcting the manager"
+  ],
+
+  "anti_principles": [
+    "We do not ship without @P1 at 100 % — even if the deadline is tomorrow; we descope or push the date",
+    "We do not exit ICs without 90 days of documented feedback — withholding feedback to be liked is career sabotage, not kindness",
+    "We do not make hiring exceptions below the bar — every off-bar hire makes the bar lower for the next one",
+    "We do not write engineer-grade defect narratives for executive audiences — we re-tune for BLUF + verdict + 3 things"
+  ],
+
+  "operating_model": {
+    "ones_on_ones": "weekly, 30 min, IC drives the agenda, doc per templates/manager/1on1-template.md, ~95 % attendance, cancellation only when IC has nothing",
+    "standup": "async daily in #qa-phoenix-standup; sync 2×/week (Tue + Thu) for 15 min on blockers only",
+    "retro": "bi-weekly, rotating facilitator, glad/sad/mad format with team-safety scoring at the end",
+    "planning": "first 2 weeks of quarter; 3 OKRs + 1 SLO + 1 stop-loss criterion per OKR; reviewed by peer Director and VP",
+    "on_call": "1-week shifts, 4-deep rotation (current team has 6 ICs but 2 are below the on-call bar; growing to 6-deep by Q4); comp time at 1.5x for any after-hours pages",
+    "skip_levels": "every 6 weeks with each report's report; 30 min, listen-only — no decisions made in the skip-level"
+  },
+
+  "decision_rights": [
+    {
+      "decision": "Hiring loop go/no-go",
+      "decides": "Hiring manager",
+      "consults": ["Loop participants (4 + bar raiser)"],
+      "informs": ["VP Engineering"]
+    },
+    {
+      "decision": "Release go/no-go",
+      "decides": "QA Director",
+      "consults": ["Eng Director", "PM", "SRE on-call"],
+      "informs": ["VP Engineering"]
+    },
+    {
+      "decision": "Quality SLO target (annual)",
+      "decides": "QA Director",
+      "consults": ["Eng leadership", "Peer Director (Platform)"],
+      "informs": ["All engineering teams"]
+    },
+    {
+      "decision": "Vendor purchases >$10k/yr",
+      "decides": "QA Director + Finance partner",
+      "consults": ["Affected ICs", "Security review"],
+      "informs": ["VP Engineering"]
+    },
+    {
+      "decision": "Performance management actions (PIP / exit)",
+      "decides": "Manager (line)",
+      "consults": ["HR business partner", "skip-level"],
+      "informs": []
+    },
+    {
+      "decision": "Framework architectural change (3-layer POM, assertion routing)",
+      "decides": "Tech lead (Senior IC, designated)",
+      "consults": ["Senior ICs", "Affected feature owners"],
+      "informs": ["Manager"]
+    },
+    {
+      "decision": "Adoption of new AI tool / agent in QA workflow",
+      "decides": "QA Director",
+      "consults": ["Tech lead", "Security", "Eng Director"],
+      "informs": ["VP Engineering", "All ICs"]
+    },
+    {
+      "decision": "Test-deprecation (removing an old suite)",
+      "decides": "Tech lead",
+      "consults": ["Feature owner", "PM"],
+      "informs": ["Manager"]
+    }
+  ],
+
+  "quality_bar": [
+    {
+      "threshold": "@P1 pass rate 100 % on every main commit (stop-the-line below)",
+      "source": "templates/qa-metrics-dashboard.html Panel #2"
+    },
+    {
+      "threshold": "@P2 pass rate ≥ 95 %",
+      "source": "templates/qa-metrics-dashboard.html Panel #2"
+    },
+    {
+      "threshold": "0 open severity:critical defects at release time",
+      "source": "templates/qa-metrics-dashboard.html Panel #3"
+    },
+    {
+      "threshold": "Mean time to triage (CI red → defect-report or fix-merged) ≤ 24h",
+      "source": "templates/qa-metrics-dashboard.html Panel #4"
+    },
+    {
+      "threshold": "Flake rate (failing then passing on retry) ≤ 1 % over rolling 14 days",
+      "source": "templates/qa-metrics-dashboard.html Panel #5"
+    }
+  ],
+
+  "incident_response": {
+    "war_room_roles": "Incident Commander (most senior on-call) / Comms Lead (manager or designated) / Scribe (junior IC — great learning role); IC does NOT debug",
+    "post_mortem_sla": "5 business days, blameless template per templates/manager/post-mortem-template.md, published internally to #engineering",
+    "change_framework": "Kotter 8-step for any change spanning >1 team or >1 sprint; named owner per step; quick-win required by step 6",
+    "customer_comms_threshold": "any incident with >50 customers affected for >15 minutes, OR any data-integrity issue regardless of duration"
+  },
+
+  "hiring": {
+    "loop_stages": 4,
+    "bar_raiser": true,
+    "growth_plan_cadence_months": 6,
+    "perf_mgmt_principle": "feedback → PIP → exit, with no surprises (nothing said in a PIP is the first time the IC heard it)"
+  },
+
+  "communication": {
+    "threaded_doc_threshold": "any decision needing >6 messages → stop and write the threaded doc; thread continues, doc becomes the artifact",
+    "exec_brief_format": "BLUF + verdict (GO / CONDITIONAL / NO-GO) + 3 things that would change it + risks-asking-you-to-accept; one page max",
+    "no_forms": [
+      "yes-and-cut (when ask is reasonable but capacity-constrained)",
+      "no-because (when ask is genuinely wrong; cite risk + cost)",
+      "not-now-but (when ask is right but timing is wrong; name the trigger)"
+    ]
+  },
+
+  "manager_operating": {
+    "office_hours": "Tuesdays 14:00–15:00 ET — any IC, any topic, no agenda required",
+    "skip_level_cadence": "every 6 weeks with each report's report; listen-only",
+    "self_retro_cadence": "quarterly, written, shared with the team in a Track P-style retro doc"
+  }
+}

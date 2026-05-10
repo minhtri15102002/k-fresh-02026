@@ -199,9 +199,9 @@ export class CheckoutPage extends CheckoutLocators {
 
   /**
    * Helper to fetch and parse a currency value from a UI element.
-   * @param {any} locator The locator containing the price text.
-   * @param {string} stepLogName Descriptive label for logging.
-   * @returns {Promise<number>} The parsed numeric price value.
+   * @param locator - Playwright `Locator` containing the price text.
+   * @param stepLogName - Descriptive label for logging.
+   * @returns The parsed numeric price value.
    */
   @step('Extract Price Value by Label')
   async getPriceValue(locator: Locator, stepLogName: string): Promise<number> {

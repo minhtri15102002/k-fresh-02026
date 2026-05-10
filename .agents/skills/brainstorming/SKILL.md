@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: "Transforms raw ideas into structured, implementable designs through rigorous questioning, multi-approach exploration, and documented decision-making."
+description: "Transforms raw ideas into structured, implementable designs through rigorous questioning, multi-approach exploration, and documented decision-making. Use when the user says ‘help me think through this’, ‘brainstorm an approach for X’, ‘what are the options for Y?’, or hands over a vague problem that needs framing before code."
 risk: safe
 source: community
 date_added: "2026-02-27"

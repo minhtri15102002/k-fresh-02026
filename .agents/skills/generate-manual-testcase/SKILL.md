@@ -1,6 +1,6 @@
 ---
 name: generate-manual-testcase
-description: Acts as a Senior QA Architect to generate enterprise-level manual test cases in an Excel-ready format from project requirements.
+description: "Acts as a Senior QA Architect to generate enterprise-level manual test cases in an Excel-ready format from project requirements, applying EP/BVA/decision-table/state-transition design techniques. Use when the user asks to ‘write manual test cases for REQ-X’, ‘generate a test-case spreadsheet from this story’, or needs review-ready cases before automation kicks in."
 ---
 
 # Generate Manual Test Case Skill
@@ -8,6 +8,8 @@ description: Acts as a Senior QA Architect to generate enterprise-level manual t
 Use this skill when the user provides a newly proposed requirement/feature and asks you to generate manual test cases.
 
 The output will be reviewed by QA leadership and stored in Excel for traceability and automation planning.
+
+> **Upstream gate:** if the requirement looks vague, untestable, or contradictory, run [`requirement-analysis`](../requirement-analysis/SKILL.md) first. Only generate cases against a `READY-FOR-DESIGN` verdict — otherwise you'll produce confident cases for the wrong intent.
 
 ## Instructions
 

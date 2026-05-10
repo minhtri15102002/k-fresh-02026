@@ -7,7 +7,11 @@
 30. [Prompt engineering for QA](./30-prompt-engineering-for-qa.md)
 31. [Using the prompt library](./31-using-the-prompt-library.md)
 32. [MCP & browser agents](./32-mcp-and-browser-agents.md)
+33a. [The AI QA Continuous Flow](./33a-the-ai-qa-continuous-flow.md) ⭐ *operational mindset + the 9-stage loop*
+33b. [Testing AI Features in Practice — Hallucination, Grounding, RAG](./33b-testing-ai-features-in-practice.md) ⭐ *techniques + the 9-metric scoring rubric*
 33. [Capstone & career paths](./33-capstone-and-career-paths.md)
+
+> Modules 33a and 33b sit **before** the capstone. They turn Phase 6 from "use AI to do QA" into "use AI to do QA **and** test the AI features themselves." The capstone exercises both if your chosen feature has any AI surface.
 
 ## Phase outcomes
 
@@ -17,7 +21,9 @@ You can:
 - Use `prompts/core/pom-generator.md`, `playwright-test-generator-prompt.md`, `manual-test-case-generator.md` to scaffold a feature end-to-end.
 - Drive a real browser session via Playwright MCP tools and have the agent generate code from observed reality.
 - Evaluate an LLM-generated test suite for correctness, brittleness, and false confidence.
-- Ship a capstone that demonstrates every skill from Phases 0–6.
+- **Draw the AI QA Continuous Flow for any AI feature** and identify which of the 9 stages your team currently instruments — and which are gaps.
+- **Author runnable spec patterns** for RAG grounding, hallucination detection, and 9-metric scoring (Accuracy, Relevance, Completeness, Coherence, Groundedness, Safety, Tone & Style, Latency, Cost).
+- Ship a capstone that demonstrates every skill from Phases 0–6, including operational AI-feature testing where applicable.
 
 ## Capstone (Module 33)
 
@@ -42,4 +48,4 @@ Trainer reviews like a real PR.
 
 ---
 
-**Prev:** [Phase 5 — Quality at Scale](../phase-5-scale/README.md) · **Up:** [Curriculum overview](../README.md)
+**Prev:** [Phase 5 — Quality at Scale](../phase-5-scale/README.md) · **Next:** [Phase 7 — AI-Era QA Leadership](../phase-7-ai-era-leadership/README.md) · **Up:** [Curriculum overview](../README.md)

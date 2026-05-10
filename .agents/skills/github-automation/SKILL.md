@@ -1,6 +1,8 @@
 ---
 name: github-automation
-description: "Automate GitHub repositories, issues, pull requests, branches, CI/CD, and permissions via Rube MCP (Composio). Manage code workflows, review PRs, search code, and handle deployments programmatically."
+description: "Automates GitHub repositories, issues, pull requests, branches, CI/CD, and permissions via Rube MCP (Composio) — manages code workflows, reviews PRs, searches code, and handles deployments programmatically. Use when the user asks to ‘open a PR’, ‘triage issues’, ‘run a CI workflow’, ‘bulk-update labels’, or wants the agent to drive GitHub from natural language instead of clicking around."
+optionalRefs:
+  - .github/workflows/main.yml   # illustrative — example workflow path discussed in pitfalls
 risk: critical
 source: community
 date_added: "2026-02-27"

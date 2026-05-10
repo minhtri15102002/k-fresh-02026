@@ -1,6 +1,6 @@
 ---
 name: acceptance-orchestrator
-description: Use when a coding task should be driven end-to-end from issue intake through implementation, review, deployment, and acceptance verification with minimal human re-intervention.
+description: "Orchestrates a coding task end-to-end from issue intake through implementation, review, deployment, and acceptance verification with minimal human re-intervention. Use when the user asks to drive a ticket all the way to merged-and-verified, runs ‘take this from spec to production’, or hands the agent a Linear/Jira/GitHub issue and expects autonomous follow-through."
 risk: safe
 source: community
 date_added: "2026-03-12"

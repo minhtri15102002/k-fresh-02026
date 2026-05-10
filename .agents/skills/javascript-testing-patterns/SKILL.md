@@ -1,6 +1,6 @@
 ---
 name: javascript-testing-patterns
-description: "Comprehensive guide for implementing robust testing strategies in JavaScript/TypeScript applications using modern testing frameworks and best practices."
+description: "Documents robust testing strategies for JavaScript/TypeScript applications using modern frameworks (Jest, Vitest, Playwright, Testing Library) and best practices around unit, integration, and component tests. Use when the user asks ‘how should I test this React/Node module?’, ‘what’s the right pattern for mocking X?’, or wants principled guidance on coverage and structure rather than just snippets."
 risk: safe
 source: community
 date_added: "2026-02-27"

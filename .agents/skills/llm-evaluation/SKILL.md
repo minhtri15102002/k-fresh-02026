@@ -1,6 +1,6 @@
 ---
 name: llm-evaluation
-description: "LLM-as-judge patterns, prompt A/B testing, and regression detection for AI outputs."
+description: "Implements LLM-as-judge patterns, prompt A/B testing, and regression detection for AI outputs so prompt changes don’t silently degrade quality. Use when the user asks to ‘A/B these prompts’, ‘set up an LLM judge for our generations’, ‘catch regressions when we swap models’, or needs offline eval rigor before shipping prompt changes."
 risk: safe
 source: community
 date_added: "2026-02-27"

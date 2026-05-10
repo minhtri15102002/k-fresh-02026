@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: "Master the TDD cycle: Write failing test first, implement minimal code to pass, then refactor. Strict red-green-refactor discipline."
+description: "Drives the TDD cycle with strict red-green-refactor discipline: writes a failing test first, implements the minimum code to pass, then refactors. Use when the user asks to ‘build this test-first’, ‘do TDD on feature X’, or wants the agent to enforce the cycle rather than write code-then-tests."
 risk: safe
 source: community
 date_added: "2026-02-27"

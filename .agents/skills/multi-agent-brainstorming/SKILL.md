@@ -1,6 +1,6 @@
 ---
 name: multi-agent-brainstorming
-description: "Transform a single-agent design into a robust, review-validated design by simulating a formal peer-review process using multiple constrained agents."
+description: "Transforms a single-agent design into a robust, review-validated design by simulating a formal peer-review process across multiple constrained agents (architect, security, perf, reviewer). Use when the user asks to ‘peer-review this design’, ‘stress-test this proposal’, ‘run a multi-agent design review’, or wants higher confidence than a single brainstorming pass would give."
 risk: safe
 source: community
 date_added: "2026-02-27"

@@ -1,6 +1,6 @@
 ---
 name: git-pushing
-description: "Stage all changes, create a conventional commit, and push to the remote branch. Use when explicitly asks to push changes (\"push this\", \"commit and push\"), mentions saving work to remote (\"save to github\", \"push to remote\"), or completes a feature and wants to share it."
+description: "Stages all changes, creates a Conventional Commit, and pushes to the remote branch. Use when the user explicitly asks to push (‘push this’, ‘commit and push’), mentions saving work to remote (‘save to github’, ‘push to remote’), or completes a feature and wants it shared."
 risk: critical
 source: community
 date_added: "2026-02-27"

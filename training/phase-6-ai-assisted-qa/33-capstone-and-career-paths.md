@@ -1,6 +1,6 @@
 # Module 33 — Capstone & Career Paths
 
-> Phase 6 · Effort: 16h+ · Prerequisites: Modules 1–32
+> Phase 6 · Effort: 16h+ · Prerequisites: Modules 1–32 (and Modules 33a + 33b if your chosen feature has any AI surface)
 
 ## Learning objectives
 
@@ -8,7 +8,7 @@ After this module you can:
 
 - Ship a complete feature end-to-end using everything from Phases 0–6.
 - Self-review like a senior reviewer would.
-- Map your strengths to a career path: SDET, Quality Engineer, Performance/Security, QA Lead, QA Architect.
+- Map your strengths to a career path: SDET, Quality Engineer, Performance/Security, **QA Manager / Director**, AI Quality Leader, or Quality Architect.
 
 ## Why it matters
 
@@ -45,6 +45,7 @@ Choose a flow on the SUT not yet covered (suggestions):
 - [ ] **Dashboard panel** — at least one new metric on `templates/qa-metrics-dashboard.html`
 - [ ] **Defect labels** — if you found bugs, file them with the right labels
 - [ ] **PR description** — written with help from `prompts/advanced/release-readiness.md`
+- [ ] **AI-surface check** — *if your feature involves an LLM, RAG, classifier, or agent:* exercise Modules 33a (continuous-flow + per-stage instrumentation) and 33b (`@grounding` spec + 9-metric scoring); link the artifacts in your PR description
 
 ### Quality gates
 
@@ -128,11 +129,12 @@ After the capstone, here's where graduates typically go.
 **Daily work:** threat modeling, security tests, pen-testing, SAST/DAST integration.
 **Next-level skills:** Burp Suite, OWASP ZAP, OAuth/OIDC depth, threat intel, certs (OSCP, eWPT).
 
-### QA Lead / Manager
+### QA Manager / Director / VP Quality
 
-**Fit if:** you want to multiply teams' effectiveness through process and people.
-**Daily work:** hiring, mentoring, dashboards (Phase 5!), DORA metrics, stakeholder reporting.
-**Next-level skills:** budget management, vendor selection, technical writing.
+**Fit if:** you want to multiply teams' effectiveness through people, process, hiring, and program design — and you've decided your highest-leverage work is *other engineers*, not your own keyboard.
+**Daily work:** 1:1s, hiring loops, growth plans, quarterly OKRs/SLOs, vendor decisions, exec briefings, blameless post-mortems, change rollouts.
+**Next-level skills:** budget defence (with [`roi-brief`](../../.agents/skills/roi-brief/SKILL.md)), vendor RFCs, change management, psychological-safety craft, written communication across audiences.
+**Take next:** [Phase 7 (Leadership) → **Track P (People & Management)**](../track-p-people-and-management/README.md). The Track P graduation artifact (Quality Org Charter) is what you bring to a Manager / Director interview.
 
 ### Quality Architect
 
@@ -171,10 +173,26 @@ After the capstone, here's where graduates typically go.
 - [ ] You can extend the QA Metrics dashboard without breaking it.
 - [ ] You can explain QA strategy to a non-technical stakeholder in 5 minutes.
 
-If you ticked all five: **graduated.** Open a PR titled `chore(training): <your-name> capstone complete` adding a one-page reflection to `training/sandbox/<your-name>/capstone-reflection.md`.
+If you ticked all five: **capstone complete.** Open a PR titled `chore(training): <your-name> capstone complete` adding a one-page reflection to `training/sandbox/<your-name>/capstone-reflection.md`.
 
 ---
 
-**Prev:** [32 — MCP & browser agents](./32-mcp-and-browser-agents.md) · **Up:** [Phase 6 README](./README.md) · **Curriculum:** [Top](../README.md)
+## Pick your next fork
 
-🎓 **Curriculum complete.** Welcome to the team.
+Phase 6 is the IC graduation. After this, the curriculum branches — pick the fork that matches your destination, not seniority. None is "above" another.
+
+| Destination | Take next | Graduation artifact |
+|---|---|---|
+| **AI Quality Leader** (strategic IC) | [Phase 7 — AI-Era QA Leadership](../phase-7-ai-era-leadership/README.md) | Portfolio of strategy artifacts (governance memo + ROI brief + AI test plan) |
+| **Quality Architect / Head of AI Quality** (deep technical) | [Phase 7](../phase-7-ai-era-leadership/README.md) → [Phase 8 — Quality Architecture](../phase-8-quality-architecture/README.md) | Quality Platform RFC |
+| **QA Manager / Director / VP Quality** (people leader) | [Phase 7](../phase-7-ai-era-leadership/README.md) → [Track P — People & Management](../track-p-people-and-management/README.md) | Quality Org Charter |
+| **Head of Quality / VP** (rare T-shape) | [Phase 7](../phase-7-ai-era-leadership/README.md) → [Phase 8](../phase-8-quality-architecture/README.md) → [Track P](../track-p-people-and-management/README.md) | Both: Platform RFC + Org Charter |
+| Stay senior IC for now | Re-do the capstone on a harder feature; contribute to Playwright OSS | A merged OSS PR or a 2nd capstone |
+
+If you're unsure which fork, take Phase 7 first — it's the common foundation for all three leadership destinations and will sharpen your sense of which one fits.
+
+---
+
+**Prev:** [32 — MCP & browser agents](./32-mcp-and-browser-agents.md) · **Next:** [Phase 7 — AI-Era QA Leadership](../phase-7-ai-era-leadership/README.md) (common to all three forks) · **Up:** [Phase 6 README](./README.md) · **Curriculum:** [Top](../README.md)
+
+🎓 **Capstone complete.** Pick your fork above, then continue.

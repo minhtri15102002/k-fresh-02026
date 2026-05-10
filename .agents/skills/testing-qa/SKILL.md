@@ -1,6 +1,6 @@
 ---
 name: testing-qa
-description: "Comprehensive testing and quality assurance workflow bundle covering unit tests, integration tests, E2E tests, browser automation, and quality gates for production-ready software."
+description: "Provides a comprehensive testing-and-QA workflow bundle covering unit, integration, E2E, browser automation, and quality gates for production-ready software. Use when the user asks ‘what should our overall testing strategy look like?’, ‘how do I wire up unit + integration + E2E + CI gates together?’, or wants an opinionated end-to-end QA blueprint rather than a single-layer recipe."
 category: workflow-bundle
 risk: safe
 source: personal

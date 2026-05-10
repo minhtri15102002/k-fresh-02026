@@ -142,6 +142,7 @@ const FEATURE_TAGS = new Set([
     '@security',
 ]);
 
+// eslint-disable-next-line no-empty-pattern -- intentionally no fixtures, only testInfo
 test.beforeEach(async ({}, testInfo) => {
     const tags = testInfo.tags ?? [];
     const priority = tags.find((t) => PRIORITY_TAG.test(t));

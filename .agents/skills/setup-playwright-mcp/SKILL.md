@@ -1,6 +1,6 @@
 ---
-name: Setup Playwright Trace Analyzer MCP
-description: Guide for AI agents to install and patch @metoto/playwright-trace-analyzer-mcp.
+name: setup-playwright-mcp
+description: "Installs and patches the @metoto/playwright-trace-analyzer-mcp package so AI agents can analyse Playwright traces. Use when explicitly asked to 'set up Playwright MCP', 'install the trace analyzer', or when an agent needs to read traces locally to debug failing specs."
 ---
 
 # Setup Playwright Trace Analyzer MCP

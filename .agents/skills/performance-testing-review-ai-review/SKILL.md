@@ -1,6 +1,6 @@
 ---
 name: performance-testing-review-ai-review
-description: "AI-assisted review of test suites to find performance bottlenecks, stability issues, and missing coverage."
+description: "Reviews a test suite with AI assistance to surface performance bottlenecks (slow specs, hidden serialisation), stability issues (flaky patterns, race conditions), and coverage gaps. Use when the user asks ‘why is my suite slow?’, ‘audit these tests for flakiness’, or wants a structured pre-CI review before tests are merged."
 risk: safe
 source: community
 date_added: "2026-02-27"

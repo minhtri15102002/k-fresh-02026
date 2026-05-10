@@ -18,9 +18,14 @@ A bug issue **MUST** carry:
 2. exactly one **severity** label: `severity:critical | severity:major | severity:minor | severity:trivial`
 3. exactly one **module** label: `module:auth | module:cart | module:checkout | module:profile | module:product | module:compare | module:wishlist | module:home`
 
-A bug issue **MAY** carry:
+A bug issue **MAY** carry (each unlocks a richer panel on the dashboard):
 
 - `status:in-progress` — actively being worked on. Bumps the issue from "Open" into the "In Progress" stat on the dashboard.
+- `status:reopened`   — the bug was closed and re-opened. Feeds the **Reopen Rate** KPI.
+- exactly one **priority** label: `priority:p1 | priority:p2 | priority:p3 | priority:p4` — feeds the **By priority** chart.
+- exactly one **root cause** label: `root-cause:requirements | root-cause:logic | root-cause:test-gap | root-cause:env | root-cause:data | root-cause:integration | root-cause:other` — feeds the **Top root causes** chart.
+- exactly one **detection phase** label: `phase:unit | phase:integration | phase:e2e | phase:manual | phase:exploratory | phase:customer` — feeds the per-phase distribution.
+- exactly one **found-in** label: `found-in:dev | found-in:qa | found-in:uat | found-in:staging | found-in:prod` — `found-in:prod` drives the **Defect Leakage** KPI and the leakage trend.
 - Any of the standard GitHub labels (`good first issue`, `help wanted`, etc.) — ignored by the dashboard.
 
 Everything else (feature requests, chores, docs) should NOT carry the `bug` label and won't appear in the defect counts.
@@ -68,6 +73,57 @@ Aligns with the test feature tags. Adding a new product area? Add the matching `
 | Label                  | Effect on dashboard |
 |------------------------|---------------------|
 | `status:in-progress`   | Open issues with this label show under **In Progress** instead of **Open**. |
+| `status:reopened`      | Counts toward the **Reopen Rate** KPI (proxy for fix quality). |
+
+### Priority (optional, exactly one)
+
+Mirrors the test-tag `@P1..@P4` taxonomy in `prompts/core/test-tags.md`.
+
+| Label          | When to use |
+|----------------|-------------|
+| `priority:p1`  | Must fix before next release. |
+| `priority:p2`  | Should fix this sprint. |
+| `priority:p3`  | Nice to fix; backlog. |
+| `priority:p4`  | Cosmetic; fix when convenient. |
+
+> Severity = how bad the bug is on its own. Priority = how urgently we will fix it. They are deliberately decoupled (a `severity:critical` cosmetic in a hidden admin screen can be `priority:p3`).
+
+### Root cause (optional, exactly one)
+
+| Label                      | Means |
+|----------------------------|-------|
+| `root-cause:requirements`  | Spec / story missing or wrong. |
+| `root-cause:logic`         | Code logic / algorithm bug. |
+| `root-cause:test-gap`      | Code is right; the test missed it. |
+| `root-cause:env`           | Environment / config / infra. |
+| `root-cause:data`          | Bad seed / fixture / migration. |
+| `root-cause:integration`   | Boundary between systems. |
+| `root-cause:other`         | Anything else (use sparingly). |
+
+### Detection phase (optional, exactly one)
+
+Where the bug was first caught. Drives the leakage funnel.
+
+| Label                  | Means |
+|------------------------|-------|
+| `phase:unit`           | Unit test |
+| `phase:integration`    | Integration / contract test |
+| `phase:e2e`            | Playwright E2E |
+| `phase:manual`         | Manual scripted test |
+| `phase:exploratory`    | Exploratory / charter session |
+| `phase:customer`       | Reported by a customer / in prod |
+
+### Found-in (optional, exactly one)
+
+Which environment surfaced the bug. `found-in:prod` is the leakage marker.
+
+| Label              | Means |
+|--------------------|-------|
+| `found-in:dev`     | Developer's machine before commit |
+| `found-in:qa`      | QA env |
+| `found-in:uat`     | UAT env |
+| `found-in:staging` | Staging env |
+| `found-in:prod`    | **Escaped — counts toward Defect Leakage KPI.** |
 
 ---
 
@@ -117,6 +173,28 @@ for m in auth cart checkout profile product compare wishlist home; do
 done
 
 gh label create "status:in-progress" --color "1D76DB" --description "Actively being worked on"
+gh label create "status:reopened"    --color "E99695" --description "Closed and re-opened — counts toward Reopen Rate"
+
+# Priority (optional)
+gh label create "priority:p1" --color "B60205" --description "Must fix before next release"
+gh label create "priority:p2" --color "D93F0B" --description "Should fix this sprint"
+gh label create "priority:p3" --color "FBCA04" --description "Nice to fix"
+gh label create "priority:p4" --color "C5DEF5" --description "Cosmetic / when convenient"
+
+# Root cause (optional)
+for rc in requirements logic test-gap env data integration other; do
+  gh label create "root-cause:$rc" --color "0E8A16" --description "Root cause: $rc"
+done
+
+# Detection phase (optional)
+for ph in unit integration e2e manual exploratory customer; do
+  gh label create "phase:$ph" --color "5319E7" --description "First caught in: $ph"
+done
+
+# Found-in environment (optional) — `found-in:prod` drives Defect Leakage KPI
+for env in dev qa uat staging prod; do
+  gh label create "found-in:$env" --color "1D76DB" --description "Surfaced in: $env"
+done
 ```
 
 ### Refresh the dashboard locally
