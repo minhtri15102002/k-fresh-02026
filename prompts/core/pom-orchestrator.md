@@ -19,15 +19,16 @@ Before writing ANY code, analyze the provided input:
 - **Scenario A (Manual Test Case):** A manual test case is ONLY ready for automation if it contains: Clear Pre-conditions, Step-by-step actions, Explicit Test Data, Expected Results, and **DOM Context / Locators** (CRITICAL).
   *Action:* If any of these are missing, **STOP** and explicitly ask the user to provide the missing information. DO NOT hallucinate.
 - **Scenario B (Existing Code for Refactoring):** Analyze the provided existing script. Identify its business logic, locators, and assertions. Point out briefly how it currently deviates from the project's POM architecture before refactoring it.
+- **MCP-first discipline (BOTH scenarios):** You MUST exercise the live flow with Playwright MCP tools (`browser_navigate`, `browser_snapshot`, etc.) before generating or refactoring code, exactly as required by Hard Rule #1 of `prompts/core/playwright-test-generator-prompt.md`. Never derive locators or selectors from a written scenario alone.
 
 ### Phase 2: Code Generation & Refactoring (Documentation-Driven)
-If the input passes Phase 1, you will generate or refactor the automated code. 
+If the input passes Phase 1, you will generate or refactor the automated code.
 *Action:* You MUST read BOTH of the following shared files in the workspace and follow them strictly:
-1. Read **`generate_test_prompt.md`**: Strictly follow the Framework Conventions, Coding Standards, and mimic the EXACT code structure provided in its "Example Locators/Pages/Tests".
-2. Read **`OOP_POM_Documentation.md`**: Strictly apply the 3-layer architecture, `CommonLocators` inheritance, `CommonPage` composition, and update `pages/base-page.ts` for fixture injection as documented.
+1. Read **`prompts/core/playwright-test-generator-prompt.md`**: Strictly follow the Framework Conventions, Coding Standards, and mimic the EXACT code structure provided in its "Example Locators/Pages/Tests".
+2. Read **`documents/OOP_POM_Documentation.md`**: Strictly apply the 3-layer architecture, `CommonLocators` inheritance, `CommonPage` composition, and update `pages/base-page.ts` for fixture injection as documented.
 
 ### Phase 3: Execution & Self-Healing (Verification)
-After generating/refactoring the files, execute the test using the terminal tool with the command `npx playwright test <path-to-spec-file>`. Analyze the terminal output. If the test fails due to syntax errors, wrong locators, or timeouts, automatically correct your generated code and re-run until it passes.
+Execute and self-heal per the **Workflow §3 Verify** and **When Input Is Insufficient** sections of `prompts/core/playwright-test-generator-prompt.md`. In short: run `npx playwright test <path-to-spec-file>`, iterate on real failures (syntax, wrong locators, timing) without using `--retries` or `page.waitForTimeout` to mask flakes, and stop with a `## Missing Artifacts` report if the failure is caused by missing locators/models/translations/data rather than a code defect.
 
 ---
 
@@ -35,7 +36,7 @@ After generating/refactoring the files, execute the test using the terminal tool
 *(Note for AI Context: Ignore this section. This instruction is for human developers only.)*
 
 **To automate a NEW manual test case:**
-> "Act as the Workflow Orchestrator. Read @pom-orchestrator.md, @generate_test_prompt.md, @OOP_POM_Documentation.md, and @<your-manual-test-case>.md. Execute the 3 Phases."
+> "Act as the Workflow Orchestrator. Read @prompts/core/pom-orchestrator.md, @prompts/core/playwright-test-generator-prompt.md, @documents/OOP_POM_Documentation.md, and @<your-manual-test-case>.md. Execute the 3 Phases."
 
 **To REFACTOR existing code:**
-> "Act as the Workflow Orchestrator. Read @pom-orchestrator.md, @generate_test_prompt.md, @OOP_POM_Documentation.md, and @<your-old-spec-file>.ts. Execute the 3 Phases to refactor."
+> "Act as the Workflow Orchestrator. Read @prompts/core/pom-orchestrator.md, @prompts/core/playwright-test-generator-prompt.md, @documents/OOP_POM_Documentation.md, and @<your-old-spec-file>.ts. Execute the 3 Phases to refactor."

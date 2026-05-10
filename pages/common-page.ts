@@ -81,6 +81,32 @@ export class CommonPage extends CommonLocators {
     }
 
     /**
+     * Check Locator
+     * @param locator
+     */
+    @step('Check Locator')
+    async check(locator: Locator): Promise<void> {
+        await expect(locator).toBeVisible();
+        await expect(locator).toBeEnabled();
+        if (await locator.isEnabled()) {
+            await locator.check({ force: true });
+        }
+    }
+
+    /**
+     * Uncheck Locator
+     * @param locator
+     */
+    @step('Uncheck Locator')
+    async uncheck(locator: Locator): Promise<void> {
+        await expect(locator).toBeVisible();
+        await expect(locator).toBeEnabled();
+        if (await locator.isEnabled()) {
+            await locator.uncheck({ force: true });
+        }
+    }
+
+    /**
      * Focuses the element, and then uses keyevents
      * @param locator
      * @param key
@@ -139,8 +165,7 @@ export class CommonPage extends CommonLocators {
     @step('Hover over a Locator')
     async hover(locator: Locator): Promise<void> {
         await expect(locator).toBeVisible();
-        await locator.hover();
-        await Utility.delay(1);
+        await locator.hover({ force: true });
     }
 
     /**
@@ -238,6 +263,7 @@ export class CommonPage extends CommonLocators {
     @step('Scroll an element into view')
     async scrollIntoView(locator: Locator): Promise<void> {
         await locator.scrollIntoViewIfNeeded();
+        await Utility.delay(1);
     }
 
     /**
@@ -366,8 +392,10 @@ export class CommonPage extends CommonLocators {
     }
 
     /**
-     * Close Browser
+     * Close the underlying Playwright Page (tests rarely need this — the
+     * Page is normally closed automatically when the test fixture tears down).
      */
+    @step('Close Browser')
     async closeBrowser(): Promise<void> {
         await this.page.close();
     }

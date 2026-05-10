@@ -43,7 +43,7 @@ test.describe('Checkout Tests', () => {
     await productPage.buySpecificItemNow(targetProduct);
   });
 
-  test('TC_CHK_001: Verify successful checkout using a different shipping address', { tag: '@smoke @regression' }, async ({ checkoutPage }) => {
+  test('TC-01: Verify successful checkout using a different shipping address', { tag: ['@P1', '@critical', '@smoke', '@regression', '@ui', '@checkout'] }, async ({ checkoutPage }) => {
     await checkoutPage.fillBillingDetails(buyerProfile, buyerAddress);
     await checkoutPage.verifyShippingSectionVisible();
     await checkoutPage.fillShippingDetails(receiverProfile, receiverAddress);
@@ -52,7 +52,7 @@ test.describe('Checkout Tests', () => {
     await checkoutPage.confirmOrderAndVerifySuccess();
   });
 
-  test('TC_CHK_002: Verify checkout recovers successfully when toggling shipping address states', { tag: '@regression' }, async ({ checkoutPage }) => {
+  test('TC-02: Verify checkout recovers successfully when toggling shipping address states', { tag: ['@P2', '@major', '@regression', '@ui', '@checkout'] }, async ({ checkoutPage }) => {
     await checkoutPage.fillBillingDetails(buyerProfile, buyerAddress);
     await checkoutPage.verifyShippingSectionVisible();
     await checkoutPage.setTermsAndConditions();
@@ -63,7 +63,7 @@ test.describe('Checkout Tests', () => {
     await checkoutPage.confirmOrderAndVerifySuccess();
   });
 
-  test('TC_CHK_003: Mandatory Terms Check - Verify error when Terms & Conditions are not accepted', { tag: '@regression' }, async ({ checkoutPage }) => {
+  test('TC-03: Mandatory Terms Check - Verify error when Terms & Conditions are not accepted', { tag: ['@P2', '@major', '@regression', '@ui', '@checkout'] }, async ({ checkoutPage }) => {
     await checkoutPage.fillBillingDetails(buyerProfile, buyerAddress);
     await checkoutPage.setTermsAndConditions(false);
     await checkoutPage.clickContinueButton();
@@ -72,7 +72,7 @@ test.describe('Checkout Tests', () => {
     await checkoutPage.clickContinueButton();
   });
 
-  test('TC_CHK_004: New User Happy Path - Complete checkout from scratch', async ({ checkoutPage }) => {
+  test('TC-04: New User Happy Path - Complete checkout from scratch', { tag: ['@P1', '@critical', '@regression', '@ui', '@checkout'] }, async ({ checkoutPage }) => {
     await checkoutPage.fillBillingDetails(buyerProfile, buyerAddress);
     await checkoutPage.verifySameAddressIsChecked();
     await checkoutPage.verifyDefaultDeliveryAndPayment();

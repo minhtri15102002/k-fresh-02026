@@ -9,7 +9,7 @@ test.describe('Compare Products Tests', () => {
     await commonPage.goto(Constants.CATEGORY_URL);
   });
 
-  test('TC-CP-001 | Add 2 products to Compare and verify compare page', async ({ commonPage, productPage, compareProductsPage }) => {
+  test('TC-01 | Add 2 products to Compare and verify compare page', { tag: ['@P3', '@minor', '@regression', '@ui', '@compare'] }, async ({ commonPage, productPage, compareProductsPage }) => {
     // STEP: Add products to compare list
     await productPage.addProductsToCompare([products.htcTouch, products.canon]);
 
@@ -18,7 +18,7 @@ test.describe('Compare Products Tests', () => {
     await compareProductsPage.verifyProductsDetails([products.canon, products.htcTouch]);
   });
 
-  test('TC-CP-002 | Verify all compare table details with 3 products', async ({ commonPage, productPage, compareProductsPage }) => {
+  test('TC-02 | Verify all compare table details with 3 products', { tag: ['@P3', '@minor', '@regression', '@ui', '@compare'] }, async ({ commonPage, productPage, compareProductsPage }) => {
     // STEP: Add 3 products to compare
     await productPage.addProductsToCompare([products.htcTouch, products.canon, products.palmTreo]);
 
@@ -32,7 +32,7 @@ test.describe('Compare Products Tests', () => {
     );
   });
 
-  test('TC-CP-003 | Remove one product from compare and verify table updates', async ({ productPage, commonPage, compareProductsPage }) => {
+  test('TC-03 | Remove one product from compare and verify table updates', { tag: ['@P3', '@minor', '@regression', '@ui', '@compare'] }, async ({ productPage, commonPage, compareProductsPage }) => {
     // STEP: Add 2 products and navigate to compare page
     await productPage.addProductsToCompare([products.htcTouch, products.canon]);
     await productPage.clickNavigateToComparePage(products.canon.name);
@@ -49,7 +49,7 @@ test.describe('Compare Products Tests', () => {
     await compareProductsPage.verifyProductsDetails([products.ipod, products.canon]);
   });
 
-  test('TC-CP-004 | Remove all products and verify empty state', async ({ commonPage, compareProductsPage, productPage }) => {
+  test('TC-04 | Remove all products and verify empty state', { tag: ['@P3', '@minor', '@regression', '@ui', '@compare'] }, async ({ commonPage, compareProductsPage, productPage }) => {
     // STEP: Add products and navigate to compare page
     await productPage.addProductsToCompare([products.htcTouch, products.canon]);
     await productPage.clickNavigateToComparePage(products.htcTouch.name);
@@ -67,7 +67,7 @@ test.describe('Compare Products Tests', () => {
     await compareProductsPage.verifyNoProductOnComparionPage('You have not chosen any products to compare.');
   });
 
-  test('TC-CP-005 | Verify duplicate handling with page navigation', async ({ commonPage, compareProductsPage, productPage }) => {
+  test('TC-05 | Verify duplicate handling with page navigation', { tag: ['@P3', '@minor', '@regression', '@ui', '@compare'] }, async ({ commonPage, compareProductsPage, productPage }) => {
     // STEP: Initial add and navigation
     await productPage.addProductsToCompare([products.htcTouch, products.canon]);
     await productPage.clickNavigateToComparePage(products.canon.name);

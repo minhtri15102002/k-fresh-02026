@@ -54,14 +54,26 @@ OUTPUT FORMAT – EXCEL READY (STRICT)
 Rules:
 - One test case per row.
 - No bullet points.
-- No line breaks inside cells.
-- Separate multiple items using semicolon.
-- Use Step 1:, Step 2: format for steps.
+- Separate multiple items using semicolon — EXCEPT in the `Test_Steps` column (see below).
 - Use realistic test data.
 - TC_ID naming convention: [MODULE]_[Feature]_[Number]
 
+Test_Steps Cell Format (STRICT):
+- All steps for a single test case MUST live in ONE cell of the `Test_Steps` column.
+- Each step MUST be on its own line within that cell, separated by a literal newline character (`\n` / `CHAR(10)` / Alt+Enter in Excel). Do NOT split steps across multiple rows or multiple cells.
+- Each line MUST start with the prefix `Step <N>: ` followed by a single, imperative action. Numbering starts at 1 and increments by 1 with no gaps.
+- Example of the exact content of one `Test_Steps` cell (note the embedded newlines):
+  ```
+  Step 1: Navigate to the login page.
+  Step 2: Enter a valid email and password.
+  Step 3: Click the "Sign In" button.
+  ```
+- Do NOT use bullets, numbered-list markdown (`1.`, `2.`), semicolons, or `<br>` to separate steps — only the in-cell newline.
+- All other cells (Preconditions, Test_Data, Expected_Result, etc.) remain single-line; multiple items there are still separated by semicolon.
+
 Columns (STRICT ORDER):
 
+```
 TC_ID
 Module
 Feature
@@ -76,6 +88,7 @@ Test_Type (Functional/Negative/Boundary/Edge/Permission/UI/Integration/Regressio
 Requirement_Reference
 Automation_Candidate (Yes/No)
 Remarks
+```
 
 ----------------------------------------------------
 EXPECTED_RESULT QUALITY STANDARD (MANDATORY)

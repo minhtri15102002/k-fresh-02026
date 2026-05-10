@@ -20,7 +20,7 @@ test.describe('Cart Tests - UI & API Hybrid', () => {
         await registerPage.submitRegistrationForm();
     });
 
-    test('TC01 - Add product to cart', async ({ productPage, commonPage }) => {
+    test('TC01 - Add product to cart', { tag: ['@P2', '@major', '@regression', '@hybrid', '@cart'] }, async ({ productPage, commonPage }) => {
         await productPage.commonPage.goto(Constants.BASE_URL);
         await productPage.searchAndSelectProduct(product);
 

@@ -1,5 +1,9 @@
 
 name: Playwright Tests
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 on:
   push:
     branches: [ main, master ]
@@ -76,6 +80,42 @@ jobs:
         java-version: '17'
     - name: Install Allure
       run: npm install -g allure
+
+    # ─── QA Metrics Dashboard: restore previous trend ────────────────────
+    # Each CI run starts with a fresh checkout, so reports/run-trend.json
+    # would reset every time and the pass-rate chart would only ever show
+    # one build. Pull the trend file from the most recent successful run
+    # of THIS workflow on THIS branch and seed it before the tests run.
+    # The reporter appends to it; the upload step at the end ships the
+    # updated trend forward to the next run.
+    - name: Restore previous run-trend.json
+      if: ${{ !cancelled() }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+      continue-on-error: true
+      run: |
+        mkdir -p reports
+        PREV_RUN_ID=$(gh run list \
+          --workflow "${{ github.workflow }}" \
+          --branch "${{ github.ref_name }}" \
+          --status success \
+          --limit 1 \
+          --json databaseId \
+          --jq '.[0].databaseId' || echo "")
+
+        if [ -n "$PREV_RUN_ID" ] && [ "$PREV_RUN_ID" != "${{ github.run_id }}" ]; then
+          echo "▸ Trying to restore trend from run $PREV_RUN_ID (env=${{ matrix.env }})"
+          gh run download "$PREV_RUN_ID" \
+            --name "qa-metrics-dashboard-${{ matrix.env }}" \
+            --dir _prev 2>/dev/null || echo "  (no prior dashboard artifact for this env)"
+          if [ -f _prev/reports/run-trend.json ]; then
+            cp _prev/reports/run-trend.json reports/run-trend.json
+            echo "✓ Trend restored ($(jq length reports/run-trend.json) entries)"
+          fi
+        else
+          echo "▸ No prior successful run found — starting trend from scratch."
+        fi
+
     - name: Run Playwright tests
       run: |
         echo "Running tests against environment: $ENV"
@@ -92,27 +132,171 @@ jobs:
           npx playwright test --grep "@$TEST_TYPE" --project="$BROWSER"
         fi
       env:
-        HEADLESS: true
+        # Headless is the default in playwright.config.ts. Use `HEADED: true`
+        # locally with an XServer if you want a visible browser.
         CI: true
         ENV: ${{ matrix.env }}
         BROWSER: ${{ github.event.inputs.browser || 'Desktop Chrome' }}
         TEST_TYPE: ${{ github.event.inputs.test_type || 'all' }}
         SPEC_FILE: ${{ github.event.inputs.spec_file || '' }}
-    - uses: actions/upload-artifact@v5
+
+    # ─── QA Metrics Dashboard: produce PDF + self-contained live HTML ────
+    # The reporter has already written reports/run-summary.json + run-trend.json.
+    # `npm run export:dashboard` chains `fetch:defects` first (uses GH_TOKEN
+    # below), then renders the PDF + live HTML.
+    # We can't rely on the npm `posttest` hook here because the CI invokes
+    # `npx playwright test` directly, so call the export script explicitly.
+    - name: Export QA Metrics Dashboard (PDF + live HTML)
       if: ${{ !cancelled() }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+        # GITHUB_REPOSITORY is auto-injected by Actions (e.g. "owner/repo").
+      run: npm run export:dashboard
+
+    - name: Upload Playwright report
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@v5
       with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 10
-    
-    - name: Generate Allure Report
-      if: ${{ !cancelled() }}
-      run: npm run allure-report
-    
-    - uses: actions/upload-artifact@v5
-      if: ${{ !cancelled() }}
-      with:
-        name: Upload Allure Report
+        name: playwright-report-${{ matrix.env }}
         path: playwright-report/
         retention-days: 10
 
+    - name: Upload QA Metrics Dashboard
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@v5
+      with:
+        name: qa-metrics-dashboard-${{ matrix.env }}
+        path: |
+          artifacts/qa-metrics-dashboard.pdf
+          artifacts/qa-metrics-dashboard.live.html
+          reports/run-summary.json
+          reports/run-trend.json
+          reports/defects.json
+        retention-days: 30
+
+    - name: Generate Allure Report
+      if: ${{ !cancelled() }}
+      run: npm run allure-generate
+
+    - name: Upload Allure Report
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@v5
+      with:
+        name: allure-report-${{ matrix.env }}
+        path: allure-report/
+        retention-days: 10
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # GitHub Pages deploy
+  # ──────────────────────────────────────────────────────────────────────────
+  # Why a separate job:
+  #   • The `test` job is a matrix [qa, staging, uat] — putting deploy inside
+  #     it would run three concurrent deploys against one Pages environment,
+  #     which Pages serializes (the 2nd/3rd would fail).
+  #   • Pages requires `pages: write` + `id-token: write` permissions and the
+  #     `github-pages` deployment environment, which we scope to this job only.
+  #
+  # Trigger guard: only on push (or manual dispatch) to `main`. PRs and
+  # non-main pushes never publish.
+  #
+  # Site layout produced:
+  #   /                       ← qa env's QA Metrics Dashboard (canonical entry)
+  #   /qa/                    ← same dashboard
+  #   /qa/allure/             ← Allure Report
+  #   /qa/playwright/         ← Playwright HTML Report
+  #   /staging/* and /uat/*   ← same triplet for the other matrix envs
+  #
+  # Prerequisite: Settings → Pages → Source must be set to "GitHub Actions"
+  # once, manually. Otherwise every deploy 404s from the Pages API.
+  deploy-pages:
+    needs: test
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Pages serializes deploys per environment anyway, but pinning the
+    # concurrency group makes that explicit and prevents two pushes on `main`
+    # from racing.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+
+    steps:
+      - name: Download all matrix artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: _artifacts
+
+      - name: Assemble Pages site
+        run: |
+          set -euo pipefail
+          mkdir -p site
+
+          # Per-env subpath: dashboard + allure + playwright. Each download is
+          # optional — workflow_dispatch can run a single env, in which case
+          # the other two simply won't have artifacts.
+          for env in qa staging uat; do
+            dash_src="_artifacts/qa-metrics-dashboard-$env/artifacts/qa-metrics-dashboard.live.html"
+            allure_src="_artifacts/allure-report-$env"
+            pw_src="_artifacts/playwright-report-$env"
+
+            mkdir -p "site/$env"
+            if [ -f "$dash_src" ]; then
+              cp "$dash_src" "site/$env/index.html"
+              echo "✓ $env dashboard copied"
+            else
+              echo "▸ $env dashboard not found — skipping"
+            fi
+            if [ -d "$allure_src" ]; then
+              cp -R "$allure_src" "site/$env/allure"
+              echo "✓ $env allure report copied"
+            fi
+            if [ -d "$pw_src" ]; then
+              cp -R "$pw_src" "site/$env/playwright"
+              echo "✓ $env playwright report copied"
+            fi
+          done
+
+          # Root index = qa dashboard (canonical entry). If qa didn't run, fall
+          # back to the first env that has a dashboard so the site is never empty.
+          if [ -f site/qa/index.html ]; then
+            cp site/qa/index.html site/index.html
+          else
+            for env in staging uat; do
+              if [ -f "site/$env/index.html" ]; then
+                cp "site/$env/index.html" site/index.html
+                echo "▸ qa absent — using $env dashboard at root"
+                break
+              fi
+            done
+          fi
+
+          # Last-resort landing if nothing produced a dashboard at all.
+          if [ ! -f site/index.html ]; then
+            cat > site/index.html <<'EOF'
+          <!doctype html><meta charset="utf-8"><title>QA Reports</title>
+          <h1>QA Reports</h1>
+          <p>No QA Metrics Dashboard was produced by the latest run. Inspect per-env reports at
+          <a href="qa/">qa/</a>, <a href="staging/">staging/</a>, <a href="uat/">uat/</a>.</p>
+          EOF
+          fi
+
+          echo "── Site tree ──"
+          find site -maxdepth 2 -type d | sort
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

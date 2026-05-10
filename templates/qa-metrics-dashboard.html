@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QA Metrics Dashboard — ai-qa-training</title>
+
+  <script>
+    /* Theme boot — runs before stylesheet evaluates so first paint matches.
+       Order: localStorage > prefers-color-scheme > 'dark'. */
+    (function () {
+      try {
+        var stored = localStorage.getItem('qa-dashboard-theme');
+        var theme = stored
+          || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.dataset.theme = theme;
+      } catch {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg:        #0B0F1A;
+      --panel:     #111827;
+      --panel-2:   #1F2937;
+      --border:    #1F2937;
+      --text:      #E5E7EB;
+      --muted:     #9CA3AF;
+      --tertiary:  #6B7280;
+      --success:   #10B981;
+      --info:      #3B82F6;
+      --warning:   #F59E0B;
+      --danger:    #EF4444;
+      --code-bg:   rgba(255,255,255,0.06);
+      --grid-line: rgba(148,163,184,0.18);
+      --chart-text:      #9CA3AF;
+      --chart-text-bold: #E5E7EB;
+      --donut-border:    #111827;
+      --gradient-1: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #DB2777 100%);
+    }
+
+    /* Light theme — same tokens, different values. Activated by setting
+       data-theme="light" on the document root; the boot script in head picks
+       the theme from localStorage or `prefers-color-scheme: light`. */
+    html[data-theme="light"] {
+      --bg:        #F9FAFB;
+      --panel:     #FFFFFF;
+      --panel-2:   #F3F4F6;
+      --border:    #E5E7EB;
+      --text:      #111827;
+      --muted:     #4B5563;
+      --tertiary:  #6B7280;
+      --code-bg:   rgba(0,0,0,0.06);
+      --grid-line: rgba(75,85,99,0.18);
+      --chart-text:      #4B5563;
+      --chart-text-bold: #111827;
+      --donut-border:    #FFFFFF;
+    }
+    html[data-theme="light"] .pill.info    { color: #1E40AF; background: #DBEAFE; border-color: #93C5FD; }
+    html[data-theme="light"] .pill.warning { color: #92400E; background: #FEF3C7; border-color: #FCD34D; }
+    html[data-theme="light"] .pill.success { color: #065F46; background: #D1FAE5; border-color: #6EE7B7; }
+    html[data-theme="light"] .pill.danger  { color: #991B1B; background: #FEE2E2; border-color: #FCA5A5; }
+    html[data-theme="light"] .status-pill.covered { background: #D1FAE5; color: #065F46; }
+    html[data-theme="light"] .status-pill.partial { background: #FEF3C7; color: #92400E; }
+    html[data-theme="light"] .status-pill.gap     { background: #FEE2E2; color: #991B1B; }
+    html[data-theme="light"] .status-pill.wontfix { background: #E5E7EB; color: #1F2937; }
+    html[data-theme="light"] .callout.warning { color: #92400E; background: #FFFBEB; }
+    html[data-theme="light"] .callout.warning .title { color: #B45309; }
+    html[data-theme="light"] .callout.danger  { color: #991B1B; background: #FEF2F2; }
+    html[data-theme="light"] .callout.danger  .title { color: #B91C1C; }
+    html[data-theme="light"] .stat.success .v { color: #047857; }
+    html[data-theme="light"] .stat.warning .v { color: #B45309; }
+    html[data-theme="light"] .stat.danger  .v { color: #B91C1C; }
+    html[data-theme="light"] .stat.info    .v { color: #1D4ED8; }
+    html[data-theme="light"] thead th { background: #F3F4F6; color: #374151; }
+    html[data-theme="light"] tbody tr:nth-child(even) td { background: #F9FAFB; }
+
+    /* Floating dark/light theme toggle. Hidden in print so it never appears
+       in the PDF export. */
+    .theme-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 50;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+    }
+    .theme-toggle:hover { border-color: var(--info); color: var(--info); }
+    .theme-toggle:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+    @media print { .theme-toggle { display: none !important; } }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    code, .mono {
+      font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 0.9em;
+      background: var(--code-bg);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 40px 48px 64px;
+    }
+
+    /* HERO */
+    .hero {
+      background: var(--gradient-1);
+      border-radius: 18px;
+      padding: 36px 40px;
+      margin-bottom: 32px;
+      box-shadow: 0 20px 60px rgba(124, 58, 237, 0.25);
+    }
+    .hero h1 {
+      margin: 0 0 6px;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .hero p {
+      margin: 0;
+      color: rgba(255,255,255,0.85);
+      font-size: 14px;
+    }
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 28px;
+    }
+    .hero-stat {
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .hero-stat .v {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .hero-stat .l {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.7);
+      margin-top: 8px;
+    }
+    .hero-stat.success .v { color: #6EE7B7; }
+    .hero-stat.warning .v { color: #FCD34D; }
+    .hero-stat.danger  .v { color: #FCA5A5; }
+
+    /* SECTION */
+    section {
+      margin-top: 40px;
+      page-break-inside: avoid;
+    }
+    section h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 4px;
+      letter-spacing: -0.01em;
+    }
+    section h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 24px 0 12px;
+      color: #F3F4F6;
+    }
+    section .sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 18px;
+    }
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    /* Solid dark-theme backgrounds (≈ what `rgba(hue, 0.22)` blends to over the
+       panel `#111827`). Tier-200 hue text on these gives ≥9:1 contrast — AAA. */
+    .pill.info    { background: #172F55; color: #BFDBFE; border: 1px solid #1E40AF; }
+    .pill.warning { background: #433521; color: #FDE68A; border: 1px solid #92400E; }
+    .pill.success { background: #113B3B; color: #A7F3D0; border: 1px solid #065F46; }
+    .pill.danger  { background: #42222D; color: #FECACA; border: 1px solid #991B1B; }
+
+    /* GRID + CARDS */
+    .grid { display: grid; gap: 16px; }
+    .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .card .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .stat .v {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .stat .l {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .stat.success .v { color: var(--success); }
+    .stat.warning .v { color: var(--warning); }
+    .stat.danger  .v { color: var(--danger);  }
+    .stat.info    .v { color: var(--info);    }
+
+    /* CALLOUTS */
+    .callout {
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      border: 1px solid;
+    }
+    .callout .title {
+      font-weight: 700;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    .callout p { margin: 4px 0; }
+    .callout.warning { background: #2A2114; border-color: #78350F; color: #FDE68A; }
+    .callout.warning .title { color: #FCD34D; }
+    .callout.danger  { background: #2A1414; border-color: #7F1D1D; color: #FECACA; }
+    .callout.danger  .title { color: #FCA5A5; }
+
+    /* TABLES */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: var(--panel);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    thead th {
+      background: var(--panel-2);
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      text-align: left;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody td {
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    tbody tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    tbody tr:last-child td { border-bottom: none; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .row-success td:last-child { color: var(--success); font-weight: 600; }
+    .row-warning td:last-child { color: var(--warning); font-weight: 600; }
+    .row-danger  td:last-child { color: var(--danger);  font-weight: 600; }
+
+    .status-pill {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-pill.covered { background: #113B3B; color: #A7F3D0; }
+    .status-pill.partial { background: #433521; color: #FDE68A; }
+    .status-pill.gap     { background: #42222D; color: #FECACA; }
+    .status-pill.wontfix { background: #1F2937; color: #E5E7EB; }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 36px 0;
+    }
+
+    /* CHART CONTAINER */
+    .chart {
+      position: relative;
+      width: 100%;
+    }
+    .chart.h-260 { height: 260px; }
+    .chart.h-300 { height: 300px; }
+    .chart.h-220 { height: 220px; }
+
+    /* FOOTER */
+    footer {
+      margin-top: 48px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--tertiary);
+      font-size: 12px;
+    }
+
+    @media print {
+      html, body { background: white !important; color: #111 !important; }
+      .page { padding: 16px 24px; max-width: none; }
+
+      .hero { box-shadow: none; }
+      .hero-stat { background: rgba(255,255,255,0.18); }
+
+      .card, .stat, table { background: #FFFFFF !important; border-color: #E5E7EB !important; color: #111 !important; }
+      .card .card-head, .stat .l, section .sub, footer { color: #4B5563 !important; }
+      thead th { background: #F3F4F6 !important; color: #374151 !important; }
+      tbody td { color: #111 !important; border-color: #E5E7EB !important; }
+      tbody tr:nth-child(even) td { background: #F9FAFB !important; }
+
+      .pill.info    { color: #1E40AF; background: #DBEAFE; border-color: #93C5FD; }
+      .pill.warning { color: #92400E; background: #FEF3C7; border-color: #FCD34D; }
+      .pill.success { color: #065F46; background: #D1FAE5; border-color: #6EE7B7; }
+      .pill.danger  { color: #991B1B; background: #FEE2E2; border-color: #FCA5A5; }
+
+      .callout.warning { color: #92400E !important; background: #FFFBEB !important; }
+      .callout.warning .title { color: #B45309 !important; }
+      .callout.danger  { color: #991B1B !important; background: #FEF2F2 !important; }
+      .callout.danger  .title { color: #B91C1C !important; }
+
+      .stat.success .v { color: #047857 !important; }
+      .stat.warning .v { color: #B45309 !important; }
+      .stat.danger  .v { color: #B91C1C !important; }
+      .stat.info    .v { color: #1D4ED8 !important; }
+
+      .status-pill.covered { background: #D1FAE5; color: #065F46; }
+      .status-pill.partial { background: #FEF3C7; color: #92400E; }
+      .status-pill.gap     { background: #FEE2E2; color: #991B1B; }
+      .status-pill.wontfix { background: #E5E7EB; color: #1F2937; }
+
+      section, .card, .grid, table { page-break-inside: avoid; break-inside: avoid; }
+      .page-break { page-break-before: always; break-before: page; }
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 12mm 14mm;
+    }
+  </style>
+</head>
+<body>
+  <button id="themeToggle" type="button" class="theme-toggle" aria-label="Toggle dark/light theme" aria-pressed="false">
+    <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+    <span class="theme-toggle-label">Light mode</span>
+  </button>
+
+  <div class="page">
+
+    <!-- HERO -->
+    <header class="hero">
+      <h1>QA Metrics Dashboard</h1>
+      <p>
+        <strong>ai-qa-training</strong> &middot; Playwright + TypeScript &middot;
+        last refreshed <span id="lastRefreshed">2026-05-09 14:02 ICT</span>
+        (build <span id="buildId">#247</span>)
+      </p>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="v" id="heroTotalTests">46</div>
+          <div class="l">Test Cases</div>
+        </div>
+        <div class="hero-stat">
+          <div class="v" id="heroSuites">11</div>
+          <div class="l">Active Suites</div>
+        </div>
+        <div class="hero-stat success">
+          <div class="v" id="heroAutomation">100%</div>
+          <div class="l">Automation Coverage</div>
+        </div>
+        <div class="hero-stat success">
+          <div class="v" id="heroPassRate">95.7%</div>
+          <div class="l" id="heroPassRateLabel">Latest Pass Rate · #247</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 1. TEST CASE COVERAGE -->
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>1 &middot; Test Case Coverage</h2>
+          <p class="sub">46 manual test cases &middot; 1:1 mapped to 12 Playwright spec files</p>
+        </div>
+        <span class="pill info">UI &middot; API &middot; Hybrid</span>
+      </div>
+
+      <div class="card">
+        <div class="card-head">Test cases by suite</div>
+        <div class="chart h-300"><canvas id="chartSuite"></canvas></div>
+      </div>
+
+      <div class="grid cols-3" style="margin-top:16px">
+        <div class="card">
+          <div class="card-head">By priority</div>
+          <div class="chart h-220"><canvas id="chartPriority"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head">By severity</div>
+          <div class="chart h-220"><canvas id="chartSeverity"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head">By tag</div>
+          <div class="chart h-220"><canvas id="chartTag"></canvas></div>
+        </div>
+      </div>
+
+      <h3>By type</h3>
+      <table>
+        <thead>
+          <tr><th>Type</th><th class="num">Cases</th><th class="num">Share</th></tr>
+        </thead>
+        <tbody id="byTypeBody">
+          <tr><td>UI</td><td class="num">42</td><td class="num">91%</td></tr>
+          <tr><td>API</td><td class="num">3</td><td class="num">7%</td></tr>
+          <tr><td>Hybrid</td><td class="num">1</td><td class="num">2%</td></tr>
+        </tbody>
+      </table>
+
+      <div id="tagCoverageCallout" class="callout warning">
+        <div class="title">Tag-coverage gap</div>
+        <p id="tagCoverageBody">33 of 46 cases (72%) are <code>Untagged</code>. Define a tagging policy
+        (<code>@smoke</code>, <code>@regression</code>, <code>@critical-path</code>) so the CI
+        matrix can shard and prioritise correctly.</p>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- 2. TEST EXECUTION -->
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>2 &middot; Test Execution</h2>
+          <p class="sub">Latest CI run &middot; 7.4 min wall time &middot; target ≥ 95% pass rate</p>
+        </div>
+        <span class="pill info">Source: Playwright reporter</span>
+      </div>
+
+      <div class="grid cols-5">
+        <div class="stat">         <div class="v">46</div><div class="l">Total</div></div>
+        <div class="stat success"> <div class="v">44</div><div class="l">Passed</div></div>
+        <div class="stat danger">  <div class="v">1</div> <div class="l">Failed</div></div>
+        <div class="stat warning"> <div class="v">1</div> <div class="l">Skipped</div></div>
+        <div class="stat warning"> <div class="v">1</div> <div class="l">Flaky</div></div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-head">
+          Pass-rate trend
+          <span class="pill info">Last 10 builds</span>
+        </div>
+        <div class="chart h-260"><canvas id="chartTrend"></canvas></div>
+      </div>
+
+      <h3>Latest run — passed by suite</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Suite</th><th>Type</th>
+            <th class="num">Tests</th><th class="num">Passed</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="suiteTableBody"></tbody>
+      </table>
+
+      <h3>Recent failures</h3>
+      <table>
+        <thead>
+          <tr><th>TC ID</th><th>Title</th><th>Suite</th><th>State</th><th>Root cause</th></tr>
+        </thead>
+        <tbody>
+          <tr class="row-success"><td>TC-CART-API-02</td><td>Update product quantity in cart</td><td>Cart API</td><td>Fixed</td><td>Edit endpoint payload shape</td></tr>
+          <tr class="row-warning"><td>TC-CHECKOUT-02</td><td>Toggle "same address" recovery</td><td>Checkout</td><td>Flaky</td><td>Shipping section race</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- 3. DEFECTS -->
+    <section class="page-break">
+      <div class="section-head">
+        <div>
+          <h2>3 &middot; Defects</h2>
+          <p class="sub" id="defectsSourceLabel">Connect a tracker (GitHub Issues by default) — values shown are illustrative until <code>reports/defects.json</code> exists.</p>
+        </div>
+        <span class="pill warning" id="defectsSourcePill">Sample data</span>
+      </div>
+
+      <div class="grid cols-4" id="defectStatsGrid">
+        <div class="stat danger">  <div class="v">11</div><div class="l">Open</div></div>
+        <div class="stat warning"> <div class="v">5</div> <div class="l">In Progress</div></div>
+        <div class="stat info">    <div class="v">6</div> <div class="l">Resolved</div></div>
+        <div class="stat success"> <div class="v">28</div><div class="l">Closed</div></div>
+      </div>
+
+      <div class="grid cols-2" style="margin-top:16px">
+        <div class="card">
+          <div class="card-head">By severity</div>
+          <div class="chart h-260"><canvas id="chartBugSeverity"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head">By module <span class="pill info">Open vs Closed</span></div>
+          <div class="chart h-260"><canvas id="chartBugModule"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-head">
+          Issues
+          <span class="pill info" id="defectIssuesCount">— rows</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Severity</th>
+              <th>Module</th>
+              <th>Assignee</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="defectIssuesBody"></tbody>
+        </table>
+      </div>
+
+      <div id="defectLabelCallout" class="callout" style="display:none">
+        <div class="title"></div>
+        <p></p>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- 4. REQUIREMENTS TRACEABILITY -->
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>4 &middot; Requirements Traceability</h2>
+          <p class="sub">Requirements ↔ Manual TC ↔ Spec file</p>
+        </div>
+        <span class="pill success" id="coveragePill">100% actionable covered</span>
+      </div>
+
+      <div class="grid cols-4">
+        <div class="stat">         <div class="v">14</div><div class="l">Total Requirements</div></div>
+        <div class="stat success"> <div class="v">11</div><div class="l">Fully Covered</div></div>
+        <div class="stat warning"> <div class="v">2</div> <div class="l">Partial</div></div>
+        <div class="stat">         <div class="v">1</div> <div class="l">Won't Fix (out of SUT scope)</div></div>
+      </div>
+
+      <table style="margin-top:16px">
+        <thead>
+          <tr>
+            <th>Req ID</th><th>Requirement</th><th>Test Cases</th>
+            <th>Spec</th><th class="num">TCs</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="traceTableBody"></tbody>
+      </table>
+
+      <div class="callout">
+        <div class="title">Coverage decisions</div>
+        <p><strong>REQ-PAY-01</strong> — Payment gateway integration is marked
+        <em>Won't Fix (out of SUT scope)</em>. The OpenCart demo exposes only Cash on
+        Delivery; there is no real Stripe / PayPal / 3DS surface to exercise. The
+        existing checkout suite (<code>TC-CHECKOUT-01..04</code>) covers the COD
+        order-placement path, which is the only payment integration this SUT supports.
+        Revisit if the SUT gains a real gateway.</p>
+        <p><strong>REQ-SEC-01</strong> — Reframed from "CSRF / auth-header validation"
+        (which did not match OpenCart's session-cookie auth model) to
+        <em>Session security &amp; authorization</em>. Covered by
+        <code>tests/api/test-security.spec.ts</code> (SEC-01 cookie hardening,
+        SEC-02 session rotation, SEC-03 HTTPS enforcement, SEC-04 anonymous-access
+        boundary, SEC-05 brute-force throttling — opt-in via <code>RUN_BRUTE_FORCE</code>).
+        Failures on the public demo are real defects to log with
+        <code>severity:major, module:auth</code>.</p>
+      </div>
+    </section>
+
+    <footer>
+      Data sources &middot; Test cases &amp; coverage parsed from
+      <code>documents/manual-testcases/</code> + <code>tests/</code>. Execution metrics should
+      come from <code>reports/custom-reporter.ts</code> JSON output. Defects: connect Jira /
+      GitHub Issues via MCP and replace the illustrative values.
+      <br /><br />
+      <em>This dashboard is the PDF/HTML export of the live Cursor Canvas at
+      <code>~/.cursor/projects/Users-khanhdo-Documents-KD-ai-qa-training/canvases/qa-metrics-dashboard.canvas.tsx</code>.
+      Regenerate after each CI run or nightly.</em>
+    </footer>
+  </div>
+
+  <script>
+  /* ─── Static fallback data (mirrors qa-metrics-dashboard.canvas.tsx) ───
+     Used when reports/run-summary.json is missing.  When a real test run
+     has produced JSON, it overrides the hero stats, suites table, recent
+     failures and pass-rate trend below. */
+  let SUITES = [
+    ['Cart (UI)', 'UI', 8, 8],
+    ['Register', 'UI', 5, 5],
+    ['Profile', 'UI', 5, 5],
+    ['Address Book', 'UI', 5, 5],
+    ['Product', 'UI', 5, 5],
+    ['Compare Products', 'UI', 5, 5],
+    ['Checkout', 'UI', 4, 3],
+    ['Wish List', 'UI', 3, 3],
+    ['Home', 'UI', 2, 2],
+    ['Cart API', 'API', 3, 3],
+    ['Cart UI+API Hybrid', 'Hybrid', 1, 1],
+  ];
+
+  /* Priority/severity/tag/type buckets — overridden by the reporter when
+     `data.priority|severity|byTag|byType` exist in run-summary.json. */
+  let PRIORITY = { labels: ['P1', 'P2', 'P3'], data: [16, 25, 5] };
+  let SEVERITY = { labels: ['Critical', 'Major', 'Minor', 'Trivial'], data: [6, 25, 10, 5] };
+  let TAGS     = { labels: ['@smoke', '@regression', 'Untagged'], data: [3, 11, 33] };
+  let BY_TYPE  = { labels: ['UI', 'API', 'Hybrid'], data: [42, 3, 1] };
+
+  let TREND_X    = ['#238','#239','#240','#241','#242','#243','#244','#245','#246','#247'];
+  let TREND_PASS = [88, 91, 90, 93, 96, 94, 92, 95, 97, 95.7];
+  let TREND_FAIL = [12,  9, 10,  7,  4,  6,  8,  5,  3,  4.3];
+
+  /* Latest-run defaults — overridden by reports/run-summary.json if present. */
+  let LATEST = {
+    build: '#247',
+    ranAtDisplay: '2026-05-09 14:02 ICT',
+    total: 46,
+    passed: 44,
+    failed: 1,
+    skipped: 1,
+    flaky: 1,
+    passRate: 95.7,
+    durationMin: 7.4,
+    failedTests: [],
+  };
+
+  let RECENT_FAILURES = [
+    ['TC-CART-API-02', 'Update product quantity in cart', 'Cart API', 'Fixed', 'Edit endpoint payload shape'],
+    ['TC-CHECKOUT-02', 'Toggle "same address" recovery', 'Checkout', 'Flaky', 'Shipping section race'],
+  ];
+
+  /* ─── Live-data hydration ───
+     The export script (scripts/export-dashboard-pdf.ts) injects these URLs
+     so the dashboard can fetch from the local filesystem. When the page is
+     opened directly in a browser, fetch falls back gracefully. */
+
+  const titleCase = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
+  const pluralize = (n, base = '') => `${base}${n === 1 ? '' : 's'}`;
+
+  function classifyTagCoverage(n) {
+    if (n === 0) return 'callout success';
+    if (n <= 5)  return 'callout warning';
+    return 'callout danger';
+  }
+
+  function tagCoverageTitle(n) {
+    if (n === 0) return 'Tag coverage: 100%';
+    return `Tag-coverage gap (${n} test${pluralize(n)})`;
+  }
+
+  function tagCoverageBody(n, untagged) {
+    if (n === 0) {
+      return 'Every test carries the required <code>@P1|@P2|@P3</code> + ' +
+             '<code>@critical|@major|@minor|@trivial</code> tags. ' +
+             'See <code>prompts/core/test-tags.md</code>.';
+    }
+    const examples = untagged.slice(0, 3).map((t) => `<code>${t}</code>`).join(', ');
+    const ellipsis = n > 3 ? '…' : '';
+    return `${n} test${pluralize(n)} missing required <code>@P*</code> or ` +
+           `<code>@critical|@major|@minor|@trivial</code> tag${pluralize(n)}. ` +
+           `Examples: ${examples}${ellipsis}. ` +
+           'See <code>prompts/core/test-tags.md</code>.';
+  }
+
+  async function hydrateFromReports() {
+    try {
+      const sources = await fetchAllSources();
+      if (sources.summary) hydrateSummary(sources.summary);
+      if (sources.trend)   hydrateTrend(sources.trend);
+      if (sources.defects) hydrateDefects(sources.defects);
+    } catch (e) {
+      console.warn('Falling back to static data —', e);
+    }
+  }
+
+  async function fetchAllSources() {
+    const summaryUrl = (globalThis.__SUMMARY_URL__ ?? '../reports/run-summary.json');
+    const trendUrl   = (globalThis.__TREND_URL__   ?? '../reports/run-trend.json');
+    const defectsUrl = (globalThis.__DEFECTS_URL__ ?? '../reports/defects.json');
+
+    const [summaryRes, trendRes, defectsRes] = await Promise.allSettled([
+      fetch(summaryUrl, { cache: 'no-store' }),
+      fetch(trendUrl,   { cache: 'no-store' }),
+      fetch(defectsUrl, { cache: 'no-store' }),
+    ]);
+    return {
+      summary: await jsonOf(summaryRes),
+      trend:   await jsonOf(trendRes),
+      defects: await jsonOf(defectsRes),
+    };
+  }
+
+  async function jsonOf(settled) {
+    if (settled.status !== 'fulfilled' || !settled.value.ok) return null;
+    return settled.value.json();
+  }
+
+  function hydrateSummary(data) {
+    applyLatestStats(data);
+    applyPerSuite(data);
+    applyTagBuckets(data);
+    applyTagCoverageCallout(data);
+    applyRecentFailures();
+  }
+
+  function applyLatestStats(data) {
+    LATEST = {
+      build:        data.build        ?? LATEST.build,
+      ranAtDisplay: data.ranAtDisplay ?? LATEST.ranAtDisplay,
+      total:        data.total        ?? LATEST.total,
+      passed:       data.passed       ?? LATEST.passed,
+      failed:       data.failed       ?? LATEST.failed,
+      skipped:      data.skipped      ?? LATEST.skipped,
+      flaky:        data.flaky        ?? LATEST.flaky,
+      passRate:     data.passRate     ?? LATEST.passRate,
+      durationMin:  data.durationMin  ?? LATEST.durationMin,
+      failedTests:  Array.isArray(data.failedTests) ? data.failedTests : [],
+    };
+  }
+
+  function applyPerSuite(data) {
+    if (Array.isArray(data.perSuite) && data.perSuite.length) {
+      SUITES = data.perSuite.map((r) => [r.name, r.type, r.total, r.passed]);
+    }
+  }
+
+  function applyTagBuckets(data) {
+    // Reporter emits `priority`, `severity`, `byType`, `byTag` and
+    // `byFeature` arrays of `{ label, count }`.
+    const labelMap = (key) => Array.isArray(data[key])
+      ? { labels: data[key].map((b) => b.label), data: data[key].map((b) => b.count) }
+      : null;
+
+    const priBuckets = labelMap('priority');
+    if (priBuckets) PRIORITY = priBuckets;
+    const sevBuckets = labelMap('severity');
+    if (sevBuckets) SEVERITY = { labels: sevBuckets.labels.map(titleCase), data: sevBuckets.data };
+    const tagBuckets = labelMap('byTag');
+    if (tagBuckets) TAGS = tagBuckets;
+    const typeBuckets = labelMap('byType');
+    if (typeBuckets) BY_TYPE = typeBuckets;
+  }
+
+  function applyTagCoverageCallout(data) {
+    if (!Array.isArray(data.untaggedTests)) return;
+    const n       = data.untaggedTests.length;
+    const callout = document.getElementById('tagCoverageCallout');
+    const body    = document.getElementById('tagCoverageBody');
+    if (callout) {
+      callout.className = classifyTagCoverage(n);
+      const title = callout.querySelector('.title');
+      if (title) title.textContent = tagCoverageTitle(n);
+    }
+    if (body) body.innerHTML = tagCoverageBody(n, data.untaggedTests);
+  }
+
+  function applyRecentFailures() {
+    if (!LATEST.failedTests.length) return;
+    RECENT_FAILURES = LATEST.failedTests.slice(0, 6).map((title, i) => {
+      const tcMatch = /TC[-_][A-Z0-9-]+/i.exec(String(title));
+      const tcId    = tcMatch ? tcMatch[0] : `FAIL-${i + 1}`;
+      return [tcId, title, '—', 'Failing', 'See Playwright trace'];
+    });
+  }
+
+  function hydrateTrend(trend) {
+    if (!Array.isArray(trend) || !trend.length) return;
+    TREND_X    = trend.map((t) => t.build);
+    TREND_PASS = trend.map((t) => t.passRate);
+    TREND_FAIL = trend.map((t) => t.failRate);
+  }
+
+  function hydrateDefects(defects) {
+    applyDefectTotals(defects);
+    applyDefectSeverity(defects);
+    applyDefectModule(defects);
+    applyDefectIssues(defects);
+    applyDefectMeta(defects);
+  }
+
+  function applyDefectTotals(defects) {
+    if (!defects.totals) return;
+    DEFECT_TOTALS = {
+      open:       defects.totals.open       ?? 0,
+      inProgress: defects.totals.inProgress ?? 0,
+      resolved:   defects.totals.resolved   ?? 0,
+      closed:     defects.totals.closed     ?? 0,
+    };
+  }
+
+  const SEVERITY_ORDER = ['critical', 'major', 'minor', 'trivial'];
+
+  function applyDefectSeverity(defects) {
+    if (!Array.isArray(defects.severity) || !defects.severity.length) return;
+    // Drop the synthetic "unknown" bucket from the chart but keep its
+    // count for the label callout below.
+    const known = defects.severity
+      .filter((b) => b.label !== 'unknown')
+      .sort((a, b) => SEVERITY_ORDER.indexOf(a.label) - SEVERITY_ORDER.indexOf(b.label));
+    if (!known.length) return;
+    BUG_SEVERITY = {
+      labels: known.map((b) => titleCase(b.label)),
+      data:   known.map((b) => b.count),
+    };
+  }
+
+  function applyDefectModule(defects) {
+    if (!Array.isArray(defects.byModule) || !defects.byModule.length) return;
+    BUG_MODULE = {
+      labels: defects.byModule.map((b) => titleCase(b.label)),
+      open:   defects.byModule.map((b) => b.open),
+      closed: defects.byModule.map((b) => b.closed),
+    };
+  }
+
+  function applyDefectIssues(defects) {
+    if (Array.isArray(defects.issues)) BUG_ISSUES = defects.issues;
+  }
+
+  function applyDefectMeta(defects) {
+    DEFECT_META = {
+      isLive:      true,
+      repo:        defects.repo ?? null,
+      fetchedAt:   defects.fetchedAt ?? null,
+      sourceCount: defects.sourceCount ?? null,
+      unlabelled:  defects.unlabelled ?? { noSeverity: 0, noModule: 0 },
+    };
+  }
+
+  /* Defect data — overridden by reports/defects.json (see scripts/fetch-defects.ts).
+     Falls back to the demo numbers when no JSON is available. */
+  let BUG_SEVERITY = { labels: ['Critical','Major','Minor','Trivial'], data: [1,4,7,3] };
+  let BUG_MODULE   = {
+    labels:  ['Cart','Checkout','Register','Profile','Wishlist','Compare'],
+    open:    [3,4,1,2,1,0],
+    closed:  [8,5,6,3,2,4],
+  };
+  let DEFECT_TOTALS = { open: 11, inProgress: 5, resolved: 6, closed: 28 };
+  let DEFECT_META   = {
+    isLive:     false,
+    repo:       null,
+    fetchedAt:  null,
+    sourceCount: null,
+    unlabelled: { noSeverity: 0, noModule: 0 },
+  };
+  /* Per-issue rows — overridden by reports/defects.json when available.
+     Fallback rows mirror the sample by-module / severity counts above so
+     the static export still tells a coherent story. */
+  let BUG_ISSUES = [
+    { number: 101, title: 'Add to cart shows wrong total when qty > 9',     url: '#', status: 'Open',        severity: 'major',   modules: ['cart'],     assignee: 'alice', updatedAt: '2026-05-08T09:14:00Z' },
+    { number:  97, title: 'Address book country dropdown empty after save', url: '#', status: 'In Progress', severity: 'major',   modules: ['profile'],  assignee: 'bob',   updatedAt: '2026-05-07T16:02:00Z' },
+    { number:  92, title: 'Wishlist item duplicated on retry click',        url: '#', status: 'Open',        severity: 'minor',   modules: ['wishlist'], assignee: null,    updatedAt: '2026-05-06T11:20:00Z' },
+    { number:  88, title: 'Checkout shipping label flickers on slow nets',  url: '#', status: 'Resolved',    severity: 'minor',   modules: ['checkout'], assignee: 'alice', updatedAt: '2026-05-04T08:44:00Z' },
+    { number:  74, title: 'Compare empty-state copy typo',                  url: '#', status: 'Closed',      severity: 'trivial', modules: ['compare'],  assignee: null,    updatedAt: '2026-04-30T13:01:00Z' },
+  ];
+
+  const TRACE = [
+    ['REQ-AUTH-01','User registration','TC-REGISTER-01..05','test-register.spec.ts',5,'Covered'],
+    ['REQ-AUTH-02','Password change w/ re-login','TC-PROFILE-05','test-profile.spec.ts',1,'Covered'],
+    ['REQ-ACCT-01','Account dashboard + edit','TC-PROFILE-01..04','test-profile.spec.ts',4,'Covered'],
+    ['REQ-ADDR-01','Address book CRUD','TC-ADDRESS-01..05','test-address-book.spec.ts',5,'Covered'],
+    ['REQ-HOME-01','Homepage entry points','TC-HOME-01..02','test-home.spec.ts',2,'Partial'],
+    ['REQ-PROD-01','Product detail interactions','TC-PRODUCT-01..05','test-product.spec.ts',5,'Covered'],
+    ['REQ-CMP-01', 'Compare products','TC-COMPARE-01..05','test-compare-products.spec.ts',5,'Covered'],
+    ['REQ-CART-01','Cart CRUD (UI)','TC-CART-01..08','test-cart.spec.ts',8,'Covered'],
+    ['REQ-CART-02','Cart API contracts','TC-CART-API-01..03','api/test-cart.spec.ts',3,'Covered'],
+    ['REQ-CART-03','UI ↔ API consistency','TC-CART-HYBRID-01','api/test-cart-ui-api.spec.ts',1,'Partial'],
+    ['REQ-CHK-01', 'Checkout happy + edge','TC-CHECKOUT-01..04','test-checkout.spec.ts',4,'Covered'],
+    ['REQ-WL-01',  'Wishlist flows','TC-WISHLIST-01..03','test-wish-list.spec.ts',3,'Covered'],
+    ['REQ-SEC-01', 'Session security &amp; authorization','SEC-01..05','api/test-security.spec.ts',5,'Covered'],
+    ['REQ-PAY-01', 'Payment gateway integration','See note','—',0,"Won't Fix"],
+  ];
+
+  /* ─── Theme tokens ─── */
+  // Hue tokens stay constant across themes; the chrome tokens (text, grid,
+  // donut border) are read from CSS custom properties so they follow the
+  // active `data-theme` and re-render cleanly on toggle.
+  function readThemeTokens() {
+    const cs = getComputedStyle(document.documentElement);
+    const cssVar = (name, fallback) => cs.getPropertyValue(name).trim() || fallback;
+    return {
+      success:     '#10B981',
+      successFill: 'rgba(16,185,129,0.20)',
+      info:        '#3B82F6',
+      warning:     '#F59E0B',
+      danger:      '#EF4444',
+      dangerFill:  'rgba(239,68,68,0.20)',
+      grid:        cssVar('--grid-line',        'rgba(148,163,184,0.18)'),
+      text:        cssVar('--chart-text',       '#9CA3AF'),
+      textBold:    cssVar('--chart-text-bold',  '#E5E7EB'),
+      donutBorder: cssVar('--donut-border',     '#111827'),
+      palette: ['#6366F1','#8B5CF6','#EC4899','#F59E0B','#10B981','#3B82F6','#EF4444','#14B8A6','#A855F7','#84CC16','#F97316'],
+    };
+  }
+  let C = readThemeTokens();
+
+  Chart.defaults.color = C.text;
+  Chart.defaults.borderColor = C.grid;
+  Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+  Chart.defaults.font.size = 12;
+
+  // Track chart instances so we can destroy + redraw them on theme toggle.
+  const __charts = [];
+  function makeChart(elId, config) {
+    const el = document.getElementById(elId);
+    if (!el) return null;
+    const chart = new Chart(el, config);
+    __charts.push(chart);
+    return chart;
+  }
+  function destroyCharts() {
+    while (__charts.length) {
+      const c = __charts.pop();
+      try { c.destroy(); } catch { /* swallow: chart was already disposed */ }
+    }
+  }
+
+  const baseAxis = (showGrid = true) => ({
+    grid:   { color: showGrid ? C.grid : 'transparent', drawTicks: false },
+    border: { display: false },
+    ticks:  { color: C.text, padding: 6 },
+  });
+
+  function applyLatestToHero() {
+    document.getElementById('lastRefreshed').textContent = LATEST.ranAtDisplay;
+    document.getElementById('buildId').textContent       = LATEST.build;
+    document.getElementById('heroPassRate').textContent  = `${LATEST.passRate}%`;
+    document.getElementById('heroPassRateLabel').textContent =
+      `Latest Pass Rate · ${LATEST.build}`;
+
+    const hero = document.getElementById('heroPassRate').parentElement;
+    hero.classList.remove('success', 'warning', 'danger');
+    hero.classList.add(passRateTone(LATEST.passRate));
+  }
+
+  function passRateTone(rate) {
+    if (rate >= 95) return 'success';
+    if (rate >= 90) return 'warning';
+    return 'danger';
+  }
+
+  function applyLatestToExecutionBlock() {
+    const grid = document.querySelector('section:nth-of-type(2) .grid.cols-5');
+    if (!grid) return;
+    const tones = ['', 'success', 'danger', 'warning', 'warning'];
+    const labels = ['Total', 'Passed', 'Failed', 'Skipped', 'Flaky'];
+    const values = [LATEST.total, LATEST.passed, LATEST.failed, LATEST.skipped, LATEST.flaky];
+    grid.innerHTML = values.map((v, i) => `
+      <div class="stat ${tones[i]}"><div class="v">${v}</div><div class="l">${labels[i]}</div></div>
+    `).join('');
+
+    document.querySelector('section:nth-of-type(2) .sub').textContent =
+      `Latest CI run · ${LATEST.durationMin} min wall time · build ${LATEST.build} · target ≥ 95% pass rate`;
+  }
+
+  /* ─── Charts ─── */
+  function renderCharts() {
+
+  // Suite (horizontal bar)
+  makeChart('chartSuite', {
+    type: 'bar',
+    data: {
+      labels: SUITES.map(r => r[0]),
+      datasets: [{
+        label: 'Test cases',
+        data: SUITES.map(r => r[2]),
+        backgroundColor: SUITES.map((_, i) => C.palette[i % C.palette.length]),
+        borderRadius: 6,
+        borderSkipped: false,
+      }],
+    },
+    options: {
+      indexAxis: 'y',
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: baseAxis(true), y: baseAxis(false) },
+    },
+  });
+
+  // Priority (vertical bar)
+  makeChart('chartPriority', {
+    type: 'bar',
+    data: {
+      labels: PRIORITY.labels,
+      datasets: [{
+        label: 'Test cases',
+        data:  PRIORITY.data,
+        backgroundColor: [C.danger, C.warning, C.info],
+        borderRadius: 6,
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: baseAxis(true), x: baseAxis(false) },
+    },
+  });
+
+  // Severity (donut)
+  makeChart('chartSeverity', {
+    type: 'doughnut',
+    data: {
+      labels: SEVERITY.labels,
+      datasets: [{
+        data: SEVERITY.data,
+        backgroundColor: [C.danger, C.warning, C.info],
+        borderColor: C.donutBorder,
+        borderWidth: 2,
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14 } } },
+    },
+  });
+
+  // Tag (donut)
+  makeChart('chartTag', {
+    type: 'doughnut',
+    data: {
+      labels: TAGS.labels,
+      datasets: [{
+        data: TAGS.data,
+        backgroundColor: [C.success, C.info, C.warning],
+        borderColor: C.donutBorder,
+        borderWidth: 2,
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14 } } },
+    },
+  });
+
+  // Pass-rate trend (line, dual series + fill)
+  makeChart('chartTrend', {
+    type: 'line',
+    data: {
+      labels: TREND_X,
+      datasets: [
+        {
+          label: 'Pass %',
+          data: TREND_PASS,
+          borderColor: C.success,
+          backgroundColor: C.successFill,
+          fill: true,
+          tension: 0.35,
+          pointRadius: 3,
+          pointBackgroundColor: C.success,
+        },
+        {
+          label: 'Fail %',
+          data: TREND_FAIL,
+          borderColor: C.danger,
+          backgroundColor: C.dangerFill,
+          fill: true,
+          tension: 0.35,
+          pointRadius: 3,
+          pointBackgroundColor: C.danger,
+        },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' } },
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        y: { ...baseAxis(true), ticks: { color: C.text, callback: (v) => v + '%' }, suggestedMax: 100 },
+        x: baseAxis(false),
+      },
+    },
+  });
+
+  // Bug severity (bar)
+  makeChart('chartBugSeverity', {
+    type: 'bar',
+    data: {
+      labels: BUG_SEVERITY.labels,
+      datasets: [{
+        label: 'Defects',
+        data:  BUG_SEVERITY.data,
+        backgroundColor: [C.danger, '#F97316', C.warning, '#FCD34D'],
+        borderRadius: 6,
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: baseAxis(true), x: baseAxis(false) },
+    },
+  });
+
+  // Bug by module (stacked)
+  makeChart('chartBugModule', {
+    type: 'bar',
+    data: {
+      labels: BUG_MODULE.labels,
+      datasets: [
+        { label: 'Open',   data: BUG_MODULE.open,   backgroundColor: C.danger,  borderRadius: 4, borderSkipped: false },
+        { label: 'Closed', data: BUG_MODULE.closed, backgroundColor: C.success, borderRadius: 4, borderSkipped: false },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' } },
+      scales: {
+        x: { ...baseAxis(false), stacked: true },
+        y: { ...baseAxis(true),  stacked: true },
+      },
+    },
+  });
+
+  } /* end renderCharts */
+
+  /* ─── Tables ─── */
+  // Lookup tables hoisted out of the render functions so they aren't rebuilt
+  // every call and Sonar doesn't flag the inline ternary chains.
+  const FAILURE_TONE   = { 'Fixed': 'row-success', 'Flaky': 'row-warning', 'Failing': 'row-danger' };
+  const STATUS_PILL    = { 'Open': 'danger', 'In Progress': 'warning', 'Resolved': 'info', 'Closed': 'success' };
+  const SEV_PILL       = { 'critical': 'danger', 'major': 'warning', 'minor': 'info', 'trivial': 'success', 'unknown': 'info' };
+  const TRACE_PILL     = { 'Covered': 'covered', 'Partial': 'partial', 'Gap': 'gap', "Won't Fix": 'wontfix' };
+
+  function escapeHtml(s) {
+    return String(s ?? '')
+      .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return String(iso);
+    const yyyy = d.getFullYear();
+    const mm   = String(d.getMonth() + 1).padStart(2, '0');
+    const dd   = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function renderTables() {
+    renderSuiteTable();
+    renderRecentFailuresTable();
+    renderByTypeTable();
+    renderDefectStats();
+    renderDefectsSourceLabel();
+    renderDefectIssuesTable();
+    renderDefectLabelCallout();
+    renderTraceTable();
+  }
+
+  function renderSuiteTable() {
+    const suiteBody = document.getElementById('suiteTableBody');
+    if (!suiteBody) return;
+    suiteBody.innerHTML = '';
+    SUITES.forEach(([name, type, total, passed]) => {
+      const allPass = passed === total;
+      const tr = document.createElement('tr');
+      tr.className = allPass ? 'row-success' : 'row-warning';
+      tr.innerHTML = `
+        <td>${name}</td>
+        <td>${type}</td>
+        <td class="num">${total}</td>
+        <td class="num">${passed}</td>
+        <td>${allPass ? 'All passing' : (total - passed) + ' failing'}</td>
+      `;
+      suiteBody.appendChild(tr);
+    });
+  }
+
+  function renderRecentFailuresTable() {
+    const failuresBody = document.querySelector('section:nth-of-type(2) table:last-of-type tbody');
+    if (!failuresBody || !RECENT_FAILURES.length) return;
+    failuresBody.innerHTML = '';
+    RECENT_FAILURES.forEach((row) => {
+      const tone = FAILURE_TONE[row[3]] ?? '';
+      const tr = document.createElement('tr');
+      if (tone) tr.className = tone;
+      tr.innerHTML = row.map((c) => `<td>${c}</td>`).join('');
+      failuresBody.appendChild(tr);
+    });
+  }
+
+  function renderByTypeTable() {
+    const byTypeBody = document.getElementById('byTypeBody');
+    if (!byTypeBody) return;
+    const totalCases = BY_TYPE.data.reduce((a, b) => a + b, 0) || 1;
+    byTypeBody.innerHTML = BY_TYPE.labels
+      .map((label, i) => {
+        const n = BY_TYPE.data[i];
+        const pct = Math.round((n / totalCases) * 100);
+        return `<tr><td>${label}</td><td class="num">${n}</td><td class="num">${pct}%</td></tr>`;
+      }).join('');
+  }
+
+  function renderDefectStats() {
+    const grid = document.getElementById('defectStatsGrid');
+    if (!grid) return;
+    grid.innerHTML = `
+      <div class="stat danger">  <div class="v">${DEFECT_TOTALS.open}</div>      <div class="l">Open</div></div>
+      <div class="stat warning"> <div class="v">${DEFECT_TOTALS.inProgress}</div><div class="l">In Progress</div></div>
+      <div class="stat info">    <div class="v">${DEFECT_TOTALS.resolved}</div>  <div class="l">Resolved</div></div>
+      <div class="stat success"> <div class="v">${DEFECT_TOTALS.closed}</div>    <div class="l">Closed</div></div>
+    `;
+  }
+
+  function renderDefectsSourceLabel() {
+    const pill  = document.getElementById('defectsSourcePill');
+    const label = document.getElementById('defectsSourceLabel');
+    if (!pill || !label) return;
+    if (DEFECT_META.isLive) {
+      const fetchedDate = DEFECT_META.fetchedAt ? new Date(DEFECT_META.fetchedAt).toLocaleString() : '—';
+      const issueWord   = DEFECT_META.sourceCount === 1 ? 'issue' : 'issues';
+      pill.className = 'pill success';
+      pill.textContent = 'Live data';
+      label.innerHTML =
+        `Source: <code>${DEFECT_META.repo ?? 'github'}</code> &middot; ` +
+        `${DEFECT_META.sourceCount ?? '—'} bug-labelled ${issueWord} &middot; ` +
+        `fetched ${fetchedDate}`;
+    } else {
+      pill.className = 'pill warning';
+      pill.textContent = 'Sample data';
+      label.innerHTML =
+        'Run <code>npm run fetch:defects</code> after labelling issues per ' +
+        '<code>prompts/core/defect-labels.md</code> to replace these illustrative numbers.';
+    }
+  }
+
+  function renderDefectIssueCell(row, isReal) {
+    if (!isReal) return { numCol: `#${row.number}`, titleCol: escapeHtml(row.title) };
+    const href = escapeHtml(row.url);
+    return {
+      numCol:   `<a href="${href}" target="_blank" rel="noopener noreferrer">#${row.number}</a>`,
+      titleCol: `<a href="${href}" target="_blank" rel="noopener noreferrer">${escapeHtml(row.title)}</a>`,
+    };
+  }
+
+  function renderDefectIssueRow(row) {
+    const sev     = (row.severity ?? 'unknown').toLowerCase();
+    const status  = row.status ?? 'Open';
+    const modules = (row.modules ?? []).map((m) => `<code>${escapeHtml(m)}</code>`).join(' ') || '—';
+    const isReal  = row.url && row.url !== '#';
+    const { numCol, titleCol } = renderDefectIssueCell(row, isReal);
+    return `<tr>
+      <td class="num">${numCol}</td>
+      <td>${titleCol}</td>
+      <td><span class="pill ${STATUS_PILL[status] ?? 'info'}">${escapeHtml(status)}</span></td>
+      <td><span class="pill ${SEV_PILL[sev]      ?? 'info'}">${titleCase(sev)}</span></td>
+      <td>${modules}</td>
+      <td>${escapeHtml(row.assignee ?? '—')}</td>
+      <td>${fmtDate(row.updatedAt)}</td>
+    </tr>`;
+  }
+
+  function renderDefectIssuesTable() {
+    const body  = document.getElementById('defectIssuesBody');
+    const count = document.getElementById('defectIssuesCount');
+    if (!body) return;
+
+    if (BUG_ISSUES.length === 0) {
+      body.innerHTML =
+        '<tr><td colspan="7" style="text-align:center;color:var(--muted, #9CA3AF);padding:18px">' +
+        'No bug-labelled issues. Open one with <code>gh issue create --label bug,severity:*,module:*</code>.' +
+        '</td></tr>';
+    } else {
+      body.innerHTML = BUG_ISSUES.map(renderDefectIssueRow).join('');
+    }
+    if (count) count.textContent = `${BUG_ISSUES.length} row${pluralize(BUG_ISSUES.length)}`;
+  }
+
+  function renderDefectLabelCallout() {
+    const callout = document.getElementById('defectLabelCallout');
+    if (!callout) return;
+    const { noSeverity = 0, noModule = 0 } = DEFECT_META.unlabelled || {};
+    const gaps = [];
+    if (noSeverity > 0) gaps.push(`${noSeverity} bug${pluralize(noSeverity)} missing a <code>severity:*</code> label`);
+    if (noModule   > 0) gaps.push(`${noModule} bug${pluralize(noModule)} missing a <code>module:*</code> label`);
+
+    if (!DEFECT_META.isLive) {
+      callout.style.display = 'none';
+      return;
+    }
+
+    callout.style.display = '';
+    const title = callout.querySelector('.title');
+    const body  = callout.querySelector('p');
+    if (gaps.length) {
+      callout.className = 'callout warning';
+      if (title) title.textContent = 'Defect-label gap';
+      if (body) body.innerHTML =
+        `${gaps.join(' &middot; ')}. These items are bucketed under <code>unknown</code> and ` +
+        'still affect totals. See <code>prompts/core/defect-labels.md</code>.';
+    } else {
+      callout.className = 'callout success';
+      if (title) title.textContent = 'Defect labels: 100%';
+      if (body) body.innerHTML =
+        'Every <code>bug</code> issue carries the required <code>severity:*</code> and <code>module:*</code> labels.';
+    }
+  }
+
+  function renderTraceTable() {
+    const traceBody = document.getElementById('traceTableBody');
+    if (!traceBody) return;
+    TRACE.forEach(([id, req, tcs, spec, n, status]) => {
+      const cls = TRACE_PILL[status] ?? 'gap';
+      const tr  = document.createElement('tr');
+      tr.innerHTML = `
+        <td><code>${id}</code></td>
+        <td>${req}</td>
+        <td>${tcs}</td>
+        <td><code>${spec}</code></td>
+        <td class="num">${n}</td>
+        <td><span class="status-pill ${cls}">${status}</span></td>
+      `;
+      traceBody.appendChild(tr);
+    });
+  }
+
+  /* ─── Theme toggle ─── */
+  function syncThemeToggle() {
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    const isLight = document.documentElement.dataset.theme === 'light';
+    const icon  = btn.querySelector('.theme-toggle-icon');
+    const label = btn.querySelector('.theme-toggle-label');
+    if (icon)  icon.textContent  = isLight ? '☀️' : '🌙';
+    if (label) label.textContent = isLight ? 'Dark mode' : 'Light mode';
+    btn.setAttribute('aria-pressed', String(isLight));
+    btn.title = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+  }
+
+  function applyTheme(name) {
+    document.documentElement.dataset.theme = name;
+    try { localStorage.setItem('qa-dashboard-theme', name); }
+    catch { /* swallow: incognito / disabled storage */ }
+    C = readThemeTokens();
+    Chart.defaults.color = C.text;
+    Chart.defaults.borderColor = C.grid;
+    destroyCharts();
+    renderCharts();
+    syncThemeToggle();
+  }
+
+  function bindThemeToggle() {
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+      applyTheme(next);
+    });
+    syncThemeToggle();
+  }
+
+  /* ─── Boot ─── */
+  (async () => {
+    await hydrateFromReports();
+    applyLatestToHero();
+    applyLatestToExecutionBlock();
+    renderCharts();
+    renderTables();
+    bindThemeToggle();
+    /* Signal Playwright that all charts have rendered */
+    globalThis.__DASHBOARD_READY__ = true;
+  })();
+  </script>
+</body>
+</html>

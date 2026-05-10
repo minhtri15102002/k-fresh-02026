@@ -150,6 +150,303 @@ function buildSummary(suite: Suite): RunSummary {
   return summary;
 }
 
+// ─── Per-suite breakdown + dashboard JSON persistence ──────────────────────
+//
+// `buildSummary` already gives us totals, but the dashboard's "passed by suite"
+// table needs counts grouped by spec file. We derive a friendly suite name from
+// the spec path (e.g. `tests/ui/test-cart.spec.ts` → "Cart (UI)") so new spec
+// files appear automatically without touching the dashboard HTML.
+
+type SpecType = 'UI' | 'API' | 'Hybrid';
+
+interface PerSuiteRow {
+  name: string;
+  type: SpecType;
+  total: number;
+  passed: number;
+}
+
+function classifySpec(filePath: string): { name: string; type: SpecType } {
+  const segments = filePath.replaceAll('\\', '/').split('/');
+  const fileName = segments.at(-1) ?? '';
+  const folder = segments.includes('api') ? 'api' : 'ui';
+  const stem = fileName.replace(/^test-/, '').replace(/\.spec\.ts$/, '');
+
+  let type: SpecType = folder === 'api' ? 'API' : 'UI';
+  let display = stem
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+
+  // Heuristic: a spec under `tests/api/` whose name combines `ui` and `api` is a hybrid.
+  const lower = stem.toLowerCase();
+  if (folder === 'api' && lower.includes('ui') && lower.includes('api')) {
+    type = 'Hybrid';
+    display = `${display} Hybrid`;
+  } else if (folder === 'api') {
+    display = `${display} API`;
+  } else {
+    display = `${display} (UI)`;
+  }
+
+  return { name: display, type };
+}
+
+function buildPerSuite(suite: Suite): PerSuiteRow[] {
+  const rows = new Map<string, PerSuiteRow>();
+  for (const test of suite.allTests()) {
+    const file = test.location.file;
+    if (!file) continue;
+    const { name, type } = classifySpec(file);
+    const row = rows.get(file) ?? { name, type, total: 0, passed: 0 };
+    row.total += 1;
+    if (test.outcome() === 'expected') row.passed += 1;
+    rows.set(file, row);
+  }
+  return [...rows.values()].sort((a, b) => b.total - a.total);
+}
+
+// ─── Tag-driven aggregations ─────────────────────────────────────────────────
+//
+// Tags carried by each `test(..., { tag: [...] }, ...)` declaration are the
+// single source of truth for priority/severity/feature buckets in the
+// dashboard. Convention lives in `prompts/core/test-tags.md`:
+//   priority: @P1 | @P2 | @P3
+//   severity: @critical | @major | @minor | @trivial
+//   type:     @ui | @api | @hybrid (else inferred from spec path)
+//   feature:  @auth | @cart | @checkout | @profile | @product | @compare | @wishlist | @home
+
+const PRIORITY_TAG = /^@P([1-3])$/;
+const SEVERITY_TAG = /^@(critical|major|minor|trivial)$/;
+const TYPE_TAG = /^@(ui|api|hybrid)$/;
+const FEATURE_TAGS = new Set([
+  '@auth', '@cart', '@checkout', '@profile',
+  '@product', '@compare', '@wishlist', '@home',
+]);
+
+interface BucketCount { label: string; count: number }
+
+function inferTypeFromPath(file: string): SpecType {
+  const norm = file.replaceAll('\\', '/').toLowerCase();
+  if (norm.includes('/tests/api/') && norm.includes('ui-api')) return 'Hybrid';
+  if (norm.includes('/tests/api/')) return 'API';
+  return 'UI';
+}
+
+interface TagAggregations {
+  priority: BucketCount[];   // [{label:'P1', count:N}, ...] in P1→P3 order
+  severity: BucketCount[];   // critical → trivial
+  byType: BucketCount[];   // UI / API / Hybrid
+  byTag: BucketCount[];   // smoke / regression / Untagged
+  byFeature: BucketCount[];  // sorted desc by count
+  untaggedTests: string[];   // titles missing priority OR severity (max 10)
+}
+
+function bump(m: Map<string, number>, key: string): void {
+  m.set(key, (m.get(key) ?? 0) + 1);
+}
+
+function firstMatch(tags: readonly string[], re: RegExp): RegExpExecArray | null {
+  for (const tag of tags) {
+    const result = re.exec(tag);
+    if (result) return result;
+  }
+  return null;
+}
+
+function classifyType(tags: readonly string[], file: string): SpecType {
+  const explicit = firstMatch(tags, TYPE_TAG);
+  if (!explicit) return inferTypeFromPath(file);
+  const value = explicit[1];
+  if (value === 'hybrid') return 'Hybrid';
+  return value === 'api' ? 'API' : 'UI';
+}
+
+function aggregateTest(
+  test: TestCase,
+  acc: {
+    priority: Map<string, number>;
+    severity: Map<string, number>;
+    byType: Map<string, number>;
+    byTag: Map<string, number>;
+    byFeature: Map<string, number>;
+    untaggedTests: string[];
+  },
+): void {
+  const tags = test.tags ?? [];
+
+  const pri = firstMatch(tags, PRIORITY_TAG);
+  if (pri) bump(acc.priority, `P${pri[1]}`);
+
+  const sev = firstMatch(tags, SEVERITY_TAG);
+  if (sev) bump(acc.severity, sev[1] ?? '');
+
+  if ((!pri || !sev) && acc.untaggedTests.length < 10) {
+    acc.untaggedTests.push(formatTitlePath(test));
+  }
+
+  bump(acc.byType, classifyType(tags, test.location.file ?? ''));
+
+  const hasSmoke = tags.includes('@smoke');
+  const hasReg = tags.includes('@regression');
+  if (hasSmoke) bump(acc.byTag, '@smoke');
+  if (hasReg) bump(acc.byTag, '@regression');
+  if (!hasSmoke && !hasReg) bump(acc.byTag, 'Untagged');
+
+  for (const tag of tags) {
+    if (FEATURE_TAGS.has(tag)) bump(acc.byFeature, tag.slice(1));
+  }
+}
+
+function buildTagAggregations(suite: Suite): TagAggregations {
+  const acc = {
+    priority: new Map<string, number>([['P1', 0], ['P2', 0], ['P3', 0]]),
+    severity: new Map<string, number>([
+      ['critical', 0], ['major', 0], ['minor', 0], ['trivial', 0],
+    ]),
+    byType: new Map<string, number>([['UI', 0], ['API', 0], ['Hybrid', 0]]),
+    byTag: new Map<string, number>([['@smoke', 0], ['@regression', 0], ['Untagged', 0]]),
+    byFeature: new Map<string, number>(),
+    untaggedTests: [] as string[],
+  };
+
+  for (const test of suite.allTests()) aggregateTest(test, acc);
+
+  const toArr = (m: Map<string, number>): BucketCount[] =>
+    [...m.entries()].map(([label, count]) => ({ label, count }));
+
+  return {
+    priority: toArr(acc.priority),
+    severity: toArr(acc.severity),
+    byType: toArr(acc.byType),
+    byTag: toArr(acc.byTag),
+    byFeature: toArr(acc.byFeature).sort((a, b) => b.count - a.count),
+    untaggedTests: acc.untaggedTests,
+  };
+}
+
+function nowDisplay(date: Date): string {
+  // YYYY-MM-DD HH:mm in the local timezone, with a tz hint from Intl.
+  const pad = (n: number): string => String(n).padStart(2, '0');
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'local';
+  const tzAbbr = tz.split('/').at(-1) ?? tz;
+  return (
+    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ` +
+    `${pad(date.getHours())}:${pad(date.getMinutes())} ${tzAbbr}`
+  );
+}
+
+function resolveBuildLabel(): string {
+  const env = process.env;
+  const fromCi =
+    env['GITHUB_RUN_NUMBER'] ||
+    env['BUILD_NUMBER'] ||
+    env['CI_PIPELINE_ID'] ||
+    env['CIRCLE_BUILD_NUM'];
+  if (fromCi) return `#${fromCi}`;
+  return `local-${Date.now().toString(36).slice(-5)}`;
+}
+
+interface RunSummaryArtifact {
+  build: string;
+  ranAt: string;
+  ranAtDisplay: string;
+  status: FullResult['status'];
+  total: number;
+  passed: number;
+  failed: number;
+  skipped: number;
+  flaky: number;
+  passRate: number;
+  failRate: number;
+  durationMs: number;
+  durationMin: number;
+  failedTests: string[];
+  perSuite: PerSuiteRow[];
+  priority: BucketCount[];
+  severity: BucketCount[];
+  byType: BucketCount[];
+  byTag: BucketCount[];
+  byFeature: BucketCount[];
+  untaggedTests: string[];
+}
+
+interface TrendEntry {
+  build: string;
+  ranAt: string;
+  passRate: number;
+  failRate: number;
+}
+
+const TREND_WINDOW = 10;
+
+function persistRunArtifacts(
+  result: FullResult,
+  suite: Suite,
+  summary: RunSummary,
+): void {
+  const reportsDir = path.resolve(process.cwd(), 'reports');
+  if (!fs.existsSync(reportsDir)) {
+    fs.mkdirSync(reportsDir, { recursive: true });
+  }
+
+  const ran = new Date();
+  const denom = Math.max(summary.total - summary.skipped, 1);
+  const passRate = Number(((summary.passed / denom) * 100).toFixed(1));
+  const failRate = Number((((summary.failed + summary.flaky) / denom) * 100).toFixed(1));
+
+  const tagBuckets = buildTagAggregations(suite);
+  const artifact: RunSummaryArtifact = {
+    build: resolveBuildLabel(),
+    ranAt: ran.toISOString(),
+    ranAtDisplay: nowDisplay(ran),
+    status: result.status,
+    total: summary.total,
+    passed: summary.passed,
+    failed: summary.failed,
+    skipped: summary.skipped,
+    flaky: summary.flaky,
+    passRate,
+    failRate,
+    durationMs: result.duration,
+    durationMin: Number((result.duration / 60_000).toFixed(1)),
+    failedTests: summary.failedTests,
+    perSuite: buildPerSuite(suite),
+    priority: tagBuckets.priority,
+    severity: tagBuckets.severity,
+    byType: tagBuckets.byType,
+    byTag: tagBuckets.byTag,
+    byFeature: tagBuckets.byFeature,
+    untaggedTests: tagBuckets.untaggedTests,
+  };
+
+  const summaryPath = path.join(reportsDir, 'run-summary.json');
+  fs.writeFileSync(summaryPath, JSON.stringify(artifact, null, 2));
+
+  // Append to a rolling trend file (keep last TREND_WINDOW entries).
+  const trendPath = path.join(reportsDir, 'run-trend.json');
+  let trend: TrendEntry[] = [];
+  if (fs.existsSync(trendPath)) {
+    try {
+      const parsed: unknown = JSON.parse(fs.readFileSync(trendPath, 'utf8'));
+      if (Array.isArray(parsed)) trend = parsed as TrendEntry[];
+    } catch {
+      trend = [];
+    }
+  }
+  trend.push({
+    build: artifact.build,
+    ranAt: artifact.ranAt,
+    passRate,
+    failRate,
+  });
+  if (trend.length > TREND_WINDOW) trend = trend.slice(-TREND_WINDOW);
+  fs.writeFileSync(trendPath, JSON.stringify(trend, null, 2));
+
+  console.log(`Dashboard data: wrote ${summaryPath} (${artifact.build}, ${passRate}% pass).`);
+}
+
 function formatPassRate(summary: RunSummary): string {
   if (summary.total === 0) return '0.00%';
   return `${((summary.passed / summary.total) * 100).toFixed(2)}%`;
@@ -244,6 +541,14 @@ export default class CustomReporter implements Reporter {
     if (summary.total === 0 || isListing || allSkipped) {
       console.log('Notifications skipped: no tests executed.');
       return;
+    }
+
+    // Persist dashboard inputs *before* notifications. If a webhook fails we
+    // still want the JSON artifacts on disk for `npm run export:dashboard`.
+    try {
+      persistRunArtifacts(result, this.suite, summary);
+    } catch (err) {
+      console.warn('Dashboard data: failed to persist run-summary.json —', err);
     }
 
     const message = buildMessage(result, context, summary);

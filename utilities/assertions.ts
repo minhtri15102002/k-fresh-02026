@@ -109,6 +109,30 @@ export class Assertions {
     }
 
     /**
+     * Soft assertion to check if a value is truthy.
+     * @param actual - The actual value to check
+     * @param message - Custom message for assertion failure (optional)
+     */
+    @step('Assert To Be Truthy')
+    static assertToBeTruthy(actual: boolean, message?: string): void {
+        expect
+            .soft(actual, message ?? `Expected ${actual} to be true`)
+            .toBeTruthy();
+    }
+
+    /**
+     * Soft assertion to check if a value is falsy.
+     * @param actual - The actual value to check
+     * @param message - Custom message for assertion failure (optional)
+     */
+    @step('Assert To Be Falsy')
+    static assertToBeFalsy(actual: boolean, message?: string): void {
+        expect
+            .soft(actual, message ?? `Expected ${actual} to be false`)
+            .toBeFalsy();
+    }
+
+    /**
      * Soft assertion to check if two arrays are equal.
      * @param actual - The actual array
      * @param expected - The expected array

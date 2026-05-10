@@ -9,5 +9,9 @@ node_modules/
 .env
 /allure-results/
 /allure-report/
+/reports/run-summary.json
+/reports/run-trend.json
+/reports/defects.json
+/artifacts/
 profiles/.env.*
 !profiles/.env.*.example

@@ -16,7 +16,7 @@ test.describe('Register Tests', () => {
     user = generateUserProfileData();
   });
 
-  test('TC-001: Register with valid data - success', { tag: '@smoke @regression' }, async ({ registerPage }) => {
+  test('TC-01: Register with valid data - success', { tag: ['@P1', '@critical', '@smoke', '@regression', '@ui', '@auth'] }, async ({ registerPage }) => {
     await registerPage.fillRegistrationForm(user);
     await registerPage.unSelectNewsletter();
     await registerPage.clickAgreeTermsCheckbox();
@@ -33,14 +33,14 @@ test.describe('Register Tests', () => {
     );
   });
 
-  test('TC-002: Register without filling any required fields', async ({ registerPage }) => {
+  test('TC-02: Register without filling any required fields', { tag: ['@P2', '@major', '@regression', '@ui', '@auth'] }, async ({ registerPage }) => {
     await registerPage.submitRegistrationForm();
 
     // Verify validation messages appear for all required fields
     await registerPage.verifyRequiredFieldsErrorMessages();
   });
 
-  test('TC-003: Register with invalid email format', async ({ commonPage, registerPage, browserName }) => {
+  test('TC-03: Register with invalid email format', { tag: ['@P2', '@major', '@regression', '@ui', '@auth'] }, async ({ commonPage, registerPage, browserName }) => {
     user.email = 'invalid-email-format';
     await registerPage.fillRegistrationForm(user);
     await registerPage.clickAgreeTermsCheckbox();
@@ -60,7 +60,7 @@ test.describe('Register Tests', () => {
     Assertions.assertEqual(validationMessage, expectedMessage);
   });
 
-  test('TC-004: Register with password mismatch', async ({ registerPage }) => {
+  test('TC-04: Register with password mismatch', { tag: ['@P2', '@major', '@regression', '@ui', '@auth'] }, async ({ registerPage }) => {
     user.confirmPassword = 'mismatchpassword123';
     await registerPage.fillRegistrationForm(user);
     await registerPage.clickAgreeTermsCheckbox();
@@ -70,7 +70,7 @@ test.describe('Register Tests', () => {
     Assertions.assertEqual((await registerPage.lblErrorConfirmPassword.textContent())?.trim(), Messages.REGISTER_ERROR_PASSWORD_CONFIRM);
   });
 
-  test('TC-005: Register without agreeing to Privacy Policy', async ({ registerPage }) => {
+  test('TC-05: Register without agreeing to Privacy Policy', { tag: ['@P2', '@major', '@regression', '@ui', '@auth'] }, async ({ registerPage }) => {
     await registerPage.fillRegistrationForm(user);
     await registerPage.submitRegistrationForm();
 

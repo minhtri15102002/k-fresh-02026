@@ -15,6 +15,7 @@
 - [Tooling & Conventions](#tooling--conventions)
 - [Git Hooks (Husky)](#git-hooks-husky)
 - [Reporting](#reporting)
+- [QA Metrics Dashboard](QA-Metrics-Dashboard) — test cases, execution, defects, traceability
 - [Run-Result Notifications](#run-result-notifications)
 - [Knowledge Base](#knowledge-base)
 - [AI Prompt Library](#ai-prompt-library)

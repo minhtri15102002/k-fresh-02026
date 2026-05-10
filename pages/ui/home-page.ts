@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { Constants } from '@utilities/constants';
 import { CommonPage } from '@pages/common-page';
 import { step } from '@utilities/logging';
@@ -60,7 +60,7 @@ export class HomePage extends HomeLocators {
     const product = this.productLink(productName);
     await this.assertHelper.assertElementVisible(product);
     await product.scrollIntoViewIfNeeded();
-    await product.click({ force: true });
+    await this.commonPage.click(product, { force: true });
     await this.page.waitForURL(/route=product\/product|route=product%2Fproduct/);
   }
 
@@ -88,15 +88,12 @@ export class HomePage extends HomeLocators {
    */
   @step('Hover over product and click Add to Cart')
   async hoverAndAddToCart(productName: string): Promise<void> {
-    const productCard = this.productCard(productName).locator('visible=true').first();
-    const addToCartBtn = productCard.locator('button[title="Add to Cart"]');
+    const productCard = this.productCard(productName);
+    await this.commonPage.scrollIntoView(productCard);
 
-    await productCard.scrollIntoViewIfNeeded();
-    await productCard.hover();
-    // Hard wait — `assertHelper.assertElementVisible` is `expect.soft` and
-    // wouldn't gate the click below.
-    await addToCartBtn.waitFor({ state: 'visible' });
-    await addToCartBtn.click({ force: true });
+    await this.commonPage.hover(productCard);
+    await expect(this.btnAddToCartByProductName(productName)).toBeVisible();
+    await this.commonPage.click(this.btnAddToCartByProductName(productName), { force: true });
   }
 
   /**

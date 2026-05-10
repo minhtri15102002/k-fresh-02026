@@ -92,7 +92,7 @@ export class CheckoutLocators extends CommonLocators {
 
         // --- CONFIRM SECTION ---
         this.btnSaveCheckout = this.page.locator('#button-save');
-        this.btnConfirmOrder = this.page.getByRole('button', { name: 'Confirm Order ' });
+        this.btnConfirmOrder = this.page.getByRole('button', { name: 'Confirm Order' });
         this.inputComment = this.page.locator('textarea[name="comment"]');
 
         this.divShippingNewBlock = this.page.locator('#shipping-new');

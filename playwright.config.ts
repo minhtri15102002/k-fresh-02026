@@ -44,10 +44,17 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
     // baseURL: 'http://localhost:3000',
-
+    launchOptions: {
+      args: ['--start-maximized'],
+    },
+    viewport: null,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-failure',
-    headless: !process.env['HEADLESS'],
+    /* Default: headless. Opt in to a visible browser locally with `HEADED=true npx playwright test`.
+       This avoids the classic "headed without XServer" failure on Linux/CI runners and the
+       previous inverted `!process.env.HEADLESS` logic which silently forced headed mode whenever
+       the workflow exported `HEADLESS=true`. */
+    headless: process.env['HEADLESS'] !== 'true',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },

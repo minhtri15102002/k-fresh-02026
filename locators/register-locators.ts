@@ -14,7 +14,8 @@ export class RegisterLocators extends CommonLocators {
   inputPasswordConfirm!: Locator;
   radioNewsletterYes!: Locator;
   radioNewsletterNo!: Locator;
-  chkPrivacyPolicy!: Locator;
+  // `chkAgreeTerms` is inherited from CommonLocators (same `label[for="input-agree"]`
+  // selector) — no need to redeclare it here.
   btnSuccessContinue!: Locator;
 
   constructor(page: Page) {
@@ -44,7 +45,6 @@ export class RegisterLocators extends CommonLocators {
     this.inputConfirmPassword = this.page.locator('#input-confirm');
     this.radioNewsletterYes = this.page.locator('input[name="newsletter"][value="1"]');
     this.radioNewsletterNo = this.page.locator('input[name="newsletter"][value="0"]');
-    this.chkPrivacyPolicy = this.page.locator('label[for="input-agree"]');
     this.btnContinue = this.page.locator('input[value="Continue"]');
 
     this.lblSuccessMessage = this.page.locator('#content h1');

@@ -17,17 +17,17 @@ test.describe('Wish List Tests', () => {
     await homePage.clickWishlistInToast();
   });
 
-  test('TC-WL-003: Add product from wishlist to cart', async ({ wishlistPage }) => {
+  test('TC-01: Add product from wishlist to cart', { tag: ['@P2', '@major', '@regression', '@ui', '@wishlist'] }, async ({ wishlistPage }) => {
     await wishlistPage.verifyWishlistNotEmpty();
     await wishlistPage.addFirstProductToCartAndVerify();
   });
 
-  test('TC-WL-004: Remove product from wishlist', async ({ wishlistPage }) => {
+  test('TC-02: Remove product from wishlist', { tag: ['@P3', '@minor', '@regression', '@ui', '@wishlist'] }, async ({ wishlistPage }) => {
     await wishlistPage.verifyWishlistNotEmpty();
     await wishlistPage.removeFirstProductAndVerify();
   });
 
-  test('TC-WL-005: link to product detail', async ({ wishlistPage }) => {
+  test('TC-03: link to product detail', { tag: ['@P3', '@minor', '@regression', '@ui', '@wishlist'] }, async ({ wishlistPage }) => {
     await wishlistPage.verifyWishlistNotEmpty();
     await wishlistPage.openFirstProductAndVerifyDetail();
   });

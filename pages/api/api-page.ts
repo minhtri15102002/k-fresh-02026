@@ -34,12 +34,24 @@ export class APIPage {
   deleteMethod = 'DELETE';
   patchMethod = 'PATCH';
 
+  /**
+   * Returns a copy of the current `headers` map with an `Authorization: Bearer <token>`
+   * entry merged in when a token is provided. Pure — does not mutate `this.headers`,
+   * so callers can safely fan out to multiple authenticated requests in parallel.
+   * @param token JWT (or null/undefined to skip the Authorization header entirely).
+   * @returns A header dictionary ready to pass to Playwright's `request.fetch`.
+   */
   addAuthTokenToHeaders = (
     token: string | null | undefined,
   ): { [key: string]: string } => ({
     ...this.headers,
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   });
+
+  /**
+   * Optional hook for tests that need a re-usable seller-login routine. Left
+   * `undefined` by default so individual specs can plug in their own strategy.
+   */
   loginAsSeller: ((apiPage: APIPage) => Promise<APIResponse>) | undefined;
 
   baseUrl?: string;

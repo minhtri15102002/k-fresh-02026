@@ -61,7 +61,7 @@ export class RegisterPage extends RegisterLocators {
    */
   @step('Click Agree to Terms Checkbox')
   async clickAgreeTermsCheckbox(): Promise<void> {
-    await this.commonPage.click(this.chkPrivacyPolicy);
+    await this.commonPage.click(this.chkAgreeTerms);
   }
 
   /**

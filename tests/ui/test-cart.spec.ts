@@ -9,7 +9,8 @@ import { getEnvProduct } from '@data/product-helper';
 const product: Product = getEnvProduct();
 let userProfile: UserProfile;
 
-/** Test suite for cart-related tests */
+/** Test suite for cart-related tests. Per-test tags carry the @regression
+ *  suite tag, so it is no longer needed here. */
 test.describe('Cart Tests', () => {
   test.setTimeout(Constants.TIMEOUTS.DEFAULT * 2);
 
@@ -19,18 +20,17 @@ test.describe('Cart Tests', () => {
     await registerPage.fillRegistrationForm(userProfile);
     await registerPage.clickAgreeTermsCheckbox();
     await registerPage.submitRegistrationForm();
+    await commonPage.goto(Constants.BASE_URL);
   });
 
-  test('TC01 - Verify Empty Cart', { tag: '@regression' }, async ({ cartPage }) => {
-    await cartPage.commonPage.goto(Constants.BASE_URL);
+  test('TC-01 - Verify Empty Cart', { tag: ['@P2', '@major', '@regression', '@ui', '@cart'] }, async ({ cartPage }) => {
     await cartPage.clickCartButton();
     await cartPage.clickEditCartButton();
     await cartPage.removeAllProducts();
     await cartPage.verifyMainCartIsEmpty(Messages.EMPTY_CART_MESSAGE);
   });
 
-  test('TC02 - Add Product to Cart', { tag: '@smoke @regression' }, async ({ productPage, cartPage }) => {
-    await productPage.commonPage.goto(Constants.BASE_URL);
+  test('TC-02 - Add Product to Cart', { tag: ['@P1', '@critical', '@smoke', '@regression', '@ui', '@cart'] }, async ({ productPage, cartPage }) => {
     await productPage.searchAndSelectProduct(product);
     await productPage.increaseQuantity(product);
     await productPage.clickAddToCart();
@@ -39,8 +39,7 @@ test.describe('Cart Tests', () => {
     await cartPage.verifyProductAddedToCart(product);
   });
 
-  test('TC03 - Remove Product from Cart', { tag: '@regression' }, async ({ productPage, cartPage }) => {
-    await productPage.commonPage.goto(Constants.BASE_URL);
+  test('TC-03 - Remove Product from Cart', { tag: ['@P2', '@major', '@regression', '@ui', '@cart'] }, async ({ productPage, cartPage }) => {
     await productPage.searchAndSelectProduct(product);
     await productPage.clickAddToCart();
     await productPage.verifyAddToCartSuccessMessage(Messages.ADD_TO_CART_SUCCESS_MESSAGE);
@@ -49,8 +48,7 @@ test.describe('Cart Tests', () => {
     await cartPage.verifyProductRemovedFromCart(product);
   });
 
-  test('TC04 - Update product quantity in cart', { tag: '@regression' }, async ({ homePage, productPage, cartPage }) => {
-    await homePage.commonPage.goto(Constants.BASE_URL);
+  test('TC-04 - Update product quantity in cart', { tag: ['@P2', '@major', '@regression', '@ui', '@cart'] }, async ({ homePage, productPage, cartPage }) => {
     await homePage.selectProduct(product.name);
     await productPage.clickAddToCart();
     await productPage.verifyAddToCartSuccessMessage(
@@ -65,8 +63,7 @@ test.describe('Cart Tests', () => {
     await cartPage.verifyUpdatedProductQuantity(updatedProduct);
   });
 
-  test('TC05 - Update Product Quantity to 0 (Remove via Quantity)', { tag: '@regression' }, async ({ productPage, cartPage }) => {
-    await productPage.commonPage.goto(Constants.BASE_URL);
+  test('TC-05 - Update Product Quantity to 0 (Remove via Quantity)', { tag: ['@P3', '@minor', '@regression', '@ui', '@cart'] }, async ({ productPage, cartPage }) => {
     await productPage.searchAndSelectProduct(product);
     await productPage.clickAddToCart();
     await productPage.verifyAddToCartSuccessMessage(Messages.ADD_TO_CART_SUCCESS_MESSAGE,);
@@ -76,9 +73,7 @@ test.describe('Cart Tests', () => {
     await cartPage.verifyProductRemovedFromCart(product);
   });
 
-  /** Test case Add-to-Cart of PThao */
-  test('TC_CART_01 - Add product to cart', { tag: '@regression' }, async ({ homePage, productPage, cartPage }) => {
-    await homePage.commonPage.goto(Constants.BASE_URL);
+  test('TC-06 - Add product to cart', { tag: ['@P2', '@major', '@regression', '@ui', '@cart'] }, async ({ homePage, productPage, cartPage }) => {
     await homePage.selectProduct(product.name);
     await productPage.clickAddToCart();
     await productPage.verifyAddToCartSuccessMessage(Messages.ADD_TO_CART_SUCCESS_MESSAGE);
@@ -86,8 +81,7 @@ test.describe('Cart Tests', () => {
     await cartPage.verifyProductAddedToCart(product);
   });
 
-  test('TC_CART_02 - Add product with multiple quantity successfully', { tag: '@regression' }, async ({ homePage, productPage, cartPage }) => {
-    await homePage.commonPage.goto(Constants.BASE_URL);
+  test('TC-07 - Add product with multiple quantity successfully', { tag: ['@P2', '@major', '@regression', '@ui', '@cart'] }, async ({ homePage, productPage, cartPage }) => {
     await homePage.selectProduct(product.name);
     await productPage.setQuantity(3);
     await productPage.clickAddToCart();
@@ -96,12 +90,7 @@ test.describe('Cart Tests', () => {
     await cartPage.verifyUpdatedProductQuantity({ ...product, quantity: 3 });
   });
 
-  test('TC_CART_03 - Add product to cart from homepage', { tag: '@regression' }, async ({ homePage, cartPage }) => {
-    // Homepage flow: hovering a product card and clicking Add-to-Cart shows a
-    // toast in `#notification-box-top` (NOT the PDP's `role="alert"` banner),
-    // so verification + the View Cart link must come from `homePage`, not
-    // `productPage`. Mixing them is what made this test flaky before.
-    await homePage.commonPage.goto(Constants.BASE_URL);
+  test('TC-08 - Add product to cart from homepage', { tag: ['@P2', '@major', '@regression', '@ui', '@cart'] }, async ({ homePage, cartPage }) => {
     await homePage.hoverAndAddToCart(product.name);
     await homePage.verifyAddToCartSuccessMessage(Messages.ADD_TO_CART_SUCCESS_MESSAGE);
     await homePage.clickViewCartInToast();

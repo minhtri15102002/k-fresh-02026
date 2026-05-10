@@ -105,7 +105,6 @@ export class ProductLocators extends CommonLocators {
     this.btnDecreaseQuantity = this.page.locator(
       '(//button[@aria-label="Decrease quantity"])[2]',
     );
-    this.divSuccessAlert = this.page.getByRole('alert');
     this.productThumbnail = this.page.locator('//div[@class="product-thumb"]');
     this.productThumbnaiByName = (productName: string): Locator =>
       this.page.locator(

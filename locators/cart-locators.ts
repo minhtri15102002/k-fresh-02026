@@ -49,10 +49,10 @@ export class CartLocators extends CommonLocators {
       exact: true,
     });
 
-    this.rowProduct = (productName: string) => this.page.locator(`(//td/a[text()='${productName}']/../..)[1]`);
-    this.btnUpdate = (productName: string) => this.page.locator(`//td/a[text()='${productName}']/../..//button[@title="Update"]`);
-    this.btnRemove = (productName: string) => this.page.locator(`//td/a[text()='${productName}']/../..//button[@title="Remove"]`);
-    this.inputQuantity = (productName: string) => this.page.locator(`//td/a[text()='${productName}']/../..//input[starts-with(@name,'quantity')]`);
-    this.cellTotal = (productName: string) => this.page.locator(`(//td/a[text()='${productName}']/../..//td)[last()]`);
+    this.rowProduct    = (productName: string): Locator => this.page.locator(`(//td/a[text()='${productName}']/../..)[1]`);
+    this.btnUpdate     = (productName: string): Locator => this.page.locator(`//td/a[text()='${productName}']/../..//button[@title="Update"]`);
+    this.btnRemove     = (productName: string): Locator => this.page.locator(`//td/a[text()='${productName}']/../..//button[@title="Remove"]`);
+    this.inputQuantity = (productName: string): Locator => this.page.locator(`//td/a[text()='${productName}']/../..//input[starts-with(@name,'quantity')]`);
+    this.cellTotal     = (productName: string): Locator => this.page.locator(`(//td/a[text()='${productName}']/../..//td)[last()]`);
   }
 }

@@ -25,6 +25,7 @@ export class HomeLocators extends CommonLocators {
     btnCategory!: Locator;
     menuLink!: (menuName: string) => Locator;
     btnAddToCart!: Locator;
+    btnAddToCartByProductName!: (productName: string) => Locator;
     addToCart!: Locator;
     btnMyAccount!: Locator;
     lnkRegister!: Locator;
@@ -43,16 +44,16 @@ export class HomeLocators extends CommonLocators {
         this.btnViewCartInToast = this.page.locator(
             "//div[@id='notification-box-top']//a[normalize-space()='View Cart']",
         );
-        this.lblProductCards = (index: number) => this.page.locator(`(//div[contains(@class,'product-thumb')])[${index + 1}]`);
-        this.lnkProductName = (index: number) => this.page.locator(`(//div[contains(@class,'product-thumb')])[${index + 1}]//h4//a`);
-        this.btnAddToWishlist = (index: number) => this.page.locator(`(//div[contains(@class,'product-thumb')])[${index + 1}]//button[contains(@onclick,'wishlist.add')]`);
+        this.lblProductCards  = (index: number): Locator => this.page.locator(`(//div[contains(@class,'product-thumb')])[${index + 1}]`);
+        this.lnkProductName   = (index: number): Locator => this.page.locator(`(//div[contains(@class,'product-thumb')])[${index + 1}]//h4//a`);
+        this.btnAddToWishlist = (index: number): Locator => this.page.locator(`(//div[contains(@class,'product-thumb')])[${index + 1}]//button[contains(@onclick,'wishlist.add')]`);
         this.btnMyAccount = this.page.getByRole('button', { name: /My account/i }).first();
         this.lnkRegister = this.page.getByRole('link', { name: 'Register' }).first();
-        this.productLink = (productName: string) =>
+        this.productLink = (productName: string): Locator =>
             this.page.locator('h4 a[href*="route=product/product"]', {
                 hasText: productName,
             }).first();
-        this.productCard = (productName: string) =>
+        this.productCard = (productName: string): Locator =>
             this.page.locator('.product-thumb').filter({
                 has: this.productLink(productName),
             }).first();
@@ -60,11 +61,11 @@ export class HomeLocators extends CommonLocators {
             productNameLink: (name: string) => `//a[contains(text(),"${name}")]`
         };
         this.btnAddToCart = this.page.locator('button[title="Add to Cart"]');
+        this.btnAddToCartByProductName = (productName: string): Locator =>
+            this.productCard(productName).locator('button[title="Add to Cart"]');
 
-        this.menuLink = (menuName: string) =>
+        this.menuLink = (menuName: string): Locator =>
             this.page.locator('nav').locator(`a:has-text("${menuName}")`);
-        this.btnMyAccount = this.page.getByRole('button', { name: /My account/i }).first();
-        this.lnkRegister = this.page.getByRole('link', { name: 'Register' }).first();
     }
     getProductCard(productName: string): Locator {
         return this.page.locator('.product-thumb').filter({

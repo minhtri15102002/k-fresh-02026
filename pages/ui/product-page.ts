@@ -6,6 +6,7 @@ import { Product } from '@models/product';
 import { AssertHelper } from '@utilities/assert-helper';
 import { ActionType } from '@models/action-type';
 import { Constants } from '@utilities/constants';
+import { Assertions } from '@utilities/assertions';
 
 export class ProductPage extends ProductLocators {
   commonPage: CommonPage;
@@ -90,7 +91,7 @@ export class ProductPage extends ProductLocators {
       await this.assertHelper.assertElementVisible(this.imgMainProduct);
       await this.assertHelper.assertElementHasAttribute(this.imgMainProduct, 'src', ProductPage.REGEX.IMAGE_URL);
       const imageSrc = await this.imgMainProduct.getAttribute('src');
-      await this.assertHelper.assertTobeTruthy(imageSrc);
+      Assertions.assertToBeTruthy(imageSrc !== null);
     });
 
     await test.step('Verify description details', async () => {
@@ -157,7 +158,7 @@ export class ProductPage extends ProductLocators {
       const finalValue = await this.inputQuantity.inputValue();
       // Final quantity should be initial value + 1 (3 increments - 2 decrements)
       const expectedValue = 1;
-      await this.assertHelper.assertNumberGreaterThanOrEqual(parseInt(finalValue), expectedValue);
+      Assertions.assertToBeGreaterThanOrEqual(Number.parseInt(finalValue), expectedValue);
     });
   }
 
@@ -185,7 +186,7 @@ export class ProductPage extends ProductLocators {
   async verifyFinalQuantityValueAfterFill(quantity: string): Promise<void> {
     await test.step('Verify final quantity value after fill', async () => {
       const finalValue = await this.inputQuantity.inputValue();
-      await this.assertHelper.assertNumberGreaterThanOrEqual(parseInt(finalValue), parseInt(quantity));
+      Assertions.assertToBeGreaterThanOrEqual(Number.parseInt(finalValue), Number.parseInt(quantity));
     });
   }
 

@@ -67,9 +67,10 @@ export class CommonLocators {
         this.btnContinue = this.page.locator('//a[contains(@class, "btn") and contains(., "Continue")] | //input[@value="Continue"]');
         this.btnConfirmDelete = this.page.locator('button:has-text("Confirm Delete") | //a[text()="Confirm Delete"]');
         this.btnCancelDelete = this.page.locator('button:has-text("Cancel Delete")');
+        // CSS attribute selector preferred over XPath per project convention
+        // (see locators/login-locators.ts header comment).
         this.inputSearch = this.page.locator('input[placeholder="Search"]');
         this.ddlOption = this.page.locator('ul[role="listbox"]');
-        this.inputSearch = this.page.locator('//input[@placeholder="Search"]');
 
         this.linkText = (name: string): Locator => {
             return this.page.locator(`xpath=//a[@id and text()="${name}"]`);

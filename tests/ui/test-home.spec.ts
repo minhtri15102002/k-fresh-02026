@@ -14,7 +14,7 @@ test.describe('Home Tests', () => {
     await registerPage.submitRegistrationForm();
   });
 
-  test('TC-WL-001: Access Wishlist page', async ({ homePage, commonPage, wishlistPage }) => {
+  test('TC-01: Access Wishlist page', { tag: ['@P3', '@minor', '@regression', '@ui', '@home'] }, async ({ homePage, commonPage, wishlistPage }) => {
     await commonPage.goto(Constants.BASE_URL);
     await homePage.clickWishListIcon();
     // Confirms the icon click navigated to the wishlist route — without this
@@ -22,7 +22,7 @@ test.describe('Home Tests', () => {
     await wishlistPage.verifyOnWishlistPage();
   });
 
-  test('TC-WL-002: Add Product to Wishlist', async ({ homePage, commonPage, wishlistPage }) => {
+  test('TC-02: Add Product to Wishlist', { tag: ['@P2', '@major', '@regression', '@ui', '@home'] }, async ({ homePage, commonPage, wishlistPage }) => {
     await commonPage.goto(Constants.BASE_URL);
     await homePage.hoverProductCard();
     await homePage.clickAddToWishlistButton();

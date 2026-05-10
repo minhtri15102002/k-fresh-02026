@@ -9,7 +9,6 @@ export class ProfileLocators extends CommonLocators {
   inputTelephone!: Locator;
   inputNewPassword!: Locator;
   inputNewPasswordConfirm!: Locator;
-  alertChangePasswordSuccess!: Locator;
   inputAddressCompany!: Locator;
   inputAddressLine1!: Locator;
   inputAddressLine2!: Locator;
@@ -50,7 +49,8 @@ export class ProfileLocators extends CommonLocators {
     // Change Password locators
     this.inputNewPassword = this.page.locator("//input[@id='input-password']");
     this.inputNewPasswordConfirm = this.page.locator("//input[@id='input-confirm']");
-    this.alertChangePasswordSuccess = this.page.locator("//div[contains(@class,'alert-success')]");
+    // Note: password-change success uses the inherited `alertSuccessUpdate`
+    // (same `.alert-success` selector) — keeping a single canonical alias.
     // Address locators
     this.inputFirstName = this.page.locator("//input[@id='input-firstname']");
     this.inputLastName = this.page.locator("//input[@id='input-lastname']");

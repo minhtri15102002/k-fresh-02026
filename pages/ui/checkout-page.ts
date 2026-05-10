@@ -45,7 +45,6 @@ export class CheckoutPage extends CheckoutLocators {
     await this.commonPage.click(this.chkAgreeTerms);
     await this.commonPage.scrollTo(this.btnSaveCheckout);
     await this.commonPage.click(this.btnSaveCheckout);
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
   }
 
   /**
@@ -56,7 +55,6 @@ export class CheckoutPage extends CheckoutLocators {
     await this.page.waitForLoadState('networkidle');
     await this.commonPage.scrollTo(this.btnContinueGeneric);
     await this.commonPage.click(this.btnContinueGeneric);
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
   }
 
   /**
@@ -86,7 +84,6 @@ export class CheckoutPage extends CheckoutLocators {
   async updateProductQuantity(_productName: string, quantity: number): Promise<void> {
     await this.commonPage.fill(this.inputQty, quantity.toString());
     await this.commonPage.click(this.btnUpdateQty);
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.DOM_CONTENT_LOADED);
   }
 
   /**
@@ -98,7 +95,6 @@ export class CheckoutPage extends CheckoutLocators {
   async fillBillingDetails(user: UserProfile, address: Address): Promise<void> {
     if (await this.radioBillingNewAddress.isVisible()) {
       await this.commonPage.click(this.radioBillingNewAddress);
-      await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
     }
 
     await this.commonPage.fill(this.inputBillingFirstName, user.firstName);
@@ -108,9 +104,7 @@ export class CheckoutPage extends CheckoutLocators {
     await this.commonPage.fill(this.inputBillingCity, address.city);
 
     await this.ddlBillingCountry.selectOption('230');
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.PERFORM_LOADING * 1000);
     await this.ddlBillingZone.selectOption({ index: 1 });
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
   }
 
   /**
@@ -120,12 +114,10 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Fill Shipping Details (New Address)')
   async fillShippingDetails(user: UserProfile, address: Address): Promise<void> {
-    await this.chkSameAddress.uncheck({ force: true });
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
+    await this.commonPage.uncheck(this.chkSameAddress);
 
     if (await this.radioShippingNewAddress.isVisible()) {
       await this.commonPage.click(this.radioShippingNewAddress);
-      await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
     }
 
     await this.commonPage.fill(this.inputShippingFirstName, user.firstName);
@@ -135,9 +127,7 @@ export class CheckoutPage extends CheckoutLocators {
     await this.commonPage.fill(this.inputShippingCity, address.city);
 
     await this.ddlShippingCountry.selectOption('230');
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.PERFORM_LOADING * 1000);
     await this.ddlShippingZone.selectOption({ index: 1 });
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
   }
 
   /**
@@ -147,10 +137,8 @@ export class CheckoutPage extends CheckoutLocators {
   async useExistingAddressAndHideShipping(): Promise<void> {
     if (await this.radioBillingExistingAddress.isVisible()) {
       await this.commonPage.click(this.radioBillingExistingAddress);
-      await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
     }
-    await this.chkSameAddress.check({ force: true });
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
+    await this.commonPage.check(this.chkSameAddress);
     await this.assertHelper.assertElementHidden(this.divShippingNewBlock);
   }
 
@@ -179,7 +167,6 @@ export class CheckoutPage extends CheckoutLocators {
     await this.inputBillingAddress1.clear();
     await this.inputBillingCity.clear();
     await this.ddlBillingCountry.selectOption('');
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
   }
 
   /**
@@ -224,7 +211,7 @@ export class CheckoutPage extends CheckoutLocators {
   async calculateInitialUnitPrice(): Promise<number> {
     await this.inputQty.waitFor({ state: 'visible' });
     const initialSubTotal = await this.getPriceValue(this.lblSubTotal, 'Sub-Total');
-    const initialQty = parseInt(await this.inputQty.inputValue());
+    const initialQty = Number.parseInt(await this.inputQty.inputValue());
     return initialSubTotal / initialQty;
   }
 
@@ -248,8 +235,7 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Check Same Address Checkbox to hide section')
   async verifyInitialShippingSectionHidden(): Promise<void> {
-    await this.chkSameAddress.check({ force: true });
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
+    await this.commonPage.check(this.chkSameAddress);
     await this.assertHelper.assertElementHidden(this.divShippingNewBlock);
   }
 
@@ -258,8 +244,7 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Uncheck Same Address Checkbox to reveal section')
   async verifyShippingSectionVisible(): Promise<void> {
-    await this.chkSameAddress.uncheck({ force: true });
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
+    await this.commonPage.uncheck(this.chkSameAddress);
     await this.assertHelper.assertElementVisible(this.divShippingNewBlock);
   }
 
@@ -278,9 +263,8 @@ export class CheckoutPage extends CheckoutLocators {
   @step('Accept Terms and Continue')
   async acceptTermsAndContinue(): Promise<void> {
     await this.commonPage.scrollTo(this.chkAgreeTerms);
-    await this.chkAgreeTerms.check({ force: true });
+    await this.commonPage.check(this.chkAgreeTerms);
     await this.commonPage.click(this.btnSaveCheckout);
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
   }
 
   /**
@@ -297,7 +281,7 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Clear Shipping Address Form')
   async clearShippingAddressForm(): Promise<void> {
-    await this.chkSameAddress.uncheck({ force: true });
+    await this.commonPage.uncheck(this.chkSameAddress);
     if (await this.radioShippingNewAddress.isVisible()) {
       await this.commonPage.click(this.radioShippingNewAddress);
     }
@@ -324,7 +308,6 @@ export class CheckoutPage extends CheckoutLocators {
   async selectExistingBillingAddress(): Promise<void> {
     if (await this.radioBillingExistingAddress.isVisible()) {
       await this.commonPage.click(this.radioBillingExistingAddress);
-      await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
     }
   }
 
@@ -333,10 +316,10 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Verify Shipping Form Toggle')
   async verifyShippingFormToggle(): Promise<void> {
-    await this.radioShippingNewAddress.check({ force: true });
+    await this.commonPage.check(this.radioShippingNewAddress);
     await this.assertHelper.assertElementVisible(this.inputShippingFirstName);
 
-    await this.radioShippingExistingAddress.check({ force: true });
+    await this.commonPage.check(this.radioShippingExistingAddress);
     await this.assertHelper.assertElementHidden(this.inputShippingFirstName);
   }
 
@@ -345,7 +328,7 @@ export class CheckoutPage extends CheckoutLocators {
    */
   @step('Verify Shipping Section Hidden Again')
   async verifyShippingSectionHiddenAgain(): Promise<void> {
-    await this.chkSameAddress.check({ force: true });
+    await this.commonPage.check(this.chkSameAddress);
     await this.assertHelper.assertElementHidden(this.divShippingNewBlock);
 
   }
@@ -357,11 +340,11 @@ export class CheckoutPage extends CheckoutLocators {
   @step('Set Terms and Conditions Checkbox')
   async setTermsAndConditions(flag: boolean = true): Promise<void> {
     await this.commonPage.scrollTo(this.chkAgreeTerms);
-    const propChkAgreeTerms = await this.chkAgreeTerms.isChecked();
-    if (propChkAgreeTerms !== flag) {
-      await this.commonPage.click(this.chkAgreeTerms);
+    if (flag) {
+      await this.commonPage.check(this.chkAgreeTerms);
+    } else {
+      await this.commonPage.uncheck(this.chkAgreeTerms);
     }
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
   }
 
   /**
@@ -392,7 +375,6 @@ export class CheckoutPage extends CheckoutLocators {
   async selectBillingCountry(countryName: string): Promise<void> {
     await this.commonPage.scrollTo(this.ddlBillingCountry);
     await this.ddlBillingCountry.selectOption({ label: countryName });
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.PERFORM_LOADING * 1000);
   }
 
   /**
@@ -407,18 +389,16 @@ export class CheckoutPage extends CheckoutLocators {
   }
 
   /**
-   * Toggles the "Same Address" checkbox based on the provided boolean value.
-   * @param check Determines whether to check or uncheck the checkbox.
+   * Toggles the "Same Address" checkbox to the desired state. No-op when
+   * the checkbox is already in that state — clicking it then would silently
+   * flip it the wrong way.
+   * @param check `true` to check, `false` to uncheck.
    */
   @step('Toggle "Same Address" Checkbox')
   async toggleSameAddressCheckbox(check: boolean): Promise<void> {
     await this.commonPage.scrollTo(this.chkSameAddress);
-    const isChecked = await this.chkSameAddress.isChecked();
-    if (check && !isChecked) {
-      await this.commonPage.click(this.chkSameAddress);
-    } else if (!check && isChecked) {
+    if ((await this.chkSameAddress.isChecked()) !== check) {
       await this.commonPage.click(this.chkSameAddress);
     }
-    await this.commonPage.waitForMillis(Constants.TIMEOUTS.BUFFER_STEP_SECONDS * 1000);
   }
 }

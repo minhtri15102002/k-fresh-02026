@@ -8,7 +8,7 @@ const product: Product = getEnvProduct();
 
 test.describe('Cart API Module - Comprehensive Testing', () => {
 
-  test('TC01 - Add product to cart', async ({ apiPage }) => {
+  test('TC01 - Add product to cart', { tag: ['@P1', '@critical', '@smoke', '@regression', '@api', '@cart'] }, async ({ apiPage }) => {
     const startTime = Date.now();
     const response = await apiPage.apiPostRequest('index.php?route=checkout/cart/add', undefined, {
       form: {
@@ -51,7 +51,7 @@ test.describe('Cart API Module - Comprehensive Testing', () => {
     Assertions.assertNotNull(body.total, 'Response should contain total cart info');
   });
 
-  test('TC02 - Update product quantity in cart', async ({ apiPage, cartPage }) => {
+  test('TC02 - Update product quantity in cart', { tag: ['@P2', '@major', '@regression', '@api', '@cart'] }, async ({ apiPage, cartPage }) => {
     // Setup: Add product first
     await apiPage.apiPostRequest('index.php?route=checkout/cart/add', undefined, {
       form: {
@@ -102,7 +102,7 @@ test.describe('Cart API Module - Comprehensive Testing', () => {
     await cartPage.verifyUpdatedProductQuantity({ ...product, quantity: updatedQuantity });
   });
 
-  test('TC03 - Remove product from cart', async ({ apiPage, cartPage }) => {
+  test('TC03 - Remove product from cart', { tag: ['@P2', '@major', '@regression', '@api', '@cart'] }, async ({ apiPage, cartPage }) => {
     // Setup: Add product first
     await apiPage.apiPostRequest('index.php?route=checkout/cart/add', undefined, {
       form: {

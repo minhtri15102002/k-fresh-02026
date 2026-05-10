@@ -21,7 +21,7 @@ test.describe('My Account Tests', () => {
     await profilePage.clickMyAccountBtn();
   });
 
-  test('TC001 - My Account Dashboard', async ({
+  test('TC-01 - My Account Dashboard', { tag: ['@P3', '@minor', '@regression', '@ui', '@profile'] }, async ({
     profilePage,
   }) => {
     await profilePage.verifyMyAccountPage();
@@ -31,7 +31,7 @@ test.describe('My Account Tests', () => {
     await profilePage.expectModifyAddressShortcuts();
   });
 
-  test('TC002 - Update Account Information', async ({
+  test('TC-02 - Update Account Information', { tag: ['@P2', '@major', '@regression', '@ui', '@profile'] }, async ({
     profilePage,
   }) => {
     const updatedData = createUpdateProfileData();
@@ -44,7 +44,7 @@ test.describe('My Account Tests', () => {
     await profilePage.expectEditAccountValues(updatedDataForProfile);
   });
 
-  test('TC003 - Add New Address', async ({
+  test('TC-03 - Add New Address', { tag: ['@P2', '@major', '@regression', '@ui', '@profile'] }, async ({
     profilePage,
   }) => {
     const addressData = createAddressData();
@@ -55,7 +55,7 @@ test.describe('My Account Tests', () => {
     await profilePage.expectAddressPresent(addressData);
   });
 
-  test('TC004 - Logout', async ({
+  test('TC-04 - Logout', { tag: ['@P1', '@critical', '@smoke', '@regression', '@ui', '@auth'] }, async ({
     profilePage,
   }) => {
     await profilePage.verifyMyAccountPage();
@@ -66,8 +66,8 @@ test.describe('My Account Tests', () => {
   });
 });
 
-test.describe('TC005 - Change Password', () => {
-  test('should change password from My Account right after register', async ({
+test.describe('Change Password', () => {
+  test('TC-05 - Change password from My Account right after register', { tag: ['@P1', '@critical', '@smoke', '@regression', '@ui', '@auth'] }, async ({
     commonPage,
     registerPage,
     profilePage,

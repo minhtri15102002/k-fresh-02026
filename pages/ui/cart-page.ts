@@ -7,6 +7,10 @@ import { Currency } from '@utilities/currency';
 import { AssertHelper } from '@utilities/assert-helper';
 import { Assertions } from '@utilities/assertions';
 
+// Captures OpenCart's cart-key arg from `onclick="cart.remove('<key>')"`.
+// Hoisted to module scope so it isn't recompiled on every call.
+const CART_REMOVE_KEY_RE = /cart\.remove\('([^']+)'\)/;
+
 export class CartPage extends CartLocators {
 
   commonPage: CommonPage;
@@ -94,15 +98,17 @@ export class CartPage extends CartLocators {
   }
 
   /**
-   * Removes all products from the cart if any exist
+   * Removes all products from the cart by clicking the first remove button
+   * until none remain. Each iteration waits for the row count to drop by
+   * exactly one before clicking again, avoiding races against detach
+   * animations and bounding the loop to the initial cart size.
    */
   @step('Removing all products from the cart')
   async removeAllProducts(): Promise<void> {
-    let removeButtonsCount = await this.commonPage.count(this.btnRemoveItems);
-    while (removeButtonsCount > 0) {
+    const initialCount = await this.commonPage.count(this.btnRemoveItems);
+    for (let expected = initialCount - 1; expected >= 0; expected--) {
       await this.commonPage.click(this.btnRemoveItems.first());
-      await this.commonPage.waitForMillis(1000);
-      removeButtonsCount = await this.commonPage.count(this.btnRemoveItems);
+      await this.assertHelper.assertElementCount(this.btnRemoveItems, expected);
     }
   }
 
@@ -164,13 +170,11 @@ export class CartPage extends CartLocators {
    */
   @step('Get Product Key by Name')
   async getProductKey(productName: string): Promise<string> {
-    const onclick = await this.btnRemove(productName).getAttribute('onclick');
-    if (onclick) {
-      const match = onclick.match(/cart\.remove\('([^']+)'\)/);
-      if (match?.[1]) {
-        return match[1];
-      }
+    const onclick = await this.commonPage.getAttribute(this.btnRemove(productName), 'onclick');
+    const match   = CART_REMOVE_KEY_RE.exec(onclick);
+    if (!match?.[1]) {
+      throw new Error(`Could not find product key for product: ${productName}`);
     }
-    throw new Error(`Could not find product key for product: ${productName}`);
+    return match[1];
   }
 }
