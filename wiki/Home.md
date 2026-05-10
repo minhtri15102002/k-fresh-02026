@@ -1,8 +1,71 @@
 # Welcome to the ai-qa-training wiki
 
-> AI-assisted QA automation training repo built on **Playwright + TypeScript** with a strict **Page Object Model (POM)** structure, Allure reporting, multi-channel run notifications, and a curated library of prompts/skills for AI-assisted test authoring.
+> **A production-grade QA automation playground that doubles as a training curriculum.**
+> Real Playwright + TypeScript suite against an OpenCart e-commerce demo, a strict POM framework, a live multi-env QA Metrics dashboard, and a tightly-coupled library of AI prompts & Agent Skills — all wired together so a learner can read, run, extend, and ship tests on day one.
 
-**Website Under Test:** https://ecommerce-playground.lambdatest.io/
+| | |
+|---|---|
+| **Website Under Test** | <https://ecommerce-playground.lambdatest.io/> |
+| **Live QA Dashboard** | <https://khanhdodang.github.io/ai-qa-training/> *(QA env, auto-deployed from `main`)* |
+| **Source** | <https://github.com/khanhdodang/ai-qa-training> |
+| **Stack** | Playwright · TypeScript (strict) · Allure 3 · Chart.js · GitHub Actions |
+
+---
+
+## What this repo gives you
+
+Five things, working together — not five separate folders:
+
+1. **A real test suite.** ~46 manual test cases mapped 1:1 to Playwright specs (UI · API · hybrid), runnable against **qa / uat / staging** environments out of the box.
+2. **A strict framework.** Three-layer POM (`locators/` → `pages/` → `tests/`), `commonPage` discipline for actions, `assertHelper` + `Assertions` for verifications, web-first assertions, deterministic waits, test-tag guardrails.
+3. **A live QA cockpit.** A self-contained dashboard rendering execution metrics (`run-summary.json`), defects pulled from GitHub Issues (`defects.json`), and requirements ↔ TC ↔ spec traceability — auto-deployed per environment on every push to `main`.
+4. **An AI prompt + skill library.** ~25 curated prompts (`prompts/core` · `advanced` · `devops` · `reporting`) and 30+ Agent Skills (`.agents/skills/`) that already know this repo's conventions, so AI-generated code lands compliant on the first try.
+5. **A 33-module training curriculum.** Six phases (Foundations → Toolkit → Playwright Core → Framework → API & Quality → Quality at Scale → AI-Assisted QA) under [`training/`](https://github.com/khanhdodang/ai-qa-training/tree/main/training), each module backed by code in this repo.
+
+---
+
+## How it all flows
+
+```mermaid
+flowchart LR
+    REQ["Requirements / User Stories"] --> MTC["Manual TCs<br/>documents/manual-testcases/"]
+    MTC -->|prompts/core/test-generator| SPEC["Playwright specs<br/>tests/ui · tests/api"]
+    SPEC -->|playwright.config.ts| RUN["CI matrix<br/>qa · uat · staging"]
+    RUN --> REPORTERS["custom-reporter.ts<br/>+ allure"]
+    REPORTERS --> JSON["reports/*.json"]
+    GH["GitHub Issues<br/>label: bug"] -->|fetch-defects.ts| JSON
+    JSON --> DASH["QA Metrics Dashboard<br/>artifacts/*.live.html · *.pdf"]
+    DASH -->|deploy-pages job| PAGES["GitHub Pages<br/>per-env URLs"]
+    DASH -.->|gaps & flakes| MTC
+```
+
+The right-to-left feedback loop is the point: dashboards surface gaps and flakes, which open issues, which drive new TCs, which generate new specs.
+
+---
+
+## Live reports (auto-deployed from `main`)
+
+Every push to `main` runs the test matrix and publishes a per-env dashboard via [`.github/workflows/playwright.yml`](https://github.com/khanhdodang/ai-qa-training/blob/main/.github/workflows/playwright.yml):
+
+| Environment | Dashboard | Allure | Playwright |
+|---|---|---|---|
+| 🟢 **QA** *(canonical / site root)* | <https://khanhdodang.github.io/ai-qa-training/qa/> | [allure](https://khanhdodang.github.io/ai-qa-training/qa/allure/) | [playwright](https://khanhdodang.github.io/ai-qa-training/qa/playwright/) |
+| 🟡 **UAT** | <https://khanhdodang.github.io/ai-qa-training/uat/> | [allure](https://khanhdodang.github.io/ai-qa-training/uat/allure/) | [playwright](https://khanhdodang.github.io/ai-qa-training/uat/playwright/) |
+| 🔵 **Staging** | <https://khanhdodang.github.io/ai-qa-training/staging/> | [allure](https://khanhdodang.github.io/ai-qa-training/staging/allure/) | [playwright](https://khanhdodang.github.io/ai-qa-training/staging/playwright/) |
+
+> Each dashboard has an **environment badge**, a **Run Context** card (env · base URL · build · timestamp), and an in-page **switcher** that hops between the three envs without losing your scroll or theme.
+
+---
+
+## Where to start (by audience)
+
+| You are… | Start here | Then |
+|---|---|---|
+| **A new QA engineer** | [Quick Start](#quick-start) → run `npm test` → open the live HTML report | Read [`training/README.md`](https://github.com/khanhdodang/ai-qa-training/blob/main/training/README.md) and walk Phase 0 → Phase 2 |
+| **An automation engineer evaluating the framework** | [What's in this Repo](#whats-in-this-repo) → [Repository Layout](#repository-layout) → `pages/common-page.ts` | Skim [`documents/automation-framework/`](https://github.com/khanhdodang/ai-qa-training/tree/main/documents/automation-framework) and `prompts/core/pom-generator.md` |
+| **A QA manager / lead** | [QA Metrics Dashboard](QA-Metrics-Dashboard) (this wiki) | Open the [live QA dashboard](https://khanhdodang.github.io/ai-qa-training/qa/) — tabs 1·2·3·4 = TC coverage · execution · defects · traceability |
+| **An AI / prompt engineer** | [`prompts/core/pom-orchestrator.md`](https://github.com/khanhdodang/ai-qa-training/blob/main/prompts/core/pom-orchestrator.md) | Browse [`.agents/skills/`](https://github.com/khanhdodang/ai-qa-training/tree/main/.agents/skills) and `training/phase-6-ai-assisted-qa/` |
+| **A contributor** | [Contributing](#contributing) → `.github/pull_request_template.md` | Read `documents/husky-guidelines.md` and `prompts/core/test-tags.md` |
 
 ---
 
@@ -28,7 +91,7 @@
 
 **Prerequisites**
 
-- Node.js `>= 18` (LTS `v24.x` recommended, latest `v25.x` supported)
+- Node.js (LTS `v24.x` recommended, latest `v25.x` supported)
 - npm
 
 ```bash

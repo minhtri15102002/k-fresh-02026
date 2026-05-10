@@ -6,6 +6,16 @@
 
 **Wiki:** https://github.com/khanhdodang/ai-qa-training/wiki
 
+**Live QA Metrics Dashboard** (auto-deployed from `main` via [`.github/workflows/playwright.yml`](./.github/workflows/playwright.yml)):
+
+| Environment | Dashboard | Allure | Playwright |
+|---|---|---|---|
+| 🟢 QA *(canonical)* | <https://khanhdodang.github.io/ai-qa-training/qa/> | [allure](https://khanhdodang.github.io/ai-qa-training/qa/allure/) | [playwright](https://khanhdodang.github.io/ai-qa-training/qa/playwright/) |
+| 🟡 UAT | <https://khanhdodang.github.io/ai-qa-training/uat/> | [allure](https://khanhdodang.github.io/ai-qa-training/uat/allure/) | [playwright](https://khanhdodang.github.io/ai-qa-training/uat/playwright/) |
+| 🔵 Staging | <https://khanhdodang.github.io/ai-qa-training/staging/> | [allure](https://khanhdodang.github.io/ai-qa-training/staging/allure/) | [playwright](https://khanhdodang.github.io/ai-qa-training/staging/playwright/) |
+
+> The site root <https://khanhdodang.github.io/ai-qa-training/> mirrors the **QA** dashboard. The in-page environment switcher at the top of every dashboard hops between the three envs without leaving the report.
+
 ---
 
 ## Table of Contents
@@ -37,7 +47,7 @@
 
 - Playwright
 - TypeScript (strict mode, `bundler` module resolution)
-- Node.js (>= 18, LTS v24.x recommended, latest v25.x supported)
+- Node.js (LTS v24.x recommended, latest v25.x supported)
 - Page Object Model (POM)
 - ESLint (flat config) + Husky + lint-staged + Commitlint
 - Allure Report 3
@@ -77,7 +87,7 @@
 
 Before running this project, make sure the following are installed:
 
-- Node.js (>= 18, LTS v24.x recommended, latest v25.x supported)
+- Node.js (LTS v24.x recommended, latest v25.x supported)
 - npm
 
 Check installed versions:
@@ -241,6 +251,31 @@ A single-page report covering execution health, defects, and requirements tracea
 | `artifacts/qa-metrics-dashboard.live.html` | Self-contained snapshot — JSON inputs are inlined as base64 data URLs, so it opens directly in a browser (no server, no CORS). |
 
 A Markdown mirror of the same content lives at [`wiki/QA-Metrics-Dashboard.md`](./wiki/QA-Metrics-Dashboard.md) for the [GitHub Wiki](https://github.com/khanhdodang/ai-qa-training/wiki).
+
+### Live dashboards (GitHub Pages)
+
+Every push to `main` runs the test matrix across **qa / uat / staging** and the [`deploy-pages` job](./.github/workflows/playwright.yml) publishes a per-environment dashboard to GitHub Pages. The site is laid out as one folder per env, with the QA dashboard mirrored to the root so a bare URL always resolves:
+
+```
+https://khanhdodang.github.io/ai-qa-training/
+├── index.html              ← clone of qa/index.html (canonical landing)
+├── qa/
+│   ├── index.html          ← QA Metrics Dashboard (qa env)
+│   ├── allure/             ← Allure report
+│   └── playwright/         ← Playwright HTML report
+├── uat/        … same shape …
+└── staging/    … same shape …
+```
+
+| Environment | Dashboard | Allure | Playwright |
+|---|---|---|---|
+| QA *(canonical / root)* | <https://khanhdodang.github.io/ai-qa-training/qa/> | <https://khanhdodang.github.io/ai-qa-training/qa/allure/> | <https://khanhdodang.github.io/ai-qa-training/qa/playwright/> |
+| UAT | <https://khanhdodang.github.io/ai-qa-training/uat/> | <https://khanhdodang.github.io/ai-qa-training/uat/allure/> | <https://khanhdodang.github.io/ai-qa-training/uat/playwright/> |
+| Staging | <https://khanhdodang.github.io/ai-qa-training/staging/> | <https://khanhdodang.github.io/ai-qa-training/staging/allure/> | <https://khanhdodang.github.io/ai-qa-training/staging/playwright/> |
+
+Each dashboard renders an **environment badge** (`QA` / `UAT` / `STAGING`), a **Run Context** card (env, base URL, build ID, ran-at timestamp from `reports/run-summary.json`), and an in-page **switcher** that jumps between the three envs while preserving theme/scroll. If a single env is run via `workflow_dispatch`, the other two folders are simply omitted for that deploy — the switcher auto-hides them.
+
+> Deploys are gated to `push` events on `main` (PR runs upload artifacts but do not publish), so the URLs above always reflect the latest `main`.
 
 ### Refresh the dashboard
 

@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Security vulnerability (private)
+    url: https://github.com/khanhdodang/ai-qa-training/security/advisories/new
+    about: Please report security issues privately via GitHub Security Advisories — never in a public issue.
+  - name: 💬 Question / discussion
+    url: https://github.com/khanhdodang/ai-qa-training/discussions
+    about: Open-ended questions, design ideas, or "how do I…" go in Discussions, not Issues.
+  - name: 📚 Training curriculum
+    url: https://github.com/khanhdodang/ai-qa-training/tree/main/training
+    about: Look here before filing — your question might already be answered in a module.
+  - name: 🏷️ Defect label conventions
+    url: https://github.com/khanhdodang/ai-qa-training/blob/main/prompts/core/defect-labels.md
+    about: How `severity:*`, `module:*`, and `status:*` labels feed the QA Metrics dashboard.
